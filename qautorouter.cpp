@@ -16,6 +16,7 @@
 #include <QSettings>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QColorDialog>
 
 #include "ui_qautorouter.h"
 #include "ui_preferences.h"
@@ -34,6 +35,7 @@ QAutoRouter::QAutoRouter(QWidget *parent)
 	setupActions();
 	readSettings();
 	QObject::connect(this,SIGNAL(fault(QString)),this,SLOT(faultHandler(QString)));
+	QObject::connect(preferences->layerColors,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(layerColorDoubleClicked(QModelIndex)));
 	this->setWindowIcon(QIcon(":/icons/qautorouter.png"));
 	this->setWindowTitle("QAutoRouter "+QString(VERSION_STRING));
 	mTimer = startTimer(2000);
@@ -92,6 +94,27 @@ void QAutoRouter::wheelEvent(QWheelEvent * e)
 	e->accept();
 }
 
+void QAutoRouter::layerColorDoubleClicked(QModelIndex idx)
+{
+	QListWidgetItem* item = preferences->layerColors->currentItem();
+	QColorDialog dialog;
+	dialog.setCurrentColor(item->backgroundColor());
+	if ( dialog.exec())
+	{
+		item->setBackgroundColor(dialog.selectedColor());
+		for (int i = 0; i < pcb()->structure()->layers().count(); ++i)
+		{
+			if ( item->text() == pcb()->structure()->layers().at(i)->description() )
+			{
+				pcb()->structure()->layers().at(i)->setColor(dialog.selectedColor());
+				writeSettings();
+				break;
+			}
+		}
+	}
+	CSpecctraObject::scene()->update();
+}
+
 void QAutoRouter::populateLayersForm()
 {
 	if ( pcb() != NULL )
@@ -124,14 +147,14 @@ void QAutoRouter::writeSettings()
 		settings.setValue("size", size());
 		settings.setValue("pos", pos());
 	settings.endGroup();
-	settings.beginWriteArray("layers");
 
 	settings.beginGroup("layers");
 	if ( pcb()!=NULL)
 	{
-			for (int i = 0; i < pcb()->structure()->layers().count(); ++i)
+		for (int i = 0; i < pcb()->structure()->layers().count(); ++i)
 		{
-			settings.setValue(pcb()->structure()->layers().at(i)->name(), pcb()->structure()->layers().at(i)->toBytes());
+			QString layerName = pcb()->structure()->layers().at(i)->name();
+			settings.setValue(layerName, pcb()->structure()->layers().at(i)->toBytes());
 		}
 	}
 	settings.endGroup();
@@ -151,7 +174,8 @@ void QAutoRouter::readSettings()
 	{
 		for (int i = 0; i < pcb()->structure()->layers().count(); ++i)
 		{
-			QByteArray bytes = settings.value(pcb()->structure()->layers().at(i)->name()).toByteArray();
+			QString layerName = pcb()->structure()->layers().at(i)->name();
+			QByteArray bytes = settings.value(layerName).toByteArray();
 			if ( bytes.count() )
 			{
 				pcb()->structure()->layers().at(i)->fromBytes(bytes);
@@ -236,6 +260,7 @@ bool QAutoRouter::load(QFile& file)
 		root()->dump(); /** DEBUG */
 		if ( root()->objectClass() == "pcb" )
 		{
+			readSettings();
 			zoomFit();
 			rc=true;
 		}
@@ -292,6 +317,7 @@ bool QAutoRouter::maybeSave()
 void QAutoRouter::updateZoom()
 {
 	ui->graphicsView->scale(zoom(),zoom());
+	CSpecctraObject::scene()->update();
 }
 
 void QAutoRouter::zoomIn()

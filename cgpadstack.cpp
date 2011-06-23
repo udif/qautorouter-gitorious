@@ -45,7 +45,11 @@ void CGPadstack::clear()
   */
 CPcb* CGPadstack::pcb()
 {
-	return place()->pcb();
+	if ( place() != NULL )
+	{
+		return place()->pcb();
+	}
+	return NULL;
 }
 
 /**
@@ -54,17 +58,6 @@ CPcb* CGPadstack::pcb()
 void CGPadstack::addPad(CGPad* pad)
 {
 	mPads.insert(pad->layer(),pad);
-	/** FIXME HACK */
-	if ( pad->layer() == "Copper" )
-	{
-		for(int n=0; n < pcb()->structure()->layers().count(); n++)
-		{
-			if (pcb()->structure()->layers().at(n)->name() == "Copper" )
-			{
-				pcb()->structure()->layers().at(n)->setColor(QColor(0,0xA0,0));
-			}
-		}
-	}
 }
 
 /**

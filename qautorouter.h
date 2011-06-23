@@ -41,6 +41,7 @@ class QAutoRouter : public QMainWindow
 		void					faultHandler(QString txt);
 
 	protected slots:
+		void					layerColorDoubleClicked(QModelIndex idx);
 		void					readSettings();
 		void					writeSettings();
 		void					editPreferences();
