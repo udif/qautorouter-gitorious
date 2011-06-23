@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/configure.png</file>
+        <file>icons/exit.png</file>
+        <file>icons/fileopen.png</file>
+        <file>icons/filesave.png</file>
+        <file>icons/filesaveas.png</file>
+        <file>icons/help.png</file>
+        <file>icons/player_pause.png</file>
+        <file>icons/player_play.png</file>
+        <file>icons/player_stop.png</file>
+        <file>icons/qautorouter.png</file>
+        <file>icons/redo.png</file>
+        <file>icons/undo.png</file>
+        <file>icons/viewmag-.png</file>
+        <file>icons/viewmag.png</file>
+        <file>icons/viewmag1.png</file>
+        <file>icons/viewmag+.png</file>
+        <file>icons/viewmagfit.png</file>
+    </qresource>
+</RCC>
