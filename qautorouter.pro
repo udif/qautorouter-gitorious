@@ -26,7 +26,6 @@ SOURCES += main.cpp \
     cpcboutline.cpp \
     cpcbpath.cpp \
     cpcbpadstack.cpp \
-    cpcbrender.cpp \
     cpcbshape.cpp \
     cpcbcircle.cpp \
     cpcbrect.cpp \
@@ -53,7 +52,6 @@ HEADERS += qautorouter.h \
     cpcboutline.h \
     cpcbpath.h \
     cpcbpadstack.h \
-    cpcbrender.h \
     cpcbpadstack.h \
     cpcbshape.h \
     cpcbcircle.h \
