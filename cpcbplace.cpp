@@ -23,6 +23,7 @@ CPcbPlace::CPcbPlace(QGraphicsItem *parent)
 , mPadstacksCreated(false)
 {
 	CSpecctraObject::scene()->addItem(this);
+	setOpacity(0.35);
 }
 
 CPcbPlace::~CPcbPlace()
