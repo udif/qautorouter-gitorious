@@ -31,6 +31,7 @@ class CGPadstack : public QObject
 		QString						unitRef();
 		QPointF						pos();
 
+		static void					clear();
 		static CGPadstack*			padstack(QString unitRef);
 		static QMap<QString,CGPadstack*> padstacks() {return mGPadstacks;}
 

@@ -162,8 +162,8 @@ void QAutoRouter::setupActions()
 	ui->actionQuit->setIcon(QIcon(":/icons/exit.png"));
 	ui->actionOptions->setIcon(QIcon(":/icons/configure.png"));
 	ui->actionZoom_Fit->setIcon(QIcon(":/icons/viewmagfit.png"));
-	ui->actionZoom_In->setIcon(QIcon(":/icons/viewmag-.png"));
-	ui->actionZoom_Out->setIcon(QIcon(":/icons/viewmag+.png"));
+	ui->actionZoom_In->setIcon(QIcon(":/icons/viewmag+.png"));
+	ui->actionZoom_Out->setIcon(QIcon(":/icons/viewmag-.png"));
 	ui->actionAbout->setIcon(QIcon(":/icons/qautorouter.png"));
 
 	ui->actionQuit->setShortcut((QKeySequence(tr("Ctrl+Q"))));
@@ -179,6 +179,21 @@ void QAutoRouter::setupActions()
 	QObject::connect(ui->actionZoom_Fit,SIGNAL(triggered()),this,SLOT(zoomFit()));
 	QObject::connect(ui->actionOptions,SIGNAL(triggered()),this,SLOT(editPreferences()));
 	QObject::connect(ui->actionAbout,SIGNAL(triggered()),this,SLOT(about()));
+
+	QToolBar* file = addToolBar("File");
+	file->addAction(ui->actionOpen);
+	file->addAction(ui->actionQuit);
+
+	QToolBar* view = addToolBar("View");
+	view->addAction(ui->actionZoom_In);
+	view->addAction(ui->actionZoom_Out);
+	view->addAction(ui->actionZoom_Fit);
+
+	QToolBar* settings = addToolBar("Settings");
+	settings->addAction(ui->actionOptions);
+
+	QToolBar* help = addToolBar("Help");
+	help->addAction(ui->actionAbout);
 }
 
 
