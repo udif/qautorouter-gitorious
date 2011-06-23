@@ -3,6 +3,10 @@
 * Author: Mike Sharkey <mike@pikeaero.com>                                     *
 *******************************************************************************/
 #include "cpcb.h"
+#include "cpcbstructure.h"
+#include "cpcbplacement.h"
+#include "cpcblibrary.h"
+#include "cpcbnetwork.h"
 
 #define inherited CSpecctraObject
 
@@ -42,6 +46,7 @@ CPcbPlacement* CPcb::placement()
 	return NULL;
 
 }
+
 /**
   * @return the pcb library object
   */
@@ -51,6 +56,20 @@ CPcbLibrary* CPcb::library()
 	if ( i != NULL )
 	{
 		return (CPcbLibrary*)i;
+	}
+	return NULL;
+
+}
+
+/**
+  * @return the pcb network object
+  */
+CPcbNetwork* CPcb::network()
+{
+	CSpecctraObject* i = child("network");
+	if ( i != NULL )
+	{
+		return (CPcbNetwork*)i;
 	}
 	return NULL;
 

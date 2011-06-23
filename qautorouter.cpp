@@ -5,6 +5,10 @@
 #include "qautorouter.h"
 #include "cspecctrareader.h"
 #include "cpcbstructure.h"
+#include "cgpadstack.h"
+#include "cpcbnetwork.h"
+#include "cpcbnet.h"
+#include "cpcb.h"
 
 #include <QTextStream>
 #include <QFileDialog>
@@ -15,8 +19,6 @@
 
 #include "ui_qautorouter.h"
 #include "ui_preferences.h"
-
-#include "cgpadstack.h"
 
 QAutoRouter::QAutoRouter(QWidget *parent)
 : QMainWindow(parent)
@@ -34,6 +36,7 @@ QAutoRouter::QAutoRouter(QWidget *parent)
 	QObject::connect(this,SIGNAL(fault(QString)),this,SLOT(faultHandler(QString)));
 	this->setWindowIcon(QIcon(":/icons/qautorouter.png"));
 	this->setWindowTitle("QAutoRouter "+QString(VERSION_STRING));
+	mTimer = startTimer(2000);
 }
 
 QAutoRouter::~QAutoRouter()
@@ -42,6 +45,16 @@ QAutoRouter::~QAutoRouter()
 		delete mRoot;
 	delete ui;
 	delete preferences;
+}
+
+CPcb* QAutoRouter::pcb()
+{
+	CSpecctraObject* obj = root();
+	if ( obj != NULL && obj->objectClass()=="pcb")
+	{
+		return (CPcb*)root();
+	}
+	return NULL;
 }
 
 void QAutoRouter::closeEvent(QCloseEvent* e)
@@ -81,15 +94,14 @@ void QAutoRouter::wheelEvent(QWheelEvent * e)
 
 void QAutoRouter::populateLayersForm()
 {
-	if ( root() != NULL && root()->objectClass()=="pcb")
+	if ( pcb() != NULL )
 	{
-		CPcb* pcb = (CPcb*)root();
 		preferences->layerColors->clear();
-		for (int i = 0; i < pcb->structure()->layers().count(); ++i)
+		for (int i = 0; i < pcb()->structure()->layers().count(); ++i)
 		{
 			QListWidgetItem* item = new QListWidgetItem(preferences->layerColors);
-			item->setBackground(pcb->structure()->layers().at(i)->color());
-			item->setText(pcb->structure()->layers().at(i)->description());
+			item->setBackground(pcb()->structure()->layers().at(i)->color());
+			item->setText(pcb()->structure()->layers().at(i)->description());
 			preferences->layerColors->addItem(item);
 		}
 	}
@@ -115,12 +127,11 @@ void QAutoRouter::writeSettings()
 	settings.beginWriteArray("layers");
 
 	settings.beginGroup("layers");
-	if ( root() != NULL && root()->objectClass()=="pcb")
+	if ( pcb()!=NULL)
 	{
-		CPcb* pcb = (CPcb*)root();
-		for (int i = 0; i < pcb->structure()->layers().count(); ++i)
+			for (int i = 0; i < pcb()->structure()->layers().count(); ++i)
 		{
-			settings.setValue(pcb->structure()->layers().at(i)->name(), pcb->structure()->layers().at(i)->toBytes());
+			settings.setValue(pcb()->structure()->layers().at(i)->name(), pcb()->structure()->layers().at(i)->toBytes());
 		}
 	}
 	settings.endGroup();
@@ -136,15 +147,14 @@ void QAutoRouter::readSettings()
 	settings.endGroup();
 
 	settings.beginGroup("layers");
-	if ( root() != NULL && root()->objectClass()=="pcb")
+	if ( pcb()!=NULL)
 	{
-		CPcb* pcb = (CPcb*)root();
-		for (int i = 0; i < pcb->structure()->layers().count(); ++i)
+		for (int i = 0; i < pcb()->structure()->layers().count(); ++i)
 		{
-			QByteArray bytes = settings.value(pcb->structure()->layers().at(i)->name()).toByteArray();
+			QByteArray bytes = settings.value(pcb()->structure()->layers().at(i)->name()).toByteArray();
 			if ( bytes.count() )
 			{
-				pcb->structure()->layers().at(i)->fromBytes(bytes);
+				pcb()->structure()->layers().at(i)->fromBytes(bytes);
 			}
 		}
 	}
@@ -230,7 +240,11 @@ bool QAutoRouter::load(QFile& file)
 			rc=true;
 		}
 		else
+		{
 			emit fault("root class 'pcb'' expected.");
+			clear();
+			rc=false;
+		}
 		file.close();
 	}
 	return rc;
@@ -326,4 +340,19 @@ void QAutoRouter::about()
 void QAutoRouter::faultHandler(QString txt)
 {
 	QMessageBox::information(this,"Information",txt);
+}
+
+void QAutoRouter::timerEvent(QTimerEvent* e)
+{
+	if ( e->timerId() == mTimer )
+	{
+		if (pcb() != NULL )
+		{
+			CPcbNetwork* network = pcb()->network();
+			if ( network!=NULL )
+			{
+				statusBar()->showMessage( tr("Nets: ")+QString::number(network->nets()) + " " + tr("Routed: ")+QString::number(network->routed()));
+			}
+		}
+	}
 }

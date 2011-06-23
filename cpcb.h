@@ -11,6 +11,7 @@
 class CPcbStructure;
 class CPcbPlacement;
 class CPcbLibrary;
+class CPcbNetwork;
 class CPcb : public CSpecctraObject
 {
 	Q_OBJECT
@@ -21,6 +22,7 @@ class CPcb : public CSpecctraObject
 		CPcbStructure*				structure();
 		CPcbPlacement*				placement();
 		CPcbLibrary*				library();
+		CPcbNetwork*				network();
 };
 
 #endif // CPCB_H

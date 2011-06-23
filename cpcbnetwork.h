@@ -21,6 +21,7 @@ class CPcbNetwork : public CSpecctraObject
 		int								nets();
 		CPcbNet*						net(int idx);
 		CPcbNet*						net(QString name);
+		int								routed();
 
 	private:
 		int								nNets;

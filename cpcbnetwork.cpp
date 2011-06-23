@@ -78,4 +78,19 @@ CPcbNet* CPcbNetwork::net(QString name)
 	return NULL;
 }
 
+/**
+  * @return tally up the unrouted
+  */
+int CPcbNetwork::routed()
+{
+	int tot=0;
+	for(int n=0; n < nets(); n++)
+	{
+		if ( net(n)->routed() )
+		{
+			++tot;
+		}
+	}
+	return tot;
+}
 

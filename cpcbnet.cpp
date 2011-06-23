@@ -10,6 +10,7 @@
 
 CPcbNet::CPcbNet(QGraphicsItem *parent)
 : inherited(parent)
+, mRouted(false)
 {
 	CSpecctraObject::scene()->addItem(this);
 }

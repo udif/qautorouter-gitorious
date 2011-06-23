@@ -22,6 +22,7 @@ namespace Ui {
 
 #define VERSION_STRING	"V0.0.1"
 
+class CPcb;
 class QAutoRouter : public QMainWindow
 {
     Q_OBJECT
@@ -30,6 +31,7 @@ class QAutoRouter : public QMainWindow
 		~QAutoRouter();
 		double					zoom() {return mZoom;}
 		CSpecctraObject*		root() {return mRoot;}
+		CPcb*					pcb();
 	signals:
 		void					fault(QString txt);
 	public slots:
@@ -55,6 +57,7 @@ class QAutoRouter : public QMainWindow
 		void					changeEvent(QEvent *e);
 		void					closeEvent(QCloseEvent* e);
 		void					wheelEvent ( QWheelEvent * event );
+		void					timerEvent(QTimerEvent* e);
 
 	private:
 		Ui::QAutoRouter*		ui;
@@ -62,6 +65,7 @@ class QAutoRouter : public QMainWindow
 		double					mZoom;
 		QDialog					mPreferencesDialog;
 		CSpecctraObject*		mRoot;
+		int						mTimer;
 };
 
 #endif // QAUTOROUTER_H

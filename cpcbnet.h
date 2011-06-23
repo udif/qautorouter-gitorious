@@ -20,12 +20,14 @@ class CPcbNet : public CSpecctraObject
 		virtual ~CPcbNet();
 
 		QString						name();
+		bool						routed() {return mRouted;}
 
 		virtual QRectF				boundingRect() const;
 		virtual QPainterPath		shape() const;
 		virtual void				paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget);
 	private:
 		QPainterPath				mShape;
+		bool						mRouted;
 };
 
 #endif // CPCBNET_H
