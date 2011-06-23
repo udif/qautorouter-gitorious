@@ -1,0 +1,11 @@
+
+Unix/Linux build depends on libqt4-dev package.
+
+$ qmake && make
+
+
+Windows:
+
+Install qtcreator and open qautorouter.pro, press "Build All".
+
+
