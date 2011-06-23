@@ -1,4 +1,4 @@
-(pcb "/media/docs/michael/projects/All-PikeAero/s100/pcbs/spi4/spi4.dsn"
+(pcb "/media/docs/michael/projects/qautorouter/spi4.dsn"
   (parser
     (string_quote ")
     (space_in_quoted_tokens on)

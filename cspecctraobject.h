@@ -28,6 +28,8 @@ class CSpecctraObject : public QObject, public QGraphicsItem /* QGraphicsPathIte
 		CSpecctraObject( const CSpecctraObject& other,QGraphicsItem* paernt=NULL);
 		virtual ~CSpecctraObject();
 
+		virtual QString					toText(int lvl=0);
+
 		CSpecctraObject&				copy( const CSpecctraObject& other );
 		CSpecctraObject&				operator=( const CSpecctraObject & other )		{return copy( other ); }
 
@@ -50,6 +52,7 @@ class CSpecctraObject : public QObject, public QGraphicsItem /* QGraphicsPathIte
 		virtual void					dump(int lvl=0);
 
 		static QGraphicsScene*			scene();
+
 
 	signals:
 		void							fault(QString txt);

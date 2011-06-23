@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>400</height>
+    <width>666</width>
+    <height>499</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,17 +25,10 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>600</width>
+     <width>666</width>
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionOpen"/>
-    <addaction name="actionQuit"/>
-   </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
@@ -55,6 +48,16 @@
      <string>Settings</string>
     </property>
     <addaction name="actionOptions"/>
+   </widget>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionSave_As"/>
+	<addaction name="separator"/>
+	<addaction name="actionQuit"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuView"/>
@@ -106,6 +109,16 @@
   <action name="actionOptions">
    <property name="text">
     <string>Preferences...</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="actionSave_As">
+   <property name="text">
+    <string>Save As...</string>
    </property>
   </action>
  </widget>

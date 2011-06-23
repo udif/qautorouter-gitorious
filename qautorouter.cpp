@@ -201,21 +201,26 @@ void QAutoRouter::changeEvent(QEvent *e)
 void QAutoRouter::setupActions()
 {
 	ui->actionOpen->setIcon(QIcon(":/icons/fileopen.png"));
+	ui->actionSave->setIcon(QIcon(":/icons/filesave.png"));
+	ui->actionSave_As->setIcon(QIcon(":/icons/filesaveas.png"));
 	ui->actionQuit->setIcon(QIcon(":/icons/exit.png"));
-	ui->actionOptions->setIcon(QIcon(":/icons/configure.png"));
 	ui->actionZoom_Fit->setIcon(QIcon(":/icons/viewmagfit.png"));
 	ui->actionZoom_In->setIcon(QIcon(":/icons/viewmag+.png"));
 	ui->actionZoom_Out->setIcon(QIcon(":/icons/viewmag-.png"));
+	ui->actionOptions->setIcon(QIcon(":/icons/configure.png"));
 	ui->actionAbout->setIcon(QIcon(":/icons/qautorouter.png"));
 
 	ui->actionQuit->setShortcut((QKeySequence(tr("Ctrl+Q"))));
 	ui->actionOpen->setShortcut((QKeySequence(tr("Ctrl+O"))));
+	ui->actionSave->setShortcut((QKeySequence(tr("Ctrl+S"))));
 	ui->actionZoom_In->setShortcut((QKeySequence(tr("Ctrl++"))));
 	ui->actionZoom_Out->setShortcut((QKeySequence(tr("Ctrl+-"))));
 	ui->actionZoom_Fit->setShortcut((QKeySequence(tr("Ctrl+0"))));
 
-	QObject::connect(ui->actionQuit,SIGNAL(triggered()),this,SLOT(close()));
 	QObject::connect(ui->actionOpen,SIGNAL(triggered()),this,SLOT(open()));
+	QObject::connect(ui->actionSave,SIGNAL(triggered()),this,SLOT(save()));
+	QObject::connect(ui->actionSave_As,SIGNAL(triggered()),this,SLOT(saveAs()));
+	QObject::connect(ui->actionQuit,SIGNAL(triggered()),this,SLOT(close()));
 	QObject::connect(ui->actionZoom_In,SIGNAL(triggered()),this,SLOT(zoomIn()));
 	QObject::connect(ui->actionZoom_Out,SIGNAL(triggered()),this,SLOT(zoomOut()));
 	QObject::connect(ui->actionZoom_Fit,SIGNAL(triggered()),this,SLOT(zoomFit()));
@@ -224,6 +229,8 @@ void QAutoRouter::setupActions()
 
 	QToolBar* file = addToolBar("File");
 	file->addAction(ui->actionOpen);
+	file->addAction(ui->actionSave);
+	file->addAction(ui->actionSave_As);
 	file->addAction(ui->actionQuit);
 
 	QToolBar* view = addToolBar("View");
@@ -277,18 +284,44 @@ bool QAutoRouter::load(QFile& file)
 
 bool QAutoRouter::save()
 {
-	/** FIXME */
+	return saveAs();
+}
+
+bool QAutoRouter::saveAs()
+{
+	QString filename = mFileName;
+	filename.replace(".dsn",".ses");
+	if (pcb()!=NULL)
+	{
+		QFileDialog dialog(this,"Save",QDir::currentPath(),tr("Specctra Session (*.ses)"));
+		dialog.selectFile(filename);
+		if ( dialog.exec() && dialog.selectedFiles().count())
+		{
+			QFile file(dialog.selectedFiles().at(0));
+			if ( file.open(QIODevice::ReadWrite))
+			{
+				file.write(pcb()->toText(0).toAscii());
+				file.close();
+				return true;
+			}
+			else
+			{
+				emit fault("error saving '"+mFileName+"'");
+				return false;
+			}
+		}
+	}
 }
 
 void QAutoRouter::open()
 {
 	if ( maybeSave() )
 	{
-		QString fileName;
 		QFileDialog dialog(this,"Open",QDir::currentPath(),tr("Specctra Files (*.dsn)"));
 		if (dialog.exec())
 		{
-			QFile file(dialog.selectedFiles().at(0));
+			mFileName = dialog.selectedFiles().at(0);
+			QFile file(mFileName);
 			if ( !load(file) )
 			{
 				emit fault("load file failed.");

@@ -47,6 +47,7 @@ class QAutoRouter : public QMainWindow
 		void					editPreferences();
 		void					open();
 		bool					save();
+		bool					saveAs();
 		void					zoomIn();
 		void					zoomOut();
 		void					zoomFit();
@@ -67,6 +68,7 @@ class QAutoRouter : public QMainWindow
 		QDialog					mPreferencesDialog;
 		CSpecctraObject*		mRoot;
 		int						mTimer;
+		QString					mFileName;
 };
 
 #endif // QAUTOROUTER_H

@@ -33,6 +33,28 @@ CSpecctraObject::~CSpecctraObject()
 	mChildren.clear();
 }
 
+QString CSpecctraObject::toText(int lvl)
+{
+	QString fill;
+	QString text;
+	fill.fill(' ',lvl*2);
+	text += fill;
+	text += "("+objectClass()+" ";
+	text += properties().join(" ");
+	if ( children().count() )
+	{
+		text += "\n";
+		for(int n=0;n<children().count();n++)
+		{
+			CSpecctraObject* child = children().at(n);
+			text += child->toText(lvl+1);
+		}
+		text += fill;
+	}
+	text += ")\n";
+	return text;
+}
+
 CSpecctraObject* CSpecctraObject::root()
 {
 	if ( parentObject() != NULL )
