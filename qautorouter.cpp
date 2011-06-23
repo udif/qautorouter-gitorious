@@ -4,14 +4,19 @@
 *******************************************************************************/
 #include "qautorouter.h"
 #include "cspecctrareader.h"
+#include "cpcbstructure.h"
 
 #include <QTextStream>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
+#include <QListWidget>
+#include <QListWidgetItem>
 
 #include "ui_qautorouter.h"
 #include "ui_preferences.h"
+
+#include "cgpadstack.h"
 
 QAutoRouter::QAutoRouter(QWidget *parent)
 : QMainWindow(parent)
@@ -66,8 +71,25 @@ void QAutoRouter::wheelEvent ( QWheelEvent * event )
 	event->accept();
 }
 
+void QAutoRouter::populateLayersForm()
+{
+	if ( root() != NULL && root()->objectClass()=="pcb")
+	{
+		CPcb* pcb = (CPcb*)root();
+		preferences->layerColors->clear();
+		for (int i = 0; i < pcb->structure()->layers().count(); ++i)
+		{
+			QListWidgetItem* item = new QListWidgetItem(preferences->layerColors);
+			item->setBackground(pcb->structure()->layers().at(i)->color());
+			item->setText(pcb->structure()->layers().at(i)->description());
+			preferences->layerColors->addItem(item);
+		}
+	}
+}
+
 void QAutoRouter::editPreferences()
 {
+	populateLayersForm();
 	if ( mPreferencesDialog.exec() == QDialog::Accepted )
 	{
 		writeSettings();
@@ -82,6 +104,18 @@ void QAutoRouter::writeSettings()
 		settings.setValue("size", size());
 		settings.setValue("pos", pos());
 	settings.endGroup();
+	settings.beginWriteArray("layers");
+
+	settings.beginGroup("layers");
+	if ( root() != NULL && root()->objectClass()=="pcb")
+	{
+		CPcb* pcb = (CPcb*)root();
+		for (int i = 0; i < pcb->structure()->layers().count(); ++i)
+		{
+			settings.setValue(pcb->structure()->layers().at(i)->name(), pcb->structure()->layers().at(i)->toBytes());
+		}
+	}
+	settings.endGroup();
 }
 
 void QAutoRouter::readSettings()
@@ -92,19 +126,34 @@ void QAutoRouter::readSettings()
 		resize(settings.value("size", QSize(800, 600)).toSize());
 		move(settings.value("pos", QPoint(100, 100)).toPoint());
 	settings.endGroup();
+
+	settings.beginGroup("layers");
+	if ( root() != NULL && root()->objectClass()=="pcb")
+	{
+		CPcb* pcb = (CPcb*)root();
+		for (int i = 0; i < pcb->structure()->layers().count(); ++i)
+		{
+			QByteArray bytes = settings.value(pcb->structure()->layers().at(i)->name()).toByteArray();
+			if ( bytes.count() )
+			{
+				pcb->structure()->layers().at(i)->fromBytes(bytes);
+			}
+		}
+	}
+	settings.endGroup();
 }
 
 
 void QAutoRouter::changeEvent(QEvent *e)
 {
-    QMainWindow::changeEvent(e);
-    switch (e->type()) {
-    case QEvent::LanguageChange:
-        ui->retranslateUi(this);
-        break;
-    default:
-        break;
-    }
+	QMainWindow::changeEvent(e);
+	switch (e->type()) {
+	case QEvent::LanguageChange:
+		ui->retranslateUi(this);
+		break;
+	default:
+		break;
+	}
 }
 
 void QAutoRouter::setupActions()

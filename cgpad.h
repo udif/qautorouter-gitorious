@@ -10,6 +10,7 @@
 #include <QString>
 #include <QGraphicsItem>
 
+class CPcb;
 class CGPadstack;
 class CGPad : public QObject, public QGraphicsItem
 {
@@ -18,9 +19,11 @@ class CGPad : public QObject, public QGraphicsItem
 		explicit CGPad(CGPadstack* padstack, QPainterPath shape, QString layer, QObject *parent = 0);
 
 		CGPadstack*					padstack() {return mPadstack;}
+		CPcb*						pcb();
 		QString						layer() {return mLayer;}
 		QString						pinRef();
 		QPointF						pos();
+		QColor						color();
 		virtual QRectF				boundingRect() const;
 		virtual QPainterPath		shape() const;
 		virtual void				paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget);

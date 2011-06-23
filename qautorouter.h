@@ -44,6 +44,7 @@ protected slots:
 	void					zoomFit();
 	void					about();
 protected:
+	void					populateLayersForm();
 	void					setupActions();
 	void					changeEvent(QEvent *e);
 	void					closeEvent(QCloseEvent* e);

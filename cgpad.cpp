@@ -5,6 +5,9 @@
 #include "cgpad.h"
 #include "cgpadstack.h"
 #include "cspecctraobject.h"
+#include "cpcb.h"
+#include "cpcbstructure.h"
+#include "cpcblayer.h"
 
 #include <QPainter>
 #include <QPainterPath>
@@ -19,7 +22,32 @@ CGPad::CGPad(CGPadstack* padstack, QPainterPath shape, QString layer, QObject *p
 {
 	padstack->addPad(this);
 	CSpecctraObject::scene()->addItem(this);
+	setOpacity(0.35);
 }
+
+/**
+  * @brief convinience function to get the root pcb pointer.
+  */
+CPcb* CGPad::pcb()
+{
+	return padstack()->pcb();
+}
+
+QColor CGPad::color()
+{
+	QColor c;
+	QList<CPcbLayer*> layers = pcb()->structure()->layers();
+	for( int n=0; n < layers.count(); n++ )
+	{
+		if ( layers.at(n)->name() == layer() )
+		{
+			c =  layers.at(n)->color();
+			break;
+		}
+	}
+	return c;
+}
+
 
 QString CGPad::pinRef()
 {
@@ -60,8 +88,8 @@ void CGPad::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWid
 	painter->setRenderHint(QPainter::Antialiasing);
 	painter->scale(scale(),scale());
 	ppath.setFillRule(Qt::WindingFill);
-	painter->setPen(QPen(QColor(0xA0,0,0), 1, Qt::SolidLine,Qt::RoundCap,Qt::RoundJoin));
+	painter->setPen(QPen(color(), 1, Qt::SolidLine,Qt::RoundCap,Qt::RoundJoin));
 	painter->drawPath(ppath);
-	painter->fillPath(ppath,QColor(0xA0,0,0));
+	painter->fillPath(ppath,color());
 }
 

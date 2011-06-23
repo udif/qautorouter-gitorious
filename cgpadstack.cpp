@@ -4,6 +4,9 @@
 *******************************************************************************/
 #include "cgpadstack.h"
 #include "cpcbplace.h"
+#include "cpcb.h"
+#include "cpcbstructure.h"
+#include "cpcblayer.h"
 
 QMap<QString,CGPadstack*>	CGPadstack::mGPadstacks; /** indexed by "UNIT-PIN" string notation. */
 
@@ -20,6 +23,33 @@ CGPadstack::~CGPadstack()
 	if ( mGPadstacks.contains(unitRef()) )
 	{
 		mGPadstacks.take(unitRef());
+	}
+}
+
+/**
+  * @brief convinience function to get the root pcb pointer
+  */
+CPcb* CGPadstack::pcb()
+{
+	return place()->pcb();
+}
+
+/**
+  * @brief Add a pad to the padstack.
+  */
+void CGPadstack::addPad(CGPad* pad)
+{
+	mPads.insert(pad->layer(),pad);
+	/** FIXME HACK */
+	if ( pad->layer() == "Copper" )
+	{
+		for(int n=0; n < pcb()->structure()->layers().count(); n++)
+		{
+			if (pcb()->structure()->layers().at(n)->name() == "Copper" )
+			{
+				pcb()->structure()->layers().at(n)->setColor(QColor(0,0xA0,0));
+			}
+		}
 	}
 }
 

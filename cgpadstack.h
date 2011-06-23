@@ -13,6 +13,7 @@
 
 #include "cgpad.h"
 
+class CPcb;
 class CPcbPlace;
 class CGPadstack : public QObject
 {
@@ -21,8 +22,9 @@ class CGPadstack : public QObject
 		CGPadstack(CPcbPlace* place,QString pinRef,QObject *parent = 0);
 		virtual ~CGPadstack();
 
-		void						addPad(CGPad* pad) {mPads.insert(pad->layer(),pad);}
+		void						addPad(CGPad* pad);
 		CPcbPlace*					place();
+		CPcb*						pcb();
 		CGPad*						pad(QString layer);
 		QStringList					layers();
 		QString						pinRef();
