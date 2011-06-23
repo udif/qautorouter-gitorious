@@ -14,7 +14,6 @@
 #include <QWheelEvent>
 
 #include "cpcb.h"
-#include "cpcbrender.h"
 
 namespace Ui {
     class QAutoRouter;
