@@ -20,43 +20,48 @@ namespace Ui {
 	class preferences;
 }
 
-class QAutoRouter : public QMainWindow {
+#define VERSION_STRING	"V0.0.1"
+
+class QAutoRouter : public QMainWindow
+{
     Q_OBJECT
-public:
-	QAutoRouter(QWidget *parent = 0);
-    ~QAutoRouter();
-	double					zoom() {return mZoom;}
-	CSpecctraObject*		root() {return mRoot;}
-signals:
-	void					fault(QString txt);
-public slots:
-	void					clear();
-	void					updateZoom();
-	bool					load(QFile& file);
-	void					faultHandler(QString txt);
+	public:
+		QAutoRouter(QWidget *parent = 0);
+		~QAutoRouter();
+		double					zoom() {return mZoom;}
+		CSpecctraObject*		root() {return mRoot;}
+	signals:
+		void					fault(QString txt);
+	public slots:
+		void					clear();
+		void					updateZoom();
+		bool					load(QFile& file);
+		void					faultHandler(QString txt);
 
-protected slots:
-	void					readSettings();
-	void					writeSettings();
-	void					editPreferences();
-	void					open();
-	void					zoomIn();
-	void					zoomOut();
-	void					zoomFit();
-	void					about();
-protected:
-	void					populateLayersForm();
-	void					setupActions();
-	void					changeEvent(QEvent *e);
-	void					closeEvent(QCloseEvent* e);
-	void					wheelEvent ( QWheelEvent * event );
+	protected slots:
+		void					readSettings();
+		void					writeSettings();
+		void					editPreferences();
+		void					open();
+		bool					save();
+		void					zoomIn();
+		void					zoomOut();
+		void					zoomFit();
+		void					about();
+	protected:
+		bool					maybeSave();
+		void					populateLayersForm();
+		void					setupActions();
+		void					changeEvent(QEvent *e);
+		void					closeEvent(QCloseEvent* e);
+		void					wheelEvent ( QWheelEvent * event );
 
-private:
-	Ui::QAutoRouter*		ui;
-	Ui::preferences*		preferences;
-	double					mZoom;
-	QDialog					mPreferencesDialog;
-	CSpecctraObject*		mRoot;
+	private:
+		Ui::QAutoRouter*		ui;
+		Ui::preferences*		preferences;
+		double					mZoom;
+		QDialog					mPreferencesDialog;
+		CSpecctraObject*		mRoot;
 };
 
 #endif // QAUTOROUTER_H

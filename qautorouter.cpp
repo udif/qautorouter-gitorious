@@ -40,18 +40,26 @@ QAutoRouter::~QAutoRouter()
 {
 	if ( mRoot != NULL )
 		delete mRoot;
-    delete ui;
+	delete ui;
 	delete preferences;
 }
 
 void QAutoRouter::closeEvent(QCloseEvent* e)
 {
-	writeSettings();
+	if (maybeSave())
+	{
+		writeSettings();
+		e->accept();
+	}
+	else
+	{
+		e->ignore();
+	}
 }
 
-void QAutoRouter::wheelEvent ( QWheelEvent * event )
+void QAutoRouter::wheelEvent(QWheelEvent * e)
 {
-	int numDegrees = event->delta() / 8;
+	int numDegrees = e->delta() / 8;
 	int numSteps = numDegrees / 15;
 
 	if ( numSteps > 0 )
@@ -68,7 +76,7 @@ void QAutoRouter::wheelEvent ( QWheelEvent * event )
 			zoomOut();
 		}
 	}
-	event->accept();
+	e->accept();
 }
 
 void QAutoRouter::populateLayersForm()
@@ -228,18 +236,43 @@ bool QAutoRouter::load(QFile& file)
 	return rc;
 }
 
+bool QAutoRouter::save()
+{
+	/** FIXME */
+}
+
 void QAutoRouter::open()
 {
-	QString fileName;
-	QFileDialog dialog(this,"Open",QDir::currentPath(),tr("Specctra Files (*.dsn)"));
-	if (dialog.exec())
+	if ( maybeSave() )
 	{
-		QFile file(dialog.selectedFiles().at(0));
-		if ( !load(file) )
+		QString fileName;
+		QFileDialog dialog(this,"Open",QDir::currentPath(),tr("Specctra Files (*.dsn)"));
+		if (dialog.exec())
 		{
-			emit fault("load file failed.");
+			QFile file(dialog.selectedFiles().at(0));
+			if ( !load(file) )
+			{
+				emit fault("load file failed.");
+			}
 		}
 	}
+}
+
+bool QAutoRouter::maybeSave()
+{
+	if (CGPadstack::padstacks().count())
+	{
+		QMessageBox::StandardButton ret;
+		ret = QMessageBox::warning(this, tr("QAutoRouter"),
+									tr("The document has been modified.\n"
+									"Do you want to save your changes?"),
+									QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+		if (ret == QMessageBox::Save)
+			return save();
+		else if (ret == QMessageBox::Cancel)
+			return false;
+	}
+	return true;
 }
 
 void QAutoRouter::updateZoom()
@@ -267,7 +300,27 @@ void QAutoRouter::zoomFit()
 
 void QAutoRouter::about()
 {
-	QMessageBox::about (this, "QAutoRouter V0.0", tr("QAutoRouter V0.0 (C) 2011 Mike Sharkey <mike@pikeaero.com>"));
+	QMessageBox::about (this, "QAutoRouter V0.0", "QAutoRouter "+QString(VERSION_STRING)+" "
+													"(c) 2011 Pike Aerospace Research Corporation\n"
+													"\n"
+													"Mike Sharkey <mike@pikeaero.com>\n"
+													"http://8bit.zapto.org\n"
+													"\n"
+													"This program is free software; you can redistribute it and/or modify\n"
+													"it under the terms of the GNU General Public License as published\n"
+													"by the Free Software Foundation; either version 2 of the License,\n"
+													"or (at your option) any later version. \n"
+													"\n"
+													"This program is distributed in the hope that it will be useful, \n"
+													"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+													"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the \n"
+													"GNU General Public License for more details. \n"
+													"\n"
+													"You should have received a copy of the GNU General Public License \n"
+													"along with this program; if not, write to the \n"
+													"\n"
+													"Free Software Foundation, Inc.,\n"
+													"59 Temple Place - Suite 330,\nBoston, MA 02111-1307,\nU.S.A.\n");
 }
 
 void QAutoRouter::faultHandler(QString txt)
