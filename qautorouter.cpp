@@ -196,6 +196,15 @@ void QAutoRouter::setupActions()
 	help->addAction(ui->actionAbout);
 }
 
+void QAutoRouter::clear()
+{
+	if ( mRoot != NULL )
+	{
+		delete mRoot;
+		mRoot = NULL;
+	}
+	CGPadstack::clear();
+}
 
 bool QAutoRouter::load(QFile& file)
 {
@@ -203,11 +212,7 @@ bool QAutoRouter::load(QFile& file)
 	if ( file.open(QIODevice::ReadOnly))
 	{
 		QTextStream in(&file);
-		if ( mRoot != NULL )
-		{
-			delete mRoot;
-			mRoot = NULL;
-		}
+		clear();
 		CSpecctraReader reader(in,this);
 		mRoot = reader.root();
 		root()->dump(); /** DEBUG */

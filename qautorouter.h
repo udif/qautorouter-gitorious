@@ -30,6 +30,7 @@ public:
 signals:
 	void					fault(QString txt);
 public slots:
+	void					clear();
 	void					updateZoom();
 	bool					load(QFile& file);
 	void					faultHandler(QString txt);

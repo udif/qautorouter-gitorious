@@ -20,9 +20,23 @@ CGPadstack::CGPadstack(CPcbPlace* place,QString pinRef, QObject *parent)
 
 CGPadstack::~CGPadstack()
 {
-	if ( mGPadstacks.contains(unitRef()) )
+	QList<QString> keys = mPads.keys();
+	for(int n=0; n < keys.count(); n++)
 	{
-		mGPadstacks.take(unitRef());
+		delete mPads[keys[n]];
+	}
+}
+
+/**
+  * @brief (static) clear the pastack statics
+  */
+void CGPadstack::clear()
+{
+	QList<QString> keys = mGPadstacks.keys();
+	for(int n=0; n < keys.count(); n++)
+	{
+		CGPadstack* padstack = mGPadstacks.take(keys[n]);
+		delete padstack;
 	}
 }
 
