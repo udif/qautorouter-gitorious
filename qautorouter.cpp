@@ -33,7 +33,7 @@ QAutoRouter::QAutoRouter(QWidget *parent)
 	readSettings();
 	QObject::connect(this,SIGNAL(fault(QString)),this,SLOT(faultHandler(QString)));
 	this->setWindowIcon(QIcon(":/icons/qautorouter.png"));
-	this->setWindowTitle("QAutoRouter - V0.0");
+	this->setWindowTitle("QAutoRouter "+QString(VERSION_STRING));
 }
 
 QAutoRouter::~QAutoRouter()
