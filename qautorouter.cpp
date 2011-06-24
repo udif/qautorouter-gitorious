@@ -18,9 +18,14 @@
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QColorDialog>
+#include <QPluginLoader>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 
 #include "ui_qautorouter.h"
 #include "ui_preferences.h"
+
+#include "cplugininterface.h"
 
 QAutoRouter::QAutoRouter(QWidget *parent)
 : QMainWindow(parent)
@@ -37,9 +42,12 @@ QAutoRouter::QAutoRouter(QWidget *parent)
 	readSettings();
 	QObject::connect(this,SIGNAL(fault(QString)),this,SLOT(faultHandler(QString)));
 	QObject::connect(preferences->layerColors,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(layerColorDoubleClicked(QModelIndex)));
+	QObject::connect(preferences->addPluginButton,SIGNAL(clicked()),this,SLOT(addPlugin()));
+	QObject::connect(preferences->removePluginButton,SIGNAL(clicked()),this,SLOT(removePlugin()));
 	this->setWindowIcon(QIcon(":/icons/qautorouter.png"));
 	this->setWindowTitle("QAutoRouter "+QString(VERSION_STRING));
 	mTimer = startTimer(2000);
+	preferences->pluginTree->setHeaderLabel(tr("Plugins"));
 }
 
 QAutoRouter::~QAutoRouter()
@@ -416,3 +424,80 @@ void QAutoRouter::timerEvent(QTimerEvent* e)
 		}
 	}
 }
+
+/**
+  * @brief Load a plugin by file name.
+  */
+bool QAutoRouter::loadPlugin(QString filename)
+{
+	bool rc=false;
+	QPluginLoader loader(filename);
+	if ( loader.load() )
+	{
+		QObject* plugin = loader.instance();
+		if ( plugin != NULL )
+		{
+			CPluginInterface *iPlugin = qobject_cast<CPluginInterface *>(plugin);
+			 if (iPlugin)
+			{
+				QTreeWidgetItem *pluginItem = new QTreeWidgetItem(preferences->pluginTree);
+				pluginItem->setText(0, iPlugin->title());
+				QTreeWidgetItem *pluginVersion = new QTreeWidgetItem(pluginItem);
+				pluginVersion->setText(0, tr("Version: ")+iPlugin->version());
+				QTreeWidgetItem *pluginAuthor = new QTreeWidgetItem(pluginItem);
+				pluginAuthor->setText(0, tr("Author: ")+iPlugin->author());
+				QTreeWidgetItem *pluginWebsite = new QTreeWidgetItem(pluginItem);
+				pluginWebsite->setText(0, tr("Website: ")+iPlugin->website());
+				QTreeWidgetItem *pluginDescription = new QTreeWidgetItem(pluginItem);
+				pluginDescription->setText(0, tr("About: ")+iPlugin->description());
+				preferences->pluginTree->addTopLevelItem(pluginItem);
+				rc = true;
+			}
+		}
+	}
+	return rc;
+}
+
+/**
+  * @brief Produce a plugin loader dialog for selecting a plugin to load, and load the plugin
+  */
+void QAutoRouter::addPlugin()
+{
+	QFileDialog dialog(this,"Open",QDir::currentPath(),tr("Plug-In Files (*.so)"));
+	if (dialog.exec())
+	{
+		QString filename = dialog.selectedFiles().at(0);
+		QPluginLoader loader(filename);
+		if ( !loadPlugin(filename) )
+		{
+			QMessageBox::warning(this,"Plugin Loader","Load '"+filename+"' failed.");
+		}
+	}
+}
+
+/**
+  * @brief Remove a plugin.
+  */
+void QAutoRouter::removePlugin()
+{
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

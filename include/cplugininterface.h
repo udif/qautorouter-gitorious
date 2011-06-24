@@ -15,6 +15,8 @@ class CPluginInterface
 
 		virtual QString title() const = 0;
 		virtual QString version() const = 0;
+		virtual QString author() const = 0;
+		virtual QString website() const = 0;
 		virtual QString description() const = 0;
 
 };

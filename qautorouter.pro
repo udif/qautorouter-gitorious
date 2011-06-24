@@ -1,12 +1,8 @@
 # -------------------------------------------------
 # Project created by QtCreator 2011-06-16T09:55:28
 # -------------------------------------------------
-QT += network \
-    opengl \
-    sql \
-    svg \
-    webkit \
-    xml
+QT += gui \
+	svg
 INCLUDEPATH += include
 TARGET = qautorouter
 TEMPLATE = app
