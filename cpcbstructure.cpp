@@ -4,6 +4,8 @@
 *******************************************************************************/
 #include "cpcbstructure.h"
 #include "cpcbboundary.h"
+#include "cpcblayer.h"
+#include "cpcbrule.h"
 
 #define inherited CSpecctraObject
 
@@ -17,16 +19,61 @@ CPcbStructure::~CPcbStructure()
 }
 
 /**
-  * @brief Append child objects, and interpret the interestin gones.
-  */
-void CPcbStructure::appendChild(CSpecctraObject* child)
+  * @return the number of layers
+ */
+int CPcbStructure::layers()
 {
-	inherited::appendChild(child);
-	if ( child->objectClass() == "layer" )
+	int count=0;
+	for(int n=0;n<children().count();n++)
 	{
-		mLayers.append((CPcbLayer*)child);
+		if ( children().at(n)->objectClass() == "layer" )
+		{
+			++count;
+		}
 	}
+	return count;
 }
+
+/**
+  * @return a layer by index
+  */
+CPcbLayer* CPcbStructure::layer(int idx)
+{
+	int count=0;
+	for(int n=0;n<children().count();n++)
+	{
+		if ( children().at(n)->objectClass() == "layer" )
+		{
+			if ( count == idx )
+			{
+				return (CPcbLayer*)children().at(n);
+			}
+			++count;
+		}
+	}
+	return NULL;
+}
+
+/**
+  * @return a layer by reference
+  */
+CPcbLayer* CPcbStructure::layer(QString ref)
+{
+	for(int n=0;n<children().count();n++)
+	{
+		CSpecctraObject* obj = children().at(n);
+		if ( obj->objectClass() == "layer" )
+		{
+			CPcbLayer* layer = (CPcbLayer*)obj;
+			if ( layer->name() == ref )
+			{
+				return layer;
+			}
+		}
+	}
+	return NULL;
+}
+
 
 /**
   * @return the boundary
@@ -37,6 +84,22 @@ CPcbBoundary* CPcbStructure::boundary()
 	if ( obj != NULL )
 	{
 		return (CPcbBoundary*)obj;
+	}
+	return NULL;
+}
+
+/**
+  * @return a pointer to the rule class instance
+  */
+CPcbRule* CPcbStructure::rule()
+{
+	for(int n=0;n<children().count();n++)
+	{
+		CSpecctraObject* obj = children().at(n);
+		if ( obj->objectClass() == "rule" )
+		{
+			return (CPcbRule*)obj;
+		}
 	}
 	return NULL;
 }

@@ -8,9 +8,10 @@
 #include <QObject>
 #include <QList>
 #include "cspecctraobject.h"
-#include "cpcblayer.h"
 
 class CPcbBoundary;
+class CPcbLayer;
+class CPcbRule;
 class CPcbStructure : public CSpecctraObject
 {
 	Q_OBJECT
@@ -18,13 +19,13 @@ class CPcbStructure : public CSpecctraObject
 		CPcbStructure(QGraphicsItem *parent = 0);
 		virtual ~CPcbStructure();
 
-		virtual void					appendChild(CSpecctraObject* child);
+		int								layers();
+		CPcbLayer*						layer(int idx);
+		CPcbLayer*						layer(QString ref);
 
-		QList<CPcbLayer*>&				layers() {return mLayers;}
+		CPcbRule*						rule();
+
 		CPcbBoundary*					boundary();
-
-	private:
-		QList<CPcbLayer*>				mLayers;			/* pcb layers */
 };
 
 #endif // CPCSTRUCTUREB_H

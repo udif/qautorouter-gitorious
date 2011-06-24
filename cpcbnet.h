@@ -20,6 +20,8 @@ class CPcbNet : public CSpecctraObject
 		virtual ~CPcbNet();
 
 		QString						name();
+		void						setWidth(double w) {mWidth=w;}
+		double						width();
 		bool						routed() {return mRouted;}
 
 		virtual QRectF				boundingRect() const;
@@ -28,6 +30,7 @@ class CPcbNet : public CSpecctraObject
 	private:
 		QPainterPath				mShape;
 		bool						mRouted;
+		double						mWidth;			/* trace width */
 };
 
 #endif // CPCBNET_H

@@ -4,6 +4,9 @@
 *******************************************************************************/
 #include "cpcbpin.h"
 #include "cpcbpadstack.h"
+#include "cpcb.h"
+#include "cpcblibrary.h"
+
 #include <QList>
 
 #define inherited CSpecctraObject
@@ -52,20 +55,12 @@ QString CPcbPin::padstackName()
   */
 CPcbPadstack* CPcbPin::padstack()
 {
-	QList<CSpecctraObject*> siblings = parentObject()->parentObject()->children();
-	for(int n=0; n < siblings.count(); n++)
+	CPcbPadstack* ps = NULL;
+	if ( pcb() != NULL && pcb()->library() != NULL )
 	{
-		CSpecctraObject* sibling = siblings.at(n);
-		if ( sibling->objectClass() == "padstack" )
-		{
-			CPcbPadstack* ps = (CPcbPadstack*)sibling;
-			if ( ps->name() == padstackName() )
-			{
-				return ps;
-			}
-		}
+		ps = pcb()->library()->padstack(padstackName());
 	}
-	return NULL;
+	return ps;
 }
 
 

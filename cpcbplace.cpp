@@ -150,6 +150,9 @@ QPainterPath CPcbPlace::outlineShape() const
 	return mOutlineShape;
 }
 
+/**
+  * @brief create the graphical padstack instances for each pni reference.
+  */
 void CPcbPlace::createPadstacks()
 {
 	if ( !mPadstacksCreated )
@@ -196,11 +199,7 @@ void CPcbPlace::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 	painter->setRenderHint(QPainter::Antialiasing);
 	painter->scale(scale(),scale());
 	QPainterPath outlinePath = outlineShape();
-	//QPainterPath padstackPath = padstackShape();
-	//padstackPath.setFillRule(Qt::WindingFill);
 	painter->setPen(QPen(QColor(0,255,255), 10, Qt::SolidLine,Qt::RoundCap,Qt::RoundJoin));
 	painter->drawPath(outlinePath);
-	//painter->setPen(QPen(QColor(0xA0,0,0), 1, Qt::SolidLine,Qt::RoundCap,Qt::RoundJoin));
-	//painter->drawPath(padstackPath);
-	//painter->fillPath(padstackPath,QColor(0xA0,0,0));
+
 }

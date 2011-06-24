@@ -5,12 +5,16 @@
 #include "cpcbnet.h"
 #include "cpcbpins.h"
 #include "cgpadstack.h"
+#include "cpcb.h"
+#include "cpcbstructure.h"
+#include "cpcbrule.h"
 
 #define inherited CSpecctraObject
 
 CPcbNet::CPcbNet(QGraphicsItem *parent)
 : inherited(parent)
 , mRouted(false)
+, mWidth(-1.0)
 {
 	CSpecctraObject::scene()->addItem(this);
 }
@@ -32,6 +36,25 @@ QString CPcbNet::name()
 	return nm;
 }
 
+/**
+  * @return the width of the net tracks
+  */
+double CPcbNet::width()
+{
+	double w=15;
+	if ( mWidth < 0.0 )
+	{
+		if (pcb()!=NULL && pcb()->structure()!=NULL && pcb()->structure()->rule()!=NULL)
+		{
+			w = pcb()->structure()->rule()->width();
+		}
+	}
+	else
+	{
+		w = mWidth;
+	}
+	return w;
+}
 
 QRectF CPcbNet::boundingRect() const
 {

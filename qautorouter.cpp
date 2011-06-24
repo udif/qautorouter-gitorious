@@ -9,6 +9,7 @@
 #include "cpcbnetwork.h"
 #include "cpcbnet.h"
 #include "cpcb.h"
+#include "cpcblayer.h"
 
 #include <QTextStream>
 #include <QFileDialog>
@@ -102,11 +103,11 @@ void QAutoRouter::layerColorDoubleClicked(QModelIndex idx)
 	if ( dialog.exec())
 	{
 		item->setBackgroundColor(dialog.selectedColor());
-		for (int i = 0; i < pcb()->structure()->layers().count(); ++i)
+		for (int i = 0; i < pcb()->structure()->layers(); ++i)
 		{
-			if ( item->text() == pcb()->structure()->layers().at(i)->description() )
+			if ( item->text() == pcb()->structure()->layer(i)->description() )
 			{
-				pcb()->structure()->layers().at(i)->setColor(dialog.selectedColor());
+				pcb()->structure()->layer(i)->setColor(dialog.selectedColor());
 				writeSettings();
 				break;
 			}
@@ -120,11 +121,11 @@ void QAutoRouter::populateLayersForm()
 	if ( pcb() != NULL )
 	{
 		preferences->layerColors->clear();
-		for (int i = 0; i < pcb()->structure()->layers().count(); ++i)
+		for (int i = 0; i < pcb()->structure()->layers(); ++i)
 		{
 			QListWidgetItem* item = new QListWidgetItem(preferences->layerColors);
-			item->setBackground(pcb()->structure()->layers().at(i)->color());
-			item->setText(pcb()->structure()->layers().at(i)->description());
+			item->setBackground(pcb()->structure()->layer(i)->color());
+			item->setText(pcb()->structure()->layer(i)->description());
 			preferences->layerColors->addItem(item);
 		}
 	}
@@ -151,10 +152,10 @@ void QAutoRouter::writeSettings()
 	settings.beginGroup("layers");
 	if ( pcb()!=NULL)
 	{
-		for (int i = 0; i < pcb()->structure()->layers().count(); ++i)
+		for (int i = 0; i < pcb()->structure()->layers(); ++i)
 		{
-			QString layerName = pcb()->structure()->layers().at(i)->name();
-			settings.setValue(layerName, pcb()->structure()->layers().at(i)->toBytes());
+			QString layerName = pcb()->structure()->layer(i)->name();
+			settings.setValue(layerName, pcb()->structure()->layer(i)->toBytes());
 		}
 	}
 	settings.endGroup();
@@ -172,13 +173,13 @@ void QAutoRouter::readSettings()
 	settings.beginGroup("layers");
 	if ( pcb()!=NULL)
 	{
-		for (int i = 0; i < pcb()->structure()->layers().count(); ++i)
+		for (int i = 0; i < pcb()->structure()->layers(); ++i)
 		{
-			QString layerName = pcb()->structure()->layers().at(i)->name();
+			QString layerName = pcb()->structure()->layer(i)->name();
 			QByteArray bytes = settings.value(layerName).toByteArray();
 			if ( bytes.count() )
 			{
-				pcb()->structure()->layers().at(i)->fromBytes(bytes);
+				pcb()->structure()->layer(i)->fromBytes(bytes);
 			}
 		}
 	}

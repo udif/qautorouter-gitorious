@@ -35,14 +35,13 @@ CPcb* CGPad::pcb()
 
 QColor CGPad::color()
 {
-	QColor c;
-	QList<CPcbLayer*> layers = pcb()->structure()->layers();
-	for( int n=0; n < layers.count(); n++ )
+	QColor c(0xa0,0,0);
+	if (pcb()!=NULL && pcb()->structure()!=NULL)
 	{
-		if ( layers.at(n)->name() == layer() )
+		CPcbLayer* l = pcb()->structure()->layer(layer());
+		if ( l!=NULL )
 		{
-			c =  layers.at(n)->color();
-			break;
+			c = l->color();
 		}
 	}
 	return c;

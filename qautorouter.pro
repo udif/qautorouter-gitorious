@@ -34,7 +34,9 @@ SOURCES += main.cpp \
     cpcbpins.cpp \
     cpcbclass.cpp \
     cgpad.cpp \
-    cgpadstack.cpp
+    cgpadstack.cpp \
+    cpcbrule.cpp \
+    cpcbvia.cpp
 HEADERS += qautorouter.h \
     qautorouter.h \
     cspecctrareader.h \
@@ -61,7 +63,9 @@ HEADERS += qautorouter.h \
     cpcbpins.h \
     cpcbclass.h \
     cgpad.h \
-    cgpadstack.h
+    cgpadstack.h \
+    cpcbrule.h \
+    cpcbvia.h
 FORMS += qautorouter.ui \
     preferences.ui
 RESOURCES += qautorouter.qrc

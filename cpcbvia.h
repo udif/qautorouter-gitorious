@@ -2,31 +2,27 @@
 * Copyright (C) Pike Aerospace Research Corporation                            *
 * Author: Mike Sharkey <mike@pikeaero.com>                                     *
 *******************************************************************************/
-#ifndef CPCBLIBRARY_H
-#define CPCBLIBRARY_H
+#ifndef CPCBVIA_H
+#define CPCBVIA_H
 
 #include <QObject>
 #include <QString>
+#include <QRectF>
+#include <QPainterPath>
 
 #include "cspecctraobject.h"
 
-class CPcbImage;
 class CPcbPadstack;
-class CPcbLibrary : public CSpecctraObject
+class CPcbVia : public CSpecctraObject
 {
 	Q_OBJECT
 	public:
-		CPcbLibrary(QGraphicsItem *parent = 0);
-		virtual ~CPcbLibrary();
+		CPcbVia(QGraphicsItem *parent = 0);
+		virtual ~CPcbVia();
 
-		int								images();
-		CPcbImage*						image(int idx);
-		CPcbImage*						image(QString ref);
+		CPcbPadstack*					padstack();
 
-		int								padstacks();
-		CPcbPadstack*					padstack(int idx);
-		CPcbPadstack*					padstack(QString ref);
 };
 
-#endif // CPCBLIBRARY_H
+#endif // CPCBVIA_H
 

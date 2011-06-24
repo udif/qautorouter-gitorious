@@ -20,6 +20,8 @@
 #include "cpcbnetwork.h"
 #include "cpcbnet.h"
 #include "cpcbpins.h"
+#include "cpcbrule.h"
+#include "cpcbvia.h"
 
 #include "qautorouter.h"
 
@@ -70,6 +72,8 @@ CSpecctraObject* CSpecctraReader::make(QString& oClass,CSpecctraObject* parentOb
 	else if (oClass == "network")		obj = new CPcbNetwork();
 	else if (oClass == "net")			obj = new CPcbNet();
 	else if (oClass == "pins")			obj = new CPcbPins();
+	else if (oClass == "rule")			obj = new CPcbRule();
+	else if (oClass == "via")			obj = new CPcbVia();
 	else
 		obj = new CSpecctraObject();
 	obj->setObjectClass(oClass);

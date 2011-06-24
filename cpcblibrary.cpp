@@ -4,6 +4,7 @@
 *******************************************************************************/
 #include "cpcblibrary.h"
 #include "cpcbimage.h"
+#include "cpcbpadstack.h"
 
 #define inherited CSpecctraObject
 
@@ -57,7 +58,6 @@ CPcbImage* CPcbLibrary::image(int comp)
   */
 CPcbImage* CPcbLibrary::image(QString name)
 {
-	int count=0;
 	for(int n=0;n<children().count();n++)
 	{
 		CSpecctraObject* obj = children().at(n);
@@ -68,7 +68,62 @@ CPcbImage* CPcbLibrary::image(QString name)
 			{
 				return image;
 			}
+		}
+	}
+	return NULL;
+}
+
+/**
+  * @return the padstack count
+  */
+int CPcbLibrary::padstacks()
+{
+	int count=0;
+	for(int n=0;n<children().count();n++)
+	{
+		if ( children().at(n)->objectClass() == "padstack" )
+		{
 			++count;
+		}
+	}
+	return count;
+}
+
+/**
+  * @return a padstack by index
+  */
+CPcbPadstack* CPcbLibrary::padstack(int idx)
+{
+	int count=0;
+	for(int n=0;n<children().count();n++)
+	{
+		if ( children().at(n)->objectClass() == "padstack" )
+		{
+			if ( count == idx )
+			{
+				return (CPcbPadstack*)children().at(n);
+			}
+			++count;
+		}
+	}
+	return NULL;
+}
+
+/**
+  * @return a padstack by name
+  */
+CPcbPadstack* CPcbLibrary::padstack(QString name)
+{
+	for(int n=0;n<children().count();n++)
+	{
+		CSpecctraObject* obj = children().at(n);
+		if ( obj->objectClass() == "padstack" )
+		{
+			CPcbPadstack* padstack = (CPcbPadstack*)obj;
+			if ( padstack->name() == name )
+			{
+				return padstack;
+			}
 		}
 	}
 	return NULL;
