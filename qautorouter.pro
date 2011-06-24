@@ -37,35 +37,35 @@ SOURCES += main.cpp \
     cgpadstack.cpp \
     cpcbrule.cpp \
     cpcbvia.cpp
-HEADERS += qautorouter.h \
-    qautorouter.h \
-    cspecctrareader.h \
-    cspecctraobject.h \
-    cpcbstructure.h \
-    cpcblayer.h \
-    cpcbboundary.h \
-    cpcb.h \
-    cpcbplacement.h \
-    cpcbcomponent.h \
-    cpcbplace.h \
-    cpcblibrary.h \
-    cpcbimage.h \
-    cpcbpin.h \
-    cpcboutline.h \
-    cpcbpath.h \
-    cpcbpadstack.h \
-    cpcbpadstack.h \
-    cpcbshape.h \
-    cpcbcircle.h \
-    cpcbrect.h \
-    cpcbnetwork.h \
-    cpcbnet.h \
-    cpcbpins.h \
-    cpcbclass.h \
-    cgpad.h \
-    cgpadstack.h \
-    cpcbrule.h \
-    cpcbvia.h
-FORMS += qautorouter.ui \
-    preferences.ui
+HEADERS += include/qautorouter.h \
+	include/cspecctrareader.h \
+	include/cspecctraobject.h \
+	include/cpcbstructure.h \
+	include/cpcblayer.h \
+	include/cpcbboundary.h \
+	include/cpcb.h \
+	include/cpcbplacement.h \
+	include/cpcbcomponent.h \
+	include/cpcbplace.h \
+	include/cpcblibrary.h \
+	include/cpcbimage.h \
+	include/cpcbpin.h \
+	include/cpcboutline.h \
+	include/cpcbpath.h \
+	include/cpcbpadstack.h \
+	include/cpcbpadstack.h \
+	include/cpcbshape.h \
+	include/cpcbcircle.h \
+	include/cpcbrect.h \
+	include/cpcbnetwork.h \
+	include/cpcbnet.h \
+	include/cpcbpins.h \
+	include/cpcbclass.h \
+	include/cgpad.h \
+	include/cgpadstack.h \
+	include/cpcbrule.h \
+	include/cpcbvia.h \
+	include/cplugininterface.h
+FORMS += include/qautorouter.ui \
+	include/preferences.ui
 RESOURCES += qautorouter.qrc
