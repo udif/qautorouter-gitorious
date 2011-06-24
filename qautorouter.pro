@@ -7,6 +7,7 @@ QT += network \
     svg \
     webkit \
     xml
+INCLUDEPATH += include
 TARGET = qautorouter
 TEMPLATE = app
 SOURCES += main.cpp \
@@ -66,6 +67,6 @@ HEADERS += include/qautorouter.h \
 	include/cpcbrule.h \
 	include/cpcbvia.h \
 	include/cplugininterface.h
-FORMS += include/qautorouter.ui \
-	include/preferences.ui
+FORMS += forms/qautorouter.ui \
+	forms/preferences.ui
 RESOURCES += qautorouter.qrc
