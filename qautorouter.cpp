@@ -10,6 +10,7 @@
 #include "cpcbnet.h"
 #include "cpcb.h"
 #include "cpcblayer.h"
+#include "cpcbclass.h"
 
 #include <QTextStream>
 #include <QFileDialog>
@@ -52,6 +53,7 @@ QAutoRouter::QAutoRouter(QWidget *parent)
 	this->setWindowTitle("QAutoRouter "+QString(VERSION_STRING));
 	mTimer = startTimer(2000);
 	preferences->pluginTree->setHeaderLabel(tr("Plugins"));
+	preferences->netsTree->setHeaderLabel(tr("Nets"));
 }
 
 QAutoRouter::~QAutoRouter()
@@ -204,14 +206,20 @@ void QAutoRouter::populateNetsForm()
 {
 	if ( pcb()!=NULL && pcb()->network()!=NULL )
 	{
-		preferences->netsList->clear();
+		preferences->netsTree->clear();
 		for(int i = 0; i < pcb()->network()->nets(); i++)
 		{
-			QListWidgetItem* item = new QListWidgetItem(preferences->netsList);
-			item->setText(pcb()->network()->net(i)->description());
-			item->setData(Qt::UserRole,pcb()->network()->net(i)->name());
-			preferences->netsList->addItem(item);
+			CPcbNet* net = pcb()->network()->net(i);
+			QTreeWidgetItem *netsItem = new QTreeWidgetItem(preferences->netsTree);
+			netsItem->setText(0, net->name());
+			netsItem->setData(0,Qt::UserRole,net->name());
+			QTreeWidgetItem *netsClass = new QTreeWidgetItem(netsItem);
+			netsClass->setText(0,tr("Class: ")+net->netClass()->name());
+			QTreeWidgetItem *netsWidth = new QTreeWidgetItem(netsItem);
+			netsWidth->setText(0,tr("Width: ")+QString::number(net->netClass()->width())+"mil");
+			preferences->netsTree->addTopLevelItem(netsItem);
 		}
+		preferences->netsTree->sortItems(0,Qt::AscendingOrder);
 	}
 }
 
