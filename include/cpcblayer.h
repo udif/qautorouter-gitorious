@@ -16,6 +16,13 @@ class CPcbLayer : public CSpecctraObject
 {
 	Q_OBJECT
 	public:
+
+		typedef enum
+		{
+			Horizontal,
+			Vertical
+		} tDirection;
+
 		CPcbLayer(QGraphicsItem *parent = 0);
 		virtual ~CPcbLayer();
 
@@ -24,6 +31,8 @@ class CPcbLayer : public CSpecctraObject
 		QString							type();
 		int								index();
 		QString							description();
+		void							setDirection(tDirection direction) {mDirection = direction;}
+		tDirection						direction() {return mDirection;}
 
 		void							setColor(QColor color) {mColor=color;}
 
@@ -31,6 +40,7 @@ class CPcbLayer : public CSpecctraObject
 		QByteArray						toBytes();
 	private:
 		QColor							mColor;
+		tDirection						mDirection;
 };
 
 #endif // CPCBLAY_H

@@ -19,6 +19,7 @@
 namespace Ui {
     class QAutoRouter;
 	class preferences;
+	class layerpreferences;
 }
 
 #define VERSION_STRING	"V0.0.1"
@@ -45,7 +46,8 @@ class QAutoRouter : public QMainWindow
 		bool					loadPlugin(QString filename,QString& errorString);
 		void					addPlugin();
 		void					removePlugin();
-		void					layerColorDoubleClicked(QModelIndex idx);
+		void					layerClicked(QModelIndex);
+		void					layerColorClicked();
 		void					readSettings();
 		void					writeSettings();
 		void					editPreferences();
@@ -68,8 +70,10 @@ class QAutoRouter : public QMainWindow
 	private:
 		Ui::QAutoRouter*		ui;
 		Ui::preferences*		preferences;
-		double					mZoom;
+		Ui::layerpreferences*	layerpreferences;
 		QDialog					mPreferencesDialog;
+		QDialog					mLayerPreferencesDialog;
+		double					mZoom;
 		CSpecctraObject*		mRoot;
 		int						mTimer;
 		QString					mFileName;

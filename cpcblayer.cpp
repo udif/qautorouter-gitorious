@@ -11,6 +11,7 @@
 
 CPcbLayer::CPcbLayer(QGraphicsItem *parent)
 : inherited(parent)
+, mDirection(Horizontal)
 {
 	setColor(QColor(0xA0,0,0));
 }
@@ -68,14 +69,20 @@ QString CPcbLayer::description()
 	QString rc;
 	rc += "["+QString::number(index())+"]";
 	rc += name();
-	rc += " ("+type()+")";
+	rc += " ("+type()+") ";
+	if ( direction() == Horizontal )
+		rc += "Horizontal";
+	else
+		rc += "Vertical";
 	return rc;
 }
 
 void CPcbLayer::fromBytes(QByteArray data)
 {
+	int i=0;
 	QDataStream in(&data,QIODevice::ReadOnly);
 	in >> mColor;
+	in >> i; mDirection=(CPcbLayer::tDirection)i;
 }
 
 QByteArray CPcbLayer::toBytes()
@@ -83,6 +90,7 @@ QByteArray CPcbLayer::toBytes()
 	QByteArray data;
 	QDataStream out(&data,QIODevice::WriteOnly);
 	out << color();
+	out << (int)mDirection;
 	return data;
 }
 

@@ -24,6 +24,7 @@
 
 #include "ui_qautorouter.h"
 #include "ui_preferences.h"
+#include "ui_layerpreferences.h"
 
 #include "cplugininterface.h"
 
@@ -31,17 +32,20 @@ QAutoRouter::QAutoRouter(QWidget *parent)
 : QMainWindow(parent)
 , ui(new Ui::QAutoRouter)
 , preferences(new Ui::preferences)
+, layerpreferences(new Ui::layerpreferences)
 , mRoot(NULL)
 , mZoom(0.125/2)
 {
 	preferences->setupUi(&mPreferencesDialog);
+	layerpreferences->setupUi(&mLayerPreferencesDialog);
 	ui->setupUi(this);
 	ui->graphicsView->setBackgroundRole(QPalette::Dark);
 	ui->graphicsView->setScene(CSpecctraObject::scene());
 	setupActions();
 	readSettings();
 	QObject::connect(this,SIGNAL(fault(QString)),this,SLOT(faultHandler(QString)));
-	QObject::connect(preferences->layerColors,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(layerColorDoubleClicked(QModelIndex)));
+	QObject::connect(preferences->layerList,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(layerClicked(QModelIndex)));
+	QObject::connect(layerpreferences->colorButton,SIGNAL(clicked()),this,SLOT(layerColorClicked()));
 	QObject::connect(preferences->addPluginButton,SIGNAL(clicked()),this,SLOT(addPlugin()));
 	QObject::connect(preferences->removePluginButton,SIGNAL(clicked()),this,SLOT(removePlugin()));
 	this->setWindowIcon(QIcon(":/icons/qautorouter.png"));
@@ -103,13 +107,20 @@ void QAutoRouter::wheelEvent(QWheelEvent * e)
 	e->accept();
 }
 
-void QAutoRouter::layerColorDoubleClicked(QModelIndex idx)
+/**
+  * @brief A layer color selection button was clicked, reset the color for the selected layer
+  */
+void QAutoRouter::layerColorClicked()
 {
-	QListWidgetItem* item = preferences->layerColors->currentItem();
+	QListWidgetItem* item = preferences->layerList->currentItem();
 	QColorDialog dialog;
 	dialog.setCurrentColor(item->backgroundColor());
 	if ( dialog.exec())
 	{
+		QPalette palette = layerpreferences->colorButton->palette();
+		palette.setColor(QPalette::Button,dialog.selectedColor());
+		palette.setColor(QPalette::Background,dialog.selectedColor());
+		layerpreferences->colorButton->setPalette(palette);
 		item->setBackgroundColor(dialog.selectedColor());
 		for (int i = 0; i < pcb()->structure()->layers(); ++i)
 		{
@@ -124,17 +135,60 @@ void QAutoRouter::layerColorDoubleClicked(QModelIndex idx)
 	CSpecctraObject::scene()->update();
 }
 
+/**
+  * @brief A layer was clicked.
+  */
+void QAutoRouter::layerClicked(QModelIndex idx)
+{
+	QListWidgetItem* item = preferences->layerList->currentItem();
+	if ( item != NULL )
+	{
+		CPcbLayer* layer = pcb()->structure()->layer(item->data(Qt::UserRole).toString());
+		if ( layer != NULL )
+		{
+			QPalette palette = layerpreferences->colorButton->palette();
+			palette.setColor(QPalette::Button,item->backgroundColor());
+			palette.setColor(QPalette::Background,item->backgroundColor());
+			layerpreferences->colorButton->setPalette(palette);
+			if ( layer->direction() == CPcbLayer::Horizontal)
+				layerpreferences->radioHorizontal->setChecked(true);
+			else
+				layerpreferences->radioVertical->setChecked(true);
+			if ( mLayerPreferencesDialog.exec() )
+			{
+				palette.setColor(QPalette::Button,item->backgroundColor());
+				palette.setColor(QPalette::Background,item->backgroundColor());
+				layerpreferences->colorButton->setPalette(palette);
+				if ( layerpreferences->radioHorizontal->isChecked() )
+					layer->setDirection(CPcbLayer::Horizontal);
+				else
+					layer->setDirection(CPcbLayer::Vertical);
+				populateLayersForm(); /* redraw the layers for with new descriptions */
+			}
+			preferences->layerList->setCurrentRow(-1);
+		}
+		else
+		{
+			emit fault(tr("problem loading layer '")+item->data(Qt::UserRole).toString()+"'");
+		}
+	}
+}
+
+/**
+  * @brief Populate layers form with layers descriptions.
+  */
 void QAutoRouter::populateLayersForm()
 {
 	if ( pcb() != NULL )
 	{
-		preferences->layerColors->clear();
+		preferences->layerList->clear();
 		for (int i = 0; i < pcb()->structure()->layers(); ++i)
 		{
-			QListWidgetItem* item = new QListWidgetItem(preferences->layerColors);
+			QListWidgetItem* item = new QListWidgetItem(preferences->layerList);
 			item->setBackground(pcb()->structure()->layer(i)->color());
 			item->setText(pcb()->structure()->layer(i)->description());
-			preferences->layerColors->addItem(item);
+			item->setData(Qt::UserRole,pcb()->structure()->layer(i)->name());
+			preferences->layerList->addItem(item);
 		}
 	}
 }
@@ -322,6 +376,7 @@ bool QAutoRouter::load(QFile& file)
 		if ( root()->objectClass() == "pcb" )
 		{
 			readSettings();
+			populateLayersForm();
 			zoomFit();
 			rc=true;
 		}
