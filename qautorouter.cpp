@@ -148,6 +148,9 @@ void QAutoRouter::editPreferences()
 	}
 }
 
+/**
+  * @brief store settings and preferences.
+  */
 void QAutoRouter::writeSettings()
 {
 	QSettings settings("8bit.zapto.org", "QAutoRouter");
@@ -176,8 +179,14 @@ void QAutoRouter::writeSettings()
 		settings.setValue("plugin",filename);
 	}
 	settings.endArray();
+
+	settings.setValue("defaultRouter", preferences->routerCombo->currentIndex());
+	settings.setValue("defaultPostRouter", preferences->postRouterCombo->currentIndex());
 }
 
+/**
+  * @brief load settings and preferences.
+  */
 void QAutoRouter::readSettings()
 {
 	QSettings settings("8bit.zapto.org", "QAutoRouter");
@@ -214,21 +223,29 @@ void QAutoRouter::readSettings()
 	}
 	settings.endArray();
 
+	preferences->routerCombo->setCurrentIndex( settings.value("defaultRouter",-1).toInt());
+	preferences->postRouterCombo->setCurrentIndex(settings.value("defaultPostRouter",-1).toInt());
 }
 
-
+/**
+  * @brief Some desktop thing changed...
+  */
 void QAutoRouter::changeEvent(QEvent *e)
 {
 	QMainWindow::changeEvent(e);
-	switch (e->type()) {
-	case QEvent::LanguageChange:
-		ui->retranslateUi(this);
-		break;
-	default:
-		break;
+	switch (e->type())
+	{
+		case QEvent::LanguageChange:
+			ui->retranslateUi(this);
+			break;
+		default:
+			break;
 	}
 }
 
+/**
+  * @brief called exactly once to setup UI actions.
+  */
 void QAutoRouter::setupActions()
 {
 	ui->actionOpen->setIcon(QIcon(":/icons/fileopen.png"));
@@ -258,24 +275,27 @@ void QAutoRouter::setupActions()
 	QObject::connect(ui->actionOptions,SIGNAL(triggered()),this,SLOT(editPreferences()));
 	QObject::connect(ui->actionAbout,SIGNAL(triggered()),this,SLOT(about()));
 
-	QToolBar* file = addToolBar("File");
+	QToolBar* file = addToolBar(tr("File"));
 	file->addAction(ui->actionOpen);
 	file->addAction(ui->actionSave);
 	file->addAction(ui->actionSave_As);
 	file->addAction(ui->actionQuit);
 
-	QToolBar* view = addToolBar("View");
+	QToolBar* view = addToolBar(tr("View"));
 	view->addAction(ui->actionZoom_In);
 	view->addAction(ui->actionZoom_Out);
 	view->addAction(ui->actionZoom_Fit);
 
-	QToolBar* settings = addToolBar("Settings");
+	QToolBar* settings = addToolBar(tr("Settings"));
 	settings->addAction(ui->actionOptions);
 
-	QToolBar* help = addToolBar("Help");
+	QToolBar* help = addToolBar(("Help"));
 	help->addAction(ui->actionAbout);
 }
 
+/**
+  * @brief Clear new, as in preparing to load a new file.
+  */
 void QAutoRouter::clear()
 {
 	if ( mRoot != NULL )
@@ -286,6 +306,9 @@ void QAutoRouter::clear()
 	CGPadstack::clear();
 }
 
+/**
+  * @brief load a file by filename
+  */
 bool QAutoRouter::load(QFile& file)
 {
 	bool rc=false;
@@ -304,7 +327,7 @@ bool QAutoRouter::load(QFile& file)
 		}
 		else
 		{
-			emit fault("root class 'pcb'' expected.");
+			emit fault(tr("root class 'pcb'' expected."));
 			clear();
 			rc=false;
 		}
@@ -324,7 +347,7 @@ bool QAutoRouter::saveAs()
 	filename.replace(".dsn",".ses");
 	if (pcb()!=NULL)
 	{
-		QFileDialog dialog(this,"Save",QDir::currentPath(),tr("Specctra Session (*.ses)"));
+		QFileDialog dialog(this,tr("Save"),QDir::currentPath(),tr("Specctra Session (*.ses)"));
 		dialog.selectFile(filename);
 		if ( dialog.exec() && dialog.selectedFiles().count())
 		{
@@ -337,30 +360,36 @@ bool QAutoRouter::saveAs()
 			}
 			else
 			{
-				emit fault("error saving '"+mFileName+"'");
+				emit fault(tr("error saving '")+mFileName+"'");
 				return false;
 			}
 		}
 	}
 }
 
+/**
+  * @brief open a file by dialog
+  */
 void QAutoRouter::open()
 {
 	if ( maybeSave() )
 	{
-		QFileDialog dialog(this,"Open",QDir::currentPath(),tr("Specctra Files (*.dsn)"));
+		QFileDialog dialog(this,tr("Open"),QDir::currentPath(),tr("Specctra Files (*.dsn)"));
 		if (dialog.exec())
 		{
 			mFileName = dialog.selectedFiles().at(0);
 			QFile file(mFileName);
 			if ( !load(file) )
 			{
-				emit fault("load file failed.");
+				emit fault(tr("load file failed."));
 			}
 		}
 	}
 }
 
+/**
+  * @brief prior to discarding current work, call this...
+  */
 bool QAutoRouter::maybeSave()
 {
 	if (CGPadstack::padstacks().count())
@@ -429,7 +458,7 @@ void QAutoRouter::about()
 
 void QAutoRouter::faultHandler(QString txt)
 {
-	QMessageBox::information(this,"Information",txt);
+	QMessageBox::information(this,tr("Fault"),txt);
 }
 
 void QAutoRouter::timerEvent(QTimerEvent* e)
@@ -476,7 +505,17 @@ bool QAutoRouter::loadPlugin(QString filename,QString& errorString)
 					}
 					if ( !inTree )
 					{
-						QString title = (iPlugin->type()==CPluginInterface::RouterPlugin)?tr("[Router] "):tr("[Post-Router] ");
+						QString title;
+						if (iPlugin->type()==CPluginInterface::RouterPlugin)
+						{
+							title=tr("[Router] ");
+							preferences->routerCombo->addItem(iPlugin->title()+" V"+iPlugin->version(),mPluginLoader.fileName());
+						}
+						else
+						{
+							title=tr("[Post-Router] ");
+							preferences->postRouterCombo->addItem(iPlugin->title()+" V"+iPlugin->version(),mPluginLoader.fileName());
+						}
 						title += iPlugin->title();
 						QTreeWidgetItem *pluginItem = new QTreeWidgetItem(preferences->pluginTree);
 						pluginItem->setText(0, title);
@@ -509,7 +548,7 @@ bool QAutoRouter::loadPlugin(QString filename,QString& errorString)
   */
 void QAutoRouter::addPlugin()
 {
-	QFileDialog dialog(this,"Open",QDir::currentPath(),tr("Plug-In Files (*.so)"));
+	QFileDialog dialog(this,tr("Open"),QDir::currentPath(),tr("Plug-In Files (*.so)"));
 	if (dialog.exec())
 	{
 		QString filename = dialog.selectedFiles().at(0);
@@ -521,7 +560,7 @@ void QAutoRouter::addPlugin()
 		}
 		else
 		{
-			QMessageBox::warning(this,"Plugin Loader","Load '"+filename+"' failed: "+errorString);
+			QMessageBox::warning(this,tr("Plugin Loader"),tr("Load '")+filename+tr("' failed: ")+errorString);
 		}
 	}
 }
@@ -546,7 +585,7 @@ void QAutoRouter::removePlugin()
 			}
 			else
 			{
-				QMessageBox::warning(this,"Plugin Unload","Unload '"+filename+"' failed: "+mPluginLoader.errorString());
+				QMessageBox::warning(this,tr("Plugin Unload"),tr("Unload '")+filename+tr("' failed: ")+mPluginLoader.errorString());
 			}
 		}
 	}
