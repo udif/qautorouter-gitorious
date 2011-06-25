@@ -7,10 +7,12 @@
 
 #include <QObject>
 #include <QString>
+#include <QStringList>
 
 #include "cspecctraobject.h"
 
 class CPcbNet;
+class CPcbRule;
 class CPcbClass : public CSpecctraObject
 {
 	Q_OBJECT
@@ -18,14 +20,15 @@ class CPcbClass : public CSpecctraObject
 		CPcbClass(QGraphicsItem *parent = 0);
 		virtual ~CPcbClass();
 
-		QString							name();
+		virtual QString					name();
+		virtual QString					description();
 
-		int								nets();
-		CPcbNet*						net(int idx);
+		QStringList&					nets();
+
+		double							width();
 
 	private:
-		int								nNets;
-		QList<CPcbNet*>					mNets;
+		QStringList						mNets;
 
 };
 

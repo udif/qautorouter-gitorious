@@ -28,6 +28,7 @@ double CPcbRule::width()
 		if (obj->objectClass()=="width" && obj->properties().count())
 		{
 			w = obj->properties().at(0).toDouble();
+			break;
 		}
 	}
 	return w;

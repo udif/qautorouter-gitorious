@@ -179,7 +179,7 @@ void QAutoRouter::layerClicked(QModelIndex idx)
   */
 void QAutoRouter::populateLayersForm()
 {
-	if ( pcb() != NULL )
+	if ( pcb() != NULL && pcb()->structure()!=NULL )
 	{
 		preferences->layerList->clear();
 		for (int i = 0; i < pcb()->structure()->layers(); ++i)
@@ -193,9 +193,32 @@ void QAutoRouter::populateLayersForm()
 	}
 }
 
+void QAutoRouter::netsClicked(QModelIndex idx)
+{
+}
+
+/**
+  * @brief populate the nets form.
+  */
+void QAutoRouter::populateNetsForm()
+{
+	if ( pcb()!=NULL && pcb()->network()!=NULL )
+	{
+		preferences->netsList->clear();
+		for(int i = 0; i < pcb()->network()->nets(); i++)
+		{
+			QListWidgetItem* item = new QListWidgetItem(preferences->netsList);
+			item->setText(pcb()->network()->net(i)->description());
+			item->setData(Qt::UserRole,pcb()->network()->net(i)->name());
+			preferences->netsList->addItem(item);
+		}
+	}
+}
+
 void QAutoRouter::editPreferences()
 {
 	populateLayersForm();
+	populateNetsForm();
 	if ( mPreferencesDialog.exec() == QDialog::Accepted )
 	{
 		writeSettings();
@@ -377,6 +400,7 @@ bool QAutoRouter::load(QFile& file)
 		{
 			readSettings();
 			populateLayersForm();
+			populateNetsForm();
 			zoomFit();
 			rc=true;
 		}

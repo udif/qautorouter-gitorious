@@ -11,6 +11,7 @@
 #include "cspecctraobject.h"
 
 class CPcbNet;
+class CPcbClass;
 class CPcbNetwork : public CSpecctraObject
 {
 	Q_OBJECT
@@ -20,12 +21,17 @@ class CPcbNetwork : public CSpecctraObject
 
 		int								nets();
 		CPcbNet*						net(int idx);
-		CPcbNet*						net(QString name);
+		CPcbNet*						net(QString ref);
+
+		int								netClasses();
+		CPcbClass*						netClass(int idx);
+		CPcbClass*						netClass(QString ref);
+
 		int								routed();
 
-	private:
-		int								nNets;
+private:
 		QList<CPcbNet*>					mNets;
+		QList<CPcbClass*>				mClasses;
 
 };
 

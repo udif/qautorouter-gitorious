@@ -20,6 +20,7 @@
 #define radian(d) (d*(pi()/180))
 
 class CPcb;
+class CPcbRule;
 class CSpecctraObject : public QObject, public QGraphicsItem /* QGraphicsPathItem */
 {
 	Q_OBJECT
@@ -28,6 +29,8 @@ class CSpecctraObject : public QObject, public QGraphicsItem /* QGraphicsPathIte
 		CSpecctraObject( const CSpecctraObject& other,QGraphicsItem* paernt=NULL);
 		virtual ~CSpecctraObject();
 
+		virtual QString					name()			{return objectClass();}
+		virtual QString					description()	{return name();}
 		virtual QString					toText(int lvl=0);
 
 		CSpecctraObject&				copy( const CSpecctraObject& other );
@@ -51,8 +54,9 @@ class CSpecctraObject : public QObject, public QGraphicsItem /* QGraphicsPathIte
 		virtual void					paint(QPainter*,const QStyleOptionGraphicsItem*, QWidget*) {}
 		virtual void					dump(int lvl=0);
 
-		static QGraphicsScene*			scene();
+		virtual CPcbRule*				rule();
 
+		static QGraphicsScene*			scene();
 
 	signals:
 		void							fault(QString txt);

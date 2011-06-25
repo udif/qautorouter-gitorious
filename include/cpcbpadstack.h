@@ -18,10 +18,10 @@ class CPcbPadstack : public CSpecctraObject
 		CPcbPadstack(QGraphicsItem *parent = 0);
 		virtual ~CPcbPadstack();
 
-		QString			name();
+		virtual QString			name();
 
-		int				shapes();
-		CPcbShape*		shape(int idx);
+		int						shapes();
+		CPcbShape*				shape(int idx);
 };
 
 #endif // CPCBPADSTACK_H

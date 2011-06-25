@@ -8,8 +8,6 @@
 
 CPcbImage::CPcbImage(QGraphicsItem *parent)
 : inherited(parent)
-, nOutlines(-1)
-, nPins(-1)
 {
 }
 
@@ -27,19 +25,17 @@ QString CPcbImage::name()
   */
 int CPcbImage::outlines()
 {
-	if ( nOutlines < 0 )
+	if ( mOutlines.count() == 0 )
 	{
-		int count=0;
 		for(int n=0;n<children().count();n++)
 		{
 			if ( children().at(n)->objectClass() == "outline" )
 			{
-				++count;
+				mOutlines.append((CPcbOutline*)children().at(n));
 			}
 		}
-		nOutlines = count;
 	}
-	return nOutlines;
+	return mOutlines.count();
 }
 
 /**
@@ -69,19 +65,17 @@ CPcbOutline* CPcbImage::outline(int comp)
   */
 int CPcbImage::pins()
 {
-	if ( nPins < 0 )
+	if ( mPins.count() == 0 )
 	{
-		int count=0;
 		for(int n=0;n<children().count();n++)
 		{
 			if ( children().at(n)->objectClass() == "pin" )
 			{
-				++count;
+				mPins.append((CPcbPin*)children().at(n));
 			}
 		}
-		nPins = count;
 	}
-	return nPins;
+	return mPins.count();
 }
 
 /**

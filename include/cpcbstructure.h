@@ -23,8 +23,6 @@ class CPcbStructure : public CSpecctraObject
 		CPcbLayer*						layer(int idx);
 		CPcbLayer*						layer(QString ref);
 
-		CPcbRule*						rule();
-
 		CPcbBoundary*					boundary();
 };
 

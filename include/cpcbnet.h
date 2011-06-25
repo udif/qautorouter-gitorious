@@ -12,6 +12,7 @@
 #include "cgpadstack.h"
 
 class CPcbPins;
+class CPcbClass;
 class CPcbNet : public CSpecctraObject
 {
 	Q_OBJECT
@@ -19,11 +20,13 @@ class CPcbNet : public CSpecctraObject
 		CPcbNet(QGraphicsItem *parent = 0);
 		virtual ~CPcbNet();
 
-		QString						name();
+		virtual QString				name();
+		virtual QString				description();
+
 		void						setWidth(double w) {mWidth=w;}
 		double						width();
 		bool						routed() {return mRouted;}
-
+		CPcbClass*					netClass();
 		virtual QRectF				boundingRect() const;
 		virtual QPainterPath		shape() const;
 		virtual void				paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget);

@@ -19,7 +19,7 @@ class CPcbImage : public CSpecctraObject
 		CPcbImage(QGraphicsItem *parent = 0);
 		virtual ~CPcbImage();
 
-		QString							name();
+		virtual QString					name();
 
 		int								outlines();
 		CPcbOutline*					outline(int comp);
@@ -28,9 +28,7 @@ class CPcbImage : public CSpecctraObject
 		CPcbPin*						pin(int comp);
 
 	private:
-		int								nOutlines;
 		QList<CPcbOutline*>				mOutlines;
-		int								nPins;
 		QList<CPcbPin*>					mPins;
 
 };

@@ -3,12 +3,13 @@
 * Author: Mike Sharkey <mike@pikeaero.com>                                     *
 *******************************************************************************/
 #include "cpcbclass.h"
+#include "cpcbnet.h"
+#include "cpcbrule.h"
 
 #define inherited CSpecctraObject
 
 CPcbClass::CPcbClass(QGraphicsItem *parent)
 : inherited(parent)
-, nNets(-1)
 {
 }
 
@@ -28,50 +29,39 @@ QString CPcbClass::name()
 }
 
 /**
-  * @return the net count
+  * @return a verbose description.
   */
-int CPcbClass::nets()
+QString CPcbClass::description()
 {
-	if ( nNets < 0 )
-	{
-		CSpecctraObject* obj = parentObject();
-		if (obj->objectName()=="network")
-		{
-			for( int n=1; n < properties().count(); n++ )
-			{
-			}
-		}
-
-		int count=0;
-		for(int n=0;n<children().count();n++)
-		{
-			if ( children().at(n)->objectClass() == "net" )
-			{
-				++count;
-			}
-		}
-		nNets = count;
-	}
-	return nNets;
+	QString rc;
+	rc += name()+" ";
+	rc += QString::number(width())+"mil";
+	return rc;
 }
 
 /**
-  * @return a net by index
+  * @return the net count
   */
-CPcbNet* CPcbClass::net(int idx)
+QStringList& CPcbClass::nets()
 {
 	if ( mNets.count() == 0 )
 	{
-		for(int n=0;n<children().count();n++)
+		for( int n=1; n < properties().count(); n++)
 		{
-			if ( children().at(n)->objectClass() == "net" )
-			{
-				mNets.append((CPcbNet*)children().at(n));
-			}
+			mNets.append(properties().at(n));
 		}
 	}
+	return mNets;
+}
 
-	if ( idx < mNets.count() )
-		return mNets.at(idx);
-	return NULL;
+/**
+  * @return the track width
+  */
+double CPcbClass::width()
+{
+	double w=12;
+	CPcbRule* r = rule();
+	if ( r != NULL )
+		w = r->width();
+	return w;
 }

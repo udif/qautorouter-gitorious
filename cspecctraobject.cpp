@@ -118,3 +118,13 @@ void CSpecctraObject::dump(int lvl)
 		child->dump(lvl+1);
 	}
 }
+
+CPcbRule* CSpecctraObject::rule()
+{
+	for(int n=0; n < children().count(); n++)
+	{
+		if ( children().at(n)->objectClass()=="rule")
+			return (CPcbRule*)children().at(n);
+	}
+	return NULL;
+}

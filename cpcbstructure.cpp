@@ -88,19 +88,3 @@ CPcbBoundary* CPcbStructure::boundary()
 	return NULL;
 }
 
-/**
-  * @return a pointer to the rule class instance
-  */
-CPcbRule* CPcbStructure::rule()
-{
-	for(int n=0;n<children().count();n++)
-	{
-		CSpecctraObject* obj = children().at(n);
-		if ( obj->objectClass() == "rule" )
-		{
-			return (CPcbRule*)obj;
-		}
-	}
-	return NULL;
-}
-

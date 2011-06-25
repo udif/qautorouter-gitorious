@@ -8,6 +8,8 @@
 #include "cpcb.h"
 #include "cpcbstructure.h"
 #include "cpcbrule.h"
+#include "cpcbnetwork.h"
+#include "cpcbclass.h"
 
 #define inherited CSpecctraObject
 
@@ -41,10 +43,14 @@ QString CPcbNet::name()
   */
 double CPcbNet::width()
 {
-	double w=15;
+	double w=12;
 	if ( mWidth < 0.0 )
 	{
-		if (pcb()!=NULL && pcb()->structure()!=NULL && pcb()->structure()->rule()!=NULL)
+		if ( netClass() != NULL )
+		{
+			w = netClass()->width();
+		}
+		else if (pcb()!=NULL && pcb()->structure()!=NULL && pcb()->structure()->rule()!=NULL)
 		{
 			w = pcb()->structure()->rule()->width();
 		}
@@ -54,6 +60,40 @@ double CPcbNet::width()
 		w = mWidth;
 	}
 	return w;
+}
+
+/**
+  * @return the net class
+  */
+CPcbClass* CPcbNet::netClass()
+{
+	if ( pcb()!=NULL && pcb()->network()!= NULL )
+	{
+		for( int n=0; n < pcb()->network()->netClasses(); n++)
+		{
+			CPcbClass* pClass = pcb()->network()->netClass(n);
+			if ( pClass != NULL )
+			{
+				QStringList& nets = pClass->nets();
+				if (nets.contains(name()))
+				{
+					return pcb()->network()->netClass(n);
+				}
+			}
+		}
+	}
+	return NULL;
+}
+
+/**
+  * @return verbose description
+  */
+QString CPcbNet::description()
+{
+	QString rc;
+	rc += name()+" ";
+	rc += netClass()->description();
+	return rc;
 }
 
 QRectF CPcbNet::boundingRect() const

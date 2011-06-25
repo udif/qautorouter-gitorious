@@ -48,6 +48,7 @@ class QAutoRouter : public QMainWindow
 		void					removePlugin();
 		void					layerClicked(QModelIndex);
 		void					layerColorClicked();
+		void					netsClicked(QModelIndex);
 		void					readSettings();
 		void					writeSettings();
 		void					editPreferences();
@@ -61,6 +62,7 @@ class QAutoRouter : public QMainWindow
 	protected:
 		bool					maybeSave();
 		void					populateLayersForm();
+		void					populateNetsForm();
 		void					setupActions();
 		void					changeEvent(QEvent *e);
 		void					closeEvent(QCloseEvent* e);

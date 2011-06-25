@@ -26,11 +26,12 @@ class CPcbLayer : public CSpecctraObject
 		CPcbLayer(QGraphicsItem *parent = 0);
 		virtual ~CPcbLayer();
 
+		virtual QString					name();
+		virtual QString					description();
+
 		QColor							color() {return mColor;}
-		QString							name();
 		QString							type();
 		int								index();
-		QString							description();
 		void							setDirection(tDirection direction) {mDirection = direction;}
 		tDirection						direction() {return mDirection;}
 

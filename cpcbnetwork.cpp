@@ -4,12 +4,12 @@
 *******************************************************************************/
 #include "cpcbnetwork.h"
 #include "cpcbnet.h"
+#include "cpcbclass.h"
 
 #define inherited CSpecctraObject
 
 CPcbNetwork::CPcbNetwork(QGraphicsItem *parent)
 : inherited(parent)
-, nNets(-1)
 {
 }
 
@@ -22,19 +22,17 @@ CPcbNetwork::~CPcbNetwork()
   */
 int CPcbNetwork::nets()
 {
-	if ( nNets < 0 )
+	if ( mNets.count() == 0 )
 	{
-		int count=0;
 		for(int n=0;n<children().count();n++)
 		{
 			if ( children().at(n)->objectClass() == "net" )
 			{
-				++count;
+				mNets.append((CPcbNet*)children().at(n));
 			}
 		}
-		nNets = count;
 	}
-	return nNets;
+	return mNets.count();
 }
 
 /**
@@ -61,22 +59,69 @@ CPcbNet* CPcbNetwork::net(int idx)
 /**
   * @return a net by name
   */
-CPcbNet* CPcbNetwork::net(QString name)
+CPcbNet* CPcbNetwork::net(QString ref)
 {
-	for(int n=0;n<children().count();n++)
+	for(int n=0; n < nets(); n++)
 	{
-		CSpecctraObject* obj = children().at(0);
-		if (obj->objectName()=="net")
-		{
-			CPcbNet* pcbNet = (CPcbNet*)obj;
-			if ( pcbNet->name() == name )
-			{
-				return pcbNet;
-			}
-		}
+		CPcbNet* pcbNet = net(n);
+		if ( pcbNet->name() == ref )
+			return pcbNet;
 	}
 	return NULL;
 }
+
+/**
+  * @return the number of net classes
+  */
+int CPcbNetwork::netClasses()
+{
+	if ( mClasses.count() == 0 )
+	{
+		for(int n=0;n<children().count();n++)
+		{
+			if ( children().at(n)->objectClass() == "class" )
+			{
+				mClasses.append((CPcbClass*)children().at(n));
+			}
+		}
+	}
+	return mClasses.count();
+}
+
+/**
+  * @return net class by index.
+  */
+CPcbClass* CPcbNetwork::netClass(int idx)
+{
+	if ( mClasses.count() == 0 )
+	{
+		for(int n=0;n<children().count();n++)
+		{
+			if ( children().at(n)->objectClass() == "class" )
+			{
+				mClasses.append((CPcbClass*)children().at(n));
+			}
+		}
+	}
+
+	if ( idx < mClasses.count() )
+		return mClasses.at(idx);
+	return NULL;
+}
+
+/**
+  * @erturn net class by reference.
+  */
+CPcbClass* CPcbNetwork::netClass(QString ref)
+{
+	for(int n=0; n < netClasses(); n++)
+	{
+		if ( netClass(n)->name() == ref)
+			return netClass(n);
+	}
+	return NULL;
+}
+
 
 /**
   * @return tally up the unrouted
