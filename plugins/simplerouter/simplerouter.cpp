@@ -3,6 +3,15 @@
 * Author: Mike Sharkey <mike@pikeaero.com>                                     *
 *******************************************************************************/
 #include "simplerouter.h"
+#include <cpcb.h>
+
+/**
+  * @return plugin type
+  */
+CPluginInterface::tPluginType SimpleRouter::type()
+{
+	return CPluginInterface::RouterPlugin;
+}
 
 /**
   * @return A title for the plugin to display in user interface.
@@ -44,6 +53,23 @@ QString SimpleRouter::description() const
 	return "A Simple Auto Router Skeleton";
 }
 
+/**
+  * @brief perform initialization
+  */
+bool SimpleRouter::initialize(CPcb* pcb)
+{
+	mPcb = pcb;
+	return( mPcb != NULL );
+}
+
+/**
+  * @brief run for a little bit.
+  */
+bool SimpleRouter::exec()
+{
+	bool rc=false;
+	return rc;
+}
 
 
 

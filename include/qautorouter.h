@@ -12,6 +12,7 @@
 #include <QCloseEvent>
 #include <QDialog>
 #include <QWheelEvent>
+#include <QPluginLoader>
 
 #include "cpcb.h"
 
@@ -41,7 +42,7 @@ class QAutoRouter : public QMainWindow
 		void					faultHandler(QString txt);
 
 	protected slots:
-		bool					loadPlugin(QString filename);
+		bool					loadPlugin(QString filename,QString& errorString);
 		void					addPlugin();
 		void					removePlugin();
 		void					layerColorDoubleClicked(QModelIndex idx);
@@ -72,6 +73,7 @@ class QAutoRouter : public QMainWindow
 		CSpecctraObject*		mRoot;
 		int						mTimer;
 		QString					mFileName;
+		QPluginLoader			mPluginLoader;
 };
 
 #endif // QAUTOROUTER_H

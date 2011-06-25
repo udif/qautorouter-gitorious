@@ -167,6 +167,15 @@ void QAutoRouter::writeSettings()
 		}
 	}
 	settings.endGroup();
+
+	settings.beginWriteArray("plugins");
+	for (int n = 0; n < preferences->pluginTree->topLevelItemCount(); ++n) {
+		settings.setArrayIndex(n);
+		QTreeWidgetItem* item = preferences->pluginTree->topLevelItem(n);
+		QString filename = item->data(0,Qt::UserRole).toString();
+		settings.setValue("plugin",filename);
+	}
+	settings.endArray();
 }
 
 void QAutoRouter::readSettings()
@@ -192,6 +201,19 @@ void QAutoRouter::readSettings()
 		}
 	}
 	settings.endGroup();
+
+	int size = settings.beginReadArray("plugins");
+	for (int n = 0; n < size; ++n) {
+		settings.setArrayIndex(n);
+		QString filename = settings.value("plugin").toString();
+		QString errorString;
+		if ( !loadPlugin(filename,errorString))
+		{
+			QMessageBox::warning(this,tr("Plugin Loader"),tr("Load '")+filename+tr("' failed: ")+errorString);
+		}
+	}
+	settings.endArray();
+
 }
 
 
@@ -428,33 +450,57 @@ void QAutoRouter::timerEvent(QTimerEvent* e)
 /**
   * @brief Load a plugin by file name.
   */
-bool QAutoRouter::loadPlugin(QString filename)
+bool QAutoRouter::loadPlugin(QString filename,QString& errorString)
 {
 	bool rc=false;
-	QPluginLoader loader(filename);
-	if ( loader.load() )
+	mPluginLoader.setFileName(filename);
+	if ( !mPluginLoader.isLoaded())
 	{
-		QObject* plugin = loader.instance();
-		if ( plugin != NULL )
+		if ( mPluginLoader.load() )
 		{
-			CPluginInterface *iPlugin = qobject_cast<CPluginInterface *>(plugin);
-			 if (iPlugin)
+			QObject* plugin = mPluginLoader.instance();
+			if ( plugin != NULL )
 			{
-				QTreeWidgetItem *pluginItem = new QTreeWidgetItem(preferences->pluginTree);
-				pluginItem->setText(0, iPlugin->title());
-				QTreeWidgetItem *pluginVersion = new QTreeWidgetItem(pluginItem);
-				pluginVersion->setText(0, tr("Version: ")+iPlugin->version());
-				QTreeWidgetItem *pluginAuthor = new QTreeWidgetItem(pluginItem);
-				pluginAuthor->setText(0, tr("Author: ")+iPlugin->author());
-				QTreeWidgetItem *pluginWebsite = new QTreeWidgetItem(pluginItem);
-				pluginWebsite->setText(0, tr("Website: ")+iPlugin->website());
-				QTreeWidgetItem *pluginDescription = new QTreeWidgetItem(pluginItem);
-				pluginDescription->setText(0, tr("About: ")+iPlugin->description());
-				preferences->pluginTree->addTopLevelItem(pluginItem);
-				rc = true;
+				CPluginInterface *iPlugin = qobject_cast<CPluginInterface *>(plugin);
+				 if (iPlugin)
+				{
+					bool inTree=false;
+					for (int n = 0; n < preferences->pluginTree->topLevelItemCount(); ++n) {
+						QTreeWidgetItem* item = preferences->pluginTree->topLevelItem(n);
+						QString filename = item->data(0,Qt::UserRole).toString();
+						if ( mPluginLoader.fileName() == filename )
+						{
+							inTree=true;
+							break;
+						}
+					}
+					if ( !inTree )
+					{
+						QString title = (iPlugin->type()==CPluginInterface::RouterPlugin)?tr("[Router] "):tr("[Post-Router] ");
+						title += iPlugin->title();
+						QTreeWidgetItem *pluginItem = new QTreeWidgetItem(preferences->pluginTree);
+						pluginItem->setText(0, title);
+						pluginItem->setData(0,Qt::UserRole,mPluginLoader.fileName());
+						QTreeWidgetItem *pluginVersion = new QTreeWidgetItem(pluginItem);
+						pluginVersion->setText(0, tr("Version: ")+iPlugin->version());
+						QTreeWidgetItem *pluginAuthor = new QTreeWidgetItem(pluginItem);
+						pluginAuthor->setText(0, tr("Author: ")+iPlugin->author());
+						QTreeWidgetItem *pluginWebsite = new QTreeWidgetItem(pluginItem);
+						pluginWebsite->setText(0, tr("Website: ")+iPlugin->website());
+						QTreeWidgetItem *pluginDescription = new QTreeWidgetItem(pluginItem);
+						pluginDescription->setText(0, tr("About: ")+iPlugin->description());
+						preferences->pluginTree->addTopLevelItem(pluginItem);
+					}
+					rc = true;
+				}
 			}
 		}
 	}
+	else
+	{
+		rc=true;
+	}
+	errorString = mPluginLoader.errorString();
 	return rc;
 }
 
@@ -468,9 +514,14 @@ void QAutoRouter::addPlugin()
 	{
 		QString filename = dialog.selectedFiles().at(0);
 		QPluginLoader loader(filename);
-		if ( !loadPlugin(filename) )
+		QString errorString;
+		if ( loadPlugin(filename,errorString) )
 		{
-			QMessageBox::warning(this,"Plugin Loader","Load '"+filename+"' failed.");
+			writeSettings();
+		}
+		else
+		{
+			QMessageBox::warning(this,"Plugin Loader","Load '"+filename+"' failed: "+errorString);
 		}
 	}
 }
@@ -480,7 +531,25 @@ void QAutoRouter::addPlugin()
   */
 void QAutoRouter::removePlugin()
 {
-
+	QList<QTreeWidgetItem*> pluginItems = preferences->pluginTree->selectedItems();
+	for(int n=0; n < pluginItems.count(); n++)
+	{
+		QTreeWidgetItem* item = pluginItems.at(n);
+		QString filename = item->data(0,Qt::UserRole).toString();
+		if ( filename.length() )
+		{
+			mPluginLoader.setFileName(filename);
+			if ( mPluginLoader.unload() )
+			{
+				preferences->pluginTree->removeItemWidget(item,0);
+				writeSettings();
+			}
+			else
+			{
+				QMessageBox::warning(this,"Plugin Unload","Unload '"+filename+"' failed: "+mPluginLoader.errorString());
+			}
+		}
+	}
 }
 
 

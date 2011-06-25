@@ -41,7 +41,11 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="0" column="0">
-           <widget class="QListWidget" name="layerColors"/>
+           <widget class="QListWidget" name="layerColors">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -62,6 +66,42 @@
       <attribute name="title">
        <string>AutoRouting</string>
       </attribute>
+      <layout class="QGridLayout" name="gridLayout_5">
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Default Router</string>
+         </property>
+         <widget class="QComboBox" name="routerCombo">
+          <property name="geometry">
+           <rect>
+            <x>30</x>
+            <y>30</y>
+            <width>331</width>
+            <height>25</height>
+           </rect>
+          </property>
+         </widget>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Default Post-Router</string>
+         </property>
+         <widget class="QComboBox" name="postRouterCombo">
+          <property name="geometry">
+           <rect>
+            <x>30</x>
+            <y>30</y>
+            <width>331</width>
+            <height>25</height>
+           </rect>
+          </property>
+         </widget>
+        </widget>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="tab">
       <attribute name="title">
