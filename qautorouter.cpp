@@ -22,6 +22,8 @@
 #include <QPluginLoader>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
+#include <QTableWidget>
+#include <QTableWidgetItem>
 
 #include "ui_qautorouter.h"
 #include "ui_preferences.h"
@@ -46,14 +48,24 @@ QAutoRouter::QAutoRouter(QWidget *parent)
 	readSettings();
 	QObject::connect(this,SIGNAL(fault(QString)),this,SLOT(faultHandler(QString)));
 	QObject::connect(preferences->layerList,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(layerClicked(QModelIndex)));
+	QObject::connect(preferences->netsTree,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(netsClicked(QModelIndex)));
 	QObject::connect(layerpreferences->colorButton,SIGNAL(clicked()),this,SLOT(layerColorClicked()));
 	QObject::connect(preferences->addPluginButton,SIGNAL(clicked()),this,SLOT(addPlugin()));
 	QObject::connect(preferences->removePluginButton,SIGNAL(clicked()),this,SLOT(removePlugin()));
+	QObject::connect(preferences->newNetClassButton,SIGNAL(clicked()),this,SLOT(newNetClass()));
+	QObject::connect(preferences->deleteNetClassButton,SIGNAL(clicked()),this,SLOT(deleteNetClass()));
 	this->setWindowIcon(QIcon(":/icons/qautorouter.png"));
 	this->setWindowTitle("QAutoRouter "+QString(VERSION_STRING));
 	mTimer = startTimer(2000);
+
 	preferences->pluginTree->setHeaderLabel(tr("Plugins"));
-	preferences->netsTree->setHeaderLabel(tr("Nets"));
+
+	QStringList netsTreeLabels;
+	netsTreeLabels << "Net";
+	netsTreeLabels << "Class Properties";
+	preferences->netsTree->setColumnCount(2);
+	preferences->netsTree->setHeaderLabels(netsTreeLabels);
+
 }
 
 QAutoRouter::~QAutoRouter()
@@ -197,6 +209,7 @@ void QAutoRouter::populateLayersForm()
 
 void QAutoRouter::netsClicked(QModelIndex idx)
 {
+	/** FIXME - get here on a nets click - open net class picker. (embed ComboBox in the nets tree?) */
 }
 
 /**
@@ -214,19 +227,61 @@ void QAutoRouter::populateNetsForm()
 			netsItem->setText(0, net->name());
 			netsItem->setData(0,Qt::UserRole,net->name());
 			QTreeWidgetItem *netsClass = new QTreeWidgetItem(netsItem);
-			netsClass->setText(0,tr("Class: ")+net->netClass()->name());
-			QTreeWidgetItem *netsWidth = new QTreeWidgetItem(netsItem);
-			netsWidth->setText(0,tr("Width: ")+QString::number(net->netClass()->width())+"mil");
+			netsClass->setText(0,net->netClass()->name());
+			netsClass->setData(0,Qt::UserRole,net->netClass()->name());
+			netsClass->setText(1,QString::number(net->netClass()->width())+"mil");
+			netsClass->setData(1,Qt::UserRole,net->netClass()->name());
 			preferences->netsTree->addTopLevelItem(netsItem);
 		}
 		preferences->netsTree->sortItems(0,Qt::AscendingOrder);
+		preferences->netsTree->resizeColumnToContents(0);
 	}
+}
+
+/**
+  * @brief populate the net classes properties form.
+  */
+void QAutoRouter::populateNetClassesForm()
+{
+	if ( pcb()!=NULL && pcb()->network()!=NULL )
+	{
+		preferences->netClassesTable->clear();
+		preferences->netClassesTable->setColumnCount(2);
+		preferences->netClassesTable->setHorizontalHeaderItem(0,new QTableWidgetItem("Class"));
+		preferences->netClassesTable->setHorizontalHeaderItem(1,new QTableWidgetItem("Width (mil)"));
+		for(int i = 0; i < pcb()->network()->netClasses(); i++)
+		{
+			preferences->netClassesTable->setRowCount(i+1);
+			CPcbClass* netClass = pcb()->network()->netClass(i);
+			preferences->netClassesTable->setItem(i,0,new QTableWidgetItem(netClass->name()));
+			preferences->netClassesTable->setItem(i,1,new QTableWidgetItem(QString::number(netClass->width())));
+		}
+		preferences->netClassesTable->resizeColumnsToContents();
+	}
+}
+
+/**
+  * @brief new net class
+  */
+void QAutoRouter::newNetClass()
+{
+	preferences->netClassesTable->setRowCount(preferences->netClassesTable->rowCount()+1);
+	/** FIXME - instantiate a new PcbClass object and add to the Pcb object tree. */
+}
+
+/**
+  * @brief elete new class
+  */
+void QAutoRouter::deleteNetClass()
+{
+	/** FIXME delete from the table and from the Pcb object tree - do we need to have a *write protect* on original sourced Pcb objects? */
 }
 
 void QAutoRouter::editPreferences()
 {
 	populateLayersForm();
 	populateNetsForm();
+	populateNetClassesForm();
 	if ( mPreferencesDialog.exec() == QDialog::Accepted )
 	{
 		writeSettings();
@@ -409,6 +464,7 @@ bool QAutoRouter::load(QFile& file)
 			readSettings();
 			populateLayersForm();
 			populateNetsForm();
+			populateNetClassesForm();
 			zoomFit();
 			rc=true;
 		}

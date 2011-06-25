@@ -43,6 +43,8 @@ class QAutoRouter : public QMainWindow
 		void					faultHandler(QString txt);
 
 	protected slots:
+		void					newNetClass();
+		void					deleteNetClass();
 		bool					loadPlugin(QString filename,QString& errorString);
 		void					addPlugin();
 		void					removePlugin();
@@ -63,6 +65,7 @@ class QAutoRouter : public QMainWindow
 		bool					maybeSave();
 		void					populateLayersForm();
 		void					populateNetsForm();
+		void					populateNetClassesForm();
 		void					setupActions();
 		void					changeEvent(QEvent *e);
 		void					closeEvent(QCloseEvent* e);
