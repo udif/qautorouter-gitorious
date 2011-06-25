@@ -10,8 +10,10 @@
 
 QMap<QString,CGPadstack*>	CGPadstack::mGPadstacks; /** indexed by "UNIT-PIN" string notation. */
 
+#define inherited CGSegment
+
 CGPadstack::CGPadstack(CPcbPlace* place,QString pinRef, QObject *parent)
-: QObject(parent)
+: inherited(parent)
 , mPlace(place)
 , mPinRef(pinRef)
 {

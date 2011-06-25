@@ -58,6 +58,9 @@ class CSpecctraObject : public QObject, public QGraphicsItem /* QGraphicsPathIte
 
 		static QGraphicsScene*			scene();
 
+	public slots:
+		virtual void					clearCache();
+
 	signals:
 		void							fault(QString txt);
 

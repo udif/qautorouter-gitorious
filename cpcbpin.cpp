@@ -23,7 +23,7 @@ CPcbPin::~CPcbPin()
 /**
   * @return the pin undex (pin number)
   */
-QString CPcbPin::index()
+QString CPcbPin::name()
 {
 	QString idx;
 	if ( properties().count() >= 2 )

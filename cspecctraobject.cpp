@@ -55,6 +55,15 @@ QString CSpecctraObject::toText(int lvl)
 	return text;
 }
 
+void CSpecctraObject::clearCache()
+{
+	for(int n=0; n < children().count(); n++)
+	{
+		CSpecctraObject* child = children().at(0);
+		child->clearCache();
+	}
+}
+
 CSpecctraObject* CSpecctraObject::root()
 {
 	if ( parentObject() != NULL )

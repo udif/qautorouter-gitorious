@@ -2,29 +2,26 @@
 * Copyright (C) Pike Aerospace Research Corporation                            *
 * Author: Mike Sharkey <mike@pikeaero.com>                                     *
 *******************************************************************************/
-#ifndef CPCBPIN_H
-#define CPCBPIN_H
+#ifndef CGVIA_H
+#define CGVIA_H
 
 #include <QObject>
+#include <QPainterPath>
 #include <QString>
-#include <QPointF>
+#include <QGraphicsItem>
+#include <QMap>
 
-#include "cspecctraobject.h"
+#include "cgpadstack.h"
 
-class CPcbPadstack;
-class CPcbPin : public CSpecctraObject
+class CGVia : public CGPadstack
 {
 	Q_OBJECT
 	public:
-		CPcbPin(QGraphicsItem *parent = 0);
-		virtual ~CPcbPin();
+		CGVia(QObject *parent = 0);
+		virtual ~CGVia();
 
-		virtual QString			name();
-		QPointF					pos();
-		QString					padstackName();
-		CPcbPadstack*			padstack();
+	private:
 
 };
 
-#endif // CPCBPIN_H
-
+#endif // CGVIA_H

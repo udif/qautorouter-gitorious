@@ -11,11 +11,12 @@
 #include <QGraphicsItem>
 #include <QMap>
 
+#include "cgsegment.h"
 #include "cgpad.h"
 
 class CPcb;
 class CPcbPlace;
-class CGPadstack : public QObject
+class CGPadstack : public CGSegment
 {
 	Q_OBJECT
 	public:

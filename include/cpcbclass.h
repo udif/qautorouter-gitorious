@@ -22,11 +22,10 @@ class CPcbClass : public CSpecctraObject
 
 		virtual QString					name();
 		virtual QString					description();
-
 		QStringList&					nets();
-
 		double							width();
-
+	public slots:
+		virtual void					clearCache();
 	private:
 		QStringList						mNets;
 

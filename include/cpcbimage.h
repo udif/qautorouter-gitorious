@@ -20,13 +20,14 @@ class CPcbImage : public CSpecctraObject
 		virtual ~CPcbImage();
 
 		virtual QString					name();
-
 		int								outlines();
-		CPcbOutline*					outline(int comp);
+		CPcbOutline*					outline(int idx);
 
 		int								pins();
-		CPcbPin*						pin(int comp);
-
+		CPcbPin*						pin(int idx);
+		CPcbPin*						pin(QString ref);
+	public slots:
+		virtual void					clearCache();
 	private:
 		QList<CPcbOutline*>				mOutlines;
 		QList<CPcbPin*>					mPins;

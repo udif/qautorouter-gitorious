@@ -27,7 +27,7 @@
     )
     (via "Via[0-1]_45:25_mil")
     (rule
-      (width 25)
+      (width 15)
       (clearance 6.1)
       (clearance 8.1 (type default_smd))
       (clearance 1.5 (type smd_smd))
@@ -1416,7 +1416,7 @@
       (circuit
         (use_via Via[0-1]_45:25_mil)
       )
-      (rule (width 25))
+      (rule (width 15))
     )
   )
   (wiring

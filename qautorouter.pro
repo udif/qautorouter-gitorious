@@ -33,7 +33,10 @@ SOURCES += main.cpp \
     cgpad.cpp \
     cgpadstack.cpp \
     cpcbrule.cpp \
-    cpcbvia.cpp
+    cpcbvia.cpp \
+    cgvia.cpp \
+    cgsegment.cpp \
+    cgwire.cpp
 HEADERS += include/qautorouter.h \
     include/cspecctrareader.h \
     include/cspecctraobject.h \
@@ -62,7 +65,10 @@ HEADERS += include/qautorouter.h \
     include/cgpadstack.h \
     include/cpcbrule.h \
     include/cpcbvia.h \
-    include/cplugininterface.h
+    include/cplugininterface.h \
+    include/cgvia.h \
+    include/cgsegment.h \
+    include/cgwire.h
 FORMS += forms/qautorouter.ui \
     forms/preferences.ui \
     forms/layerpreferences.ui

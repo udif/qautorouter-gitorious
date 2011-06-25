@@ -3,6 +3,8 @@
 * Author: Mike Sharkey <mike@pikeaero.com>                                     *
 *******************************************************************************/
 #include "cpcbimage.h"
+#include "cpcboutline.h"
+#include "cpcbpin.h"
 
 #define inherited CSpecctraObject
 
@@ -14,6 +16,14 @@ CPcbImage::CPcbImage(QGraphicsItem *parent)
 CPcbImage::~CPcbImage()
 {
 }
+
+void CPcbImage::clearCache()
+{
+	mOutlines.clear();
+	mPins.clear();
+	inherited::clearCache();
+}
+
 
 QString CPcbImage::name()
 {
@@ -41,7 +51,7 @@ int CPcbImage::outlines()
 /**
   * @return a outline by index
   */
-CPcbOutline* CPcbImage::outline(int comp)
+CPcbOutline* CPcbImage::outline(int idx)
 {
 	if ( mOutlines.count() == 0 )
 	{
@@ -54,9 +64,8 @@ CPcbOutline* CPcbImage::outline(int comp)
 		}
 	}
 
-	if ( comp < mOutlines.count() )
-		return mOutlines.at(comp);
-
+	if ( idx < mOutlines.count() )
+		return mOutlines.at(idx);
 	return NULL;
 }
 
@@ -81,7 +90,7 @@ int CPcbImage::pins()
 /**
   * @return a pin by index
   */
-CPcbPin* CPcbImage::pin(int comp)
+CPcbPin* CPcbImage::pin(int idx)
 {
 	if ( mPins.count() == 0 )
 	{
@@ -93,8 +102,20 @@ CPcbPin* CPcbImage::pin(int comp)
 			}
 		}
 	}
+	if ( idx < mPins.count() )
+		return mPins.at(idx);
+	return NULL;
+}
 
-	if ( comp < mPins.count() )
-		return mPins.at(comp);
+/**
+  * @return a pin by reference.
+  */
+CPcbPin* CPcbImage::pin(QString ref)
+{
+	for(int n=0; n < pins(); n++)
+	{
+		if ( pin(n)->name() == ref)
+			return pin(n);
+	}
 	return NULL;
 }

@@ -18,6 +18,15 @@ CPcbClass::~CPcbClass()
 }
 
 /**
+  * @brief clear the micro-cache of this and children
+  */
+void CPcbClass::clearCache()
+{
+	mNets.clear();
+	inherited::clearCache();
+}
+
+/**
   * @return the name of the net class.
   */
 QString CPcbClass::name()

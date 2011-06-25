@@ -74,7 +74,7 @@ QString CPcbPlace::side()
 /**
   * @return a pin pointer by it's index name
   */
-CPcbPin* CPcbPlace::pin(QString index)
+CPcbPin* CPcbPlace::pin(QString ref)
 {
 	CSpecctraObject* pObj = parentObject();
 	if ( pObj->objectClass() == "component")
@@ -84,14 +84,9 @@ CPcbPin* CPcbPlace::pin(QString index)
 		if ( library != NULL )
 		{
 			CPcbImage* image = library->image(component->footprint());
-			for(int iPin=0;iPin<image->pins();iPin++)
-			{
-				CPcbPin* pin = image->pin(iPin);
-				if ( pin->index() == index)
-				{
-					return pin;
-				}
-			}
+			CPcbPin* pin = image->pin(ref);
+			if ( pin != NULL )
+				return pin;
 		}
 	}
 	return NULL;
@@ -173,7 +168,7 @@ void CPcbPlace::createPadstacks()
 					QPainterPath pinShape;
 					CPcbPin* pin = image->pin(iPin);
 					CPcbPadstack* padstack = pin->padstack();
-					CGPadstack* cgPadstack = new CGPadstack(this,pin->index());
+					CGPadstack* cgPadstack = new CGPadstack(this,pin->name());
 					for(int iShape=0;iShape<padstack->shapes();iShape++)
 					{
 						CPcbShape* shape = padstack->shape(iShape);

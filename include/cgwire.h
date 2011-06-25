@@ -2,29 +2,25 @@
 * Copyright (C) Pike Aerospace Research Corporation                            *
 * Author: Mike Sharkey <mike@pikeaero.com>                                     *
 *******************************************************************************/
-#ifndef CPCBPIN_H
-#define CPCBPIN_H
+#ifndef CGWIRE_H
+#define CGWIRE_H
 
 #include <QObject>
-#include <QString>
-#include <QPointF>
+#include <QList>
 
-#include "cspecctraobject.h"
-
-class CPcbPadstack;
-class CPcbPin : public CSpecctraObject
+class CGSegment;
+class CGWire : public QObject
 {
 	Q_OBJECT
 	public:
-		CPcbPin(QGraphicsItem *parent = 0);
-		virtual ~CPcbPin();
+		CGWire(QObject *parent = 0);
+		virtual ~CGWire();
 
-		virtual QString			name();
-		QPointF					pos();
-		QString					padstackName();
-		CPcbPadstack*			padstack();
+		int								segments();
+		CGSegment*						segment(int idx);
 
+	private:
+		QList<CGSegment*>				mSegments;
 };
 
-#endif // CPCBPIN_H
-
+#endif // CGWIRE_H

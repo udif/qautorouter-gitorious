@@ -29,7 +29,9 @@ class CPcbNetwork : public CSpecctraObject
 
 		int								routed();
 
-private:
+	public slots:
+		virtual void					clearCache();
+	private:
 		QList<CPcbNet*>					mNets;
 		QList<CPcbClass*>				mClasses;
 
