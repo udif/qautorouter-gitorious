@@ -136,7 +136,10 @@ QPainterPath CPcbPlace::outlineShape() const
 				for(iOutline=0;iOutline<nOutlines;iOutline++)
 				{
 					CPcbOutline* outline = image->outline(iOutline);
-					outlineShape.addPath(outline->path()->shape());
+					if ( outline!=NULL && outline->path()!=NULL )
+					{
+						outlineShape.addPath(outline->path()->shape());
+					}
 				}
 				outlineShape.translate(me->pos());
 				p.addPath(outlineShape);

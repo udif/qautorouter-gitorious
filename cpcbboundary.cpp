@@ -38,8 +38,12 @@ QRectF CPcbBoundary::boundingRect() const
 
 QPainterPath CPcbBoundary::shape() const
 {
-	CPcbBoundary* other=(CPcbBoundary*)this;
-	QPainterPath p = other->path()->shape();
+	QPainterPath p;
+	CPcbBoundary* me=(CPcbBoundary*)this;
+	if (me->path()!=NULL)
+	{
+		p = me->path()->shape();
+	}
 	return p;
 }
 

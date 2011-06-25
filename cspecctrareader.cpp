@@ -57,6 +57,7 @@ CSpecctraReader::~CSpecctraReader()
 CSpecctraObject* CSpecctraReader::make(QString& oClass,CSpecctraObject* parentObject)
 {
 	CSpecctraObject* obj;
+	oClass.toLower();
 	if (oClass == "pcb")				obj = new CPcb();
 	else if (oClass == "structure")		obj = new CPcbStructure();
 	else if (oClass == "layer")			obj = new CPcbLayer();
@@ -80,7 +81,9 @@ CSpecctraObject* CSpecctraReader::make(QString& oClass,CSpecctraObject* parentOb
 		obj = new CSpecctraObject();
 	obj->setObjectClass(oClass);
 	if ( parentObject != NULL ) /* already in an object? */
+	{
 		parentObject->appendChild(obj);
+	}
 	return obj;
 }
 
@@ -123,6 +126,11 @@ CSpecctraObject* CSpecctraReader::parse()
 			if ( oClass.length() )	/* do we have a class name? */
 			{
 				CSpecctraObject* newObject = make(oClass,object);
+				if ( newObject == NULL )
+				{
+					emit fault("failed to load.");
+					return mRoot;
+				}
 				object = newObject;
 			}
 			else

@@ -155,7 +155,7 @@ void QAutoRouter::layerColorClicked()
 void QAutoRouter::layerClicked(QModelIndex idx)
 {
 	QListWidgetItem* item = preferences->layerList->currentItem();
-	if ( item != NULL )
+	if ( item != NULL && pcb()!=NULL && pcb()->structure()!=NULL )
 	{
 		CPcbLayer* layer = pcb()->structure()->layer(item->data(Qt::UserRole).toString());
 		if ( layer != NULL )
@@ -185,6 +185,10 @@ void QAutoRouter::layerClicked(QModelIndex idx)
 		{
 			emit fault(tr("problem loading layer '")+item->data(Qt::UserRole).toString()+"'");
 		}
+	}
+	else
+	{
+		emit fault(tr("problem with layer."));
 	}
 }
 
@@ -458,21 +462,28 @@ bool QAutoRouter::load(QFile& file)
 		clear();
 		CSpecctraReader reader(in,this);
 		mRoot = reader.root();
-		root()->dump(); /** DEBUG */
-		if ( root()->objectClass() == "pcb" )
+		if ( root() != NULL )
 		{
-			readSettings();
-			populateLayersForm();
-			populateNetsForm();
-			populateNetClassesForm();
-			zoomFit();
-			rc=true;
+			root()->dump(); /** DEBUG */
+			if ( root()->objectClass() == "pcb" )
+			{
+				readSettings();
+				populateLayersForm();
+				populateNetsForm();
+				populateNetClassesForm();
+				zoomFit();
+				rc=true;
+			}
+			else
+			{
+				emit fault(tr("root class 'pcb'' expected."));
+				clear();
+				rc=false;
+			}
 		}
 		else
 		{
-			emit fault(tr("root class 'pcb'' expected."));
-			clear();
-			rc=false;
+			emit fault(tr("load problem."));
 		}
 		file.close();
 	}
