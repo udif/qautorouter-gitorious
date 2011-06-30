@@ -35,11 +35,17 @@ double CGSegment::width()
 	return mWidth;
 }
 
+/**
+  * @brief set the pointer to the segment layer.
+  */
 void CGSegment::setLayer(CPcbLayer* layer)
 {
 	mLayer=layer;
 }
 
+/**
+  * @return the a pointer to the segment layer.
+  */
 CPcbLayer* CGSegment::layer()
 {
 	return mLayer;
@@ -78,6 +84,9 @@ QRectF CGSegment::boundingRect() const
 	return bounds;
 }
 
+/**
+  * @return the segment shape.
+  */
 QPainterPath CGSegment::shape() const
 {
 	CGSegment* me=(CGSegment*)this;
