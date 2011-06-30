@@ -8,19 +8,19 @@
 #include <QObject>
 #include <QList>
 
-class CGSegment;
-class CGWire : public QObject
+#include "cgsegment.h"
+
+class CGWire : public CGSegment
 {
 	Q_OBJECT
 	public:
 		CGWire(QObject *parent = 0);
 		virtual ~CGWire();
 
-		int								segments();
-		CGSegment*						segment(int idx);
+		virtual tSegment			segmentType() {return CGSegment::Wire;}
+		virtual bool				isA(CGSegment::tSegment t) {return t==CGSegment::Wire || CGSegment::isA(t);}
 
-	private:
-		QList<CGSegment*>				mSegments;
+		virtual QPainterPath		shape() const;
 };
 
 #endif // CGWIRE_H

@@ -135,3 +135,14 @@ QString CGPadstack::pinRef()
 	return mPinRef;
 }
 
+/**
+  * @return the shape outline of the padstack.
+  */
+QPainterPath CGPadstack::shape() const
+{
+	QPainterPath ppath;
+	ppath.addPath(inherited::shape());
+	return ppath;
+}
+
+

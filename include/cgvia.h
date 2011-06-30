@@ -20,6 +20,9 @@ class CGVia : public CGPadstack
 		CGVia(QObject *parent = 0);
 		virtual ~CGVia();
 
+		virtual tSegment			segmentType() {return CGSegment::Via;}
+		virtual bool				isA(CGSegment::tSegment t) {return t==CGSegment::Via || CGPadstack::isA(t);}
+
 	private:
 
 };

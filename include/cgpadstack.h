@@ -23,6 +23,9 @@ class CGPadstack : public CGSegment
 		CGPadstack(CPcbPlace* place,QString pinRef,QObject *parent = 0);
 		virtual ~CGPadstack();
 
+		virtual tSegment			segmentType() {return CGSegment::Padstack;}
+		virtual bool				isA(CGSegment::tSegment t) {return t==CGSegment::Padstack || CGSegment::isA(t);}
+
 		void						addPad(CGPad* pad);
 		CPcbPlace*					place();
 		CPcb*						pcb();
@@ -35,6 +38,8 @@ class CGPadstack : public CGSegment
 		static void					clear();
 		static CGPadstack*			padstack(QString unitRef);
 		static QMap<QString,CGPadstack*> padstacks() {return mGPadstacks;}
+
+		virtual QPainterPath		shape() const;
 
 	private:
 		static QMap<QString,CGPadstack*> mGPadstacks;

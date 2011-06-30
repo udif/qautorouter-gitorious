@@ -4,7 +4,7 @@
 *******************************************************************************/
 #include "cgwire.h"
 
-#define inherited QObject
+#define inherited CGSegment
 
 CGWire::CGWire(QObject *parent)
 : inherited(parent)
@@ -15,14 +15,13 @@ CGWire::~CGWire()
 {
 }
 
-int CGWire::segments()
+/**
+  * @return the shape of the wire segment
+  */
+QPainterPath CGWire::shape() const
 {
-	return mSegments.count();
+	QPainterPath ppath;
+	ppath.addPath(inherited::shape());
+	return ppath;
 }
-
-CGSegment* CGWire::segment(int idx)
-{
-	return mSegments.at(idx);
-}
-
 
