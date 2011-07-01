@@ -18,16 +18,17 @@ class CPluginInterface
 			PostRouterPlugin,
 		} tPluginType;
 
-		virtual tPluginType type()=0;
+		virtual tPluginType			type()=0;						/* is the a router or post-router */
 
-		virtual QString title() const = 0;
-		virtual QString version() const = 0;
-		virtual QString author() const = 0;
-		virtual QString website() const = 0;
-		virtual QString description() const = 0;
+		virtual QString				title() const = 0;				/* a brief name for the plugin */
+		virtual QString				version() const = 0;			/* return a version number string */
+		virtual QString				author() const = 0;				/* name of author + email */
+		virtual QString				website() const = 0;			/* the author's website */
+		virtual QString				description() const = 0;		/* a brief description of the plugin */
 
-		virtual bool initialize(CPcb* pcb)=0;		/** initialize, gets' called once prior to exec() being called */
-		virtual bool exec()=0;						/** get's called repeatedly while exec() returns true, return false to stop */
+		virtual bool				initialize(CPcb* pcb)=0;		/** initialize, gets' called once prior to exec() being called */
+		virtual bool				exec()=0;						/** get's called repeatedly while exec() returns true, return false to stop */
+		virtual QString				status()=0;						/** a brief status report for the status bar */
 };
 
 

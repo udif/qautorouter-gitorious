@@ -18,19 +18,24 @@ class SimpleRouter : public QObject, public CPluginInterface
 
 	public:
 
-		virtual tPluginType type();
-		virtual QString title() const;
-		virtual QString version() const;
-		virtual QString author() const;
-		virtual QString website() const;
-		virtual QString description() const;
+		virtual tPluginType			type();							/* is the a router or post-router */
 
-		virtual bool initialize(CPcb* pcb);			/** initialize, gets' called once prior to exec() being called */
-		virtual bool exec();						/** get's called repeatedly while exec() returns true, return false to stop */
+		virtual QString				title() const;					/* a brief name for the plugin */
+		virtual QString				version() const;				/* return a version number string */
+		virtual QString				author() const;					/* name of author + email */
+		virtual QString				website() const;				/* the author's website */
+		virtual QString				description() const;			/* a brief description of the plugin */
+
+		virtual bool				initialize(CPcb* pcb);			/** initialize, gets' called once prior to exec() being called */
+		virtual bool				exec();							/** get's called repeatedly while exec() returns true, return false to stop */
+		virtual QString				status();						/** a brief status report for the status bar */
+
 	protected:
-		CPcb*		pcb() {return mPcb;}
+		CPcb*						pcb() {return mPcb;}
+
 	private:
-		CPcb*		mPcb;
+		CPcb*						mPcb;
+
 };
 
 #endif // SIMPLEROUTER_H

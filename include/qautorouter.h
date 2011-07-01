@@ -25,6 +25,7 @@ namespace Ui {
 #define VERSION_STRING	"V0.0.1"
 
 class CPcb;
+class CPluginInterface;
 class QAutoRouter : public QMainWindow
 {
     Q_OBJECT
@@ -54,6 +55,8 @@ class QAutoRouter : public QMainWindow
 		void					readSettings();
 		void					writeSettings();
 		void					editPreferences();
+		void					start();
+		void					stop();
 		void					open();
 		bool					save();
 		bool					saveAs();
@@ -71,6 +74,7 @@ class QAutoRouter : public QMainWindow
 		void					closeEvent(QCloseEvent* e);
 		void					wheelEvent ( QWheelEvent * event );
 		void					timerEvent(QTimerEvent* e);
+		CPluginInterface*		autorouter();
 
 	private:
 		Ui::QAutoRouter*		ui;
@@ -83,6 +87,8 @@ class QAutoRouter : public QMainWindow
 		int						mTimer;
 		QString					mFileName;
 		QPluginLoader			mPluginLoader;
+		bool					mRunning;
+		CPluginInterface*		mAutoRouter;
 };
 
 #endif // QAUTOROUTER_H

@@ -3,6 +3,7 @@
 # -------------------------------------------------
 QT += gui \
     svg
+QMAKE_LFLAGS += -rdynamic
 INCLUDEPATH += include
 TARGET = qautorouter
 TEMPLATE = app

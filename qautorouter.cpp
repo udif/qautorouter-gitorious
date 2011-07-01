@@ -38,6 +38,8 @@ QAutoRouter::QAutoRouter(QWidget *parent)
 , layerpreferences(new Ui::layerpreferences)
 , mRoot(NULL)
 , mZoom(0.125/2)
+, mRunning(false)
+, mAutoRouter(NULL)
 {
 	preferences->setupUi(&mPreferencesDialog);
 	layerpreferences->setupUi(&mLayerPreferencesDialog);
@@ -399,15 +401,19 @@ void QAutoRouter::setupActions()
 	ui->actionZoom_Fit->setIcon(QIcon(":/icons/viewmagfit.png"));
 	ui->actionZoom_In->setIcon(QIcon(":/icons/viewmag+.png"));
 	ui->actionZoom_Out->setIcon(QIcon(":/icons/viewmag-.png"));
+	ui->actionStart->setIcon(QIcon(":/icons/player_play.png"));
+	ui->actionStop->setIcon(QIcon(":/icons/player_stop.png"));
 	ui->actionOptions->setIcon(QIcon(":/icons/configure.png"));
 	ui->actionAbout->setIcon(QIcon(":/icons/qautorouter.png"));
 
-	ui->actionQuit->setShortcut((QKeySequence(tr("Ctrl+Q"))));
-	ui->actionOpen->setShortcut((QKeySequence(tr("Ctrl+O"))));
-	ui->actionSave->setShortcut((QKeySequence(tr("Ctrl+S"))));
-	ui->actionZoom_In->setShortcut((QKeySequence(tr("Ctrl++"))));
-	ui->actionZoom_Out->setShortcut((QKeySequence(tr("Ctrl+-"))));
-	ui->actionZoom_Fit->setShortcut((QKeySequence(tr("Ctrl+0"))));
+	ui->actionQuit->setShortcut(QKeySequence(QKeySequence::Quit));
+	ui->actionOpen->setShortcut(QKeySequence(QKeySequence::Open));
+	ui->actionSave->setShortcut(QKeySequence(QKeySequence::Save));
+	ui->actionZoom_In->setShortcut(QKeySequence(QKeySequence::ZoomIn));
+	ui->actionZoom_Out->setShortcut(QKeySequence(QKeySequence::ZoomOut));
+	ui->actionZoom_Fit->setShortcut(QKeySequence(Qt::Key_F3));
+	ui->actionStart->setShortcut(QKeySequence(Qt::Key_F7));
+	ui->actionStop->setShortcut(QKeySequence(Qt::Key_Escape));
 
 	QObject::connect(ui->actionOpen,SIGNAL(triggered()),this,SLOT(open()));
 	QObject::connect(ui->actionSave,SIGNAL(triggered()),this,SLOT(save()));
@@ -416,6 +422,8 @@ void QAutoRouter::setupActions()
 	QObject::connect(ui->actionZoom_In,SIGNAL(triggered()),this,SLOT(zoomIn()));
 	QObject::connect(ui->actionZoom_Out,SIGNAL(triggered()),this,SLOT(zoomOut()));
 	QObject::connect(ui->actionZoom_Fit,SIGNAL(triggered()),this,SLOT(zoomFit()));
+	QObject::connect(ui->actionStart,SIGNAL(triggered()),this,SLOT(start()));
+	QObject::connect(ui->actionStop,SIGNAL(triggered()),this,SLOT(stop()));
 	QObject::connect(ui->actionOptions,SIGNAL(triggered()),this,SLOT(editPreferences()));
 	QObject::connect(ui->actionAbout,SIGNAL(triggered()),this,SLOT(about()));
 
@@ -429,6 +437,10 @@ void QAutoRouter::setupActions()
 	view->addAction(ui->actionZoom_In);
 	view->addAction(ui->actionZoom_Out);
 	view->addAction(ui->actionZoom_Fit);
+
+	QToolBar* action = addToolBar(tr("Action"));
+	action->addAction(ui->actionStart);
+	action->addAction(ui->actionStop);
 
 	QToolBar* settings = addToolBar(tr("Settings"));
 	settings->addAction(ui->actionOptions);
@@ -448,6 +460,66 @@ void QAutoRouter::clear()
 		mRoot = NULL;
 	}
 	CGPadstack::clear();
+}
+
+/**
+  * @return a pointer to the currently running auto-router plugin.
+  */
+CPluginInterface* QAutoRouter::autorouter()
+{
+	return mAutoRouter;
+}
+
+/**
+  * @brief start routing
+  */
+void QAutoRouter::start()
+{
+	if ( pcb() != NULL )
+	{
+		int idx = preferences->routerCombo->currentIndex();
+		if ( idx >= 0 )
+		{
+			QString filename = preferences->routerCombo->itemData(idx).toString();
+			mPluginLoader.setFileName(filename);
+			if ( mPluginLoader.load() )
+			{
+				QObject* plugin = mPluginLoader.instance();
+				if ( plugin != NULL )
+				{
+					mAutoRouter = qobject_cast<CPluginInterface *>(plugin);
+					if (autorouter())
+					{
+						QEventLoop loop;
+						autorouter()->initialize(pcb());
+						mRunning=true;
+						while ( mRunning )
+						{
+							loop.processEvents();
+							if ( !autorouter()->exec() )
+							{
+								mRunning = false;
+							}
+						}
+						emit fault(tr("Routing Complete"));
+					}
+					mAutoRouter=NULL;
+				}
+			}
+		}
+	}
+	else
+	{
+		emit fault(tr("PCB is NULL"));
+	}
+}
+
+/**
+  * @brief stop routing
+  */
+void QAutoRouter::stop()
+{
+	mRunning=false;
 }
 
 /**
@@ -549,10 +621,7 @@ bool QAutoRouter::maybeSave()
 	if (CGPadstack::padstacks().count())
 	{
 		QMessageBox::StandardButton ret;
-		ret = QMessageBox::warning(this, tr("QAutoRouter"),
-									tr("The document has been modified.\n"
-									"Do you want to save your changes?"),
-									QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+		ret = QMessageBox::warning(this, tr("QAutoRouter"),tr("The document has been modified.\nDo you want to save your changes?"),QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
 		if (ret == QMessageBox::Save)
 			return save();
 		else if (ret == QMessageBox::Cancel)
@@ -619,14 +688,20 @@ void QAutoRouter::timerEvent(QTimerEvent* e)
 {
 	if ( e->timerId() == mTimer )
 	{
-		if (pcb() != NULL )
+		QString msg;
+		if ( mRunning )
 		{
-			CPcbNetwork* network = pcb()->network();
-			if ( network!=NULL )
+			msg = tr("[Running] ");
+			if ( autorouter() != NULL )
 			{
-				statusBar()->showMessage( tr("Nets: ")+QString::number(network->nets()) + " " + tr("Routed: ")+QString::number(network->routed()));
+				msg += autorouter()->status();
 			}
 		}
+		else
+		{
+			msg = tr("[Stopped] ");
+		}
+		statusBar()->showMessage( msg );
 	}
 }
 
@@ -744,22 +819,6 @@ void QAutoRouter::removePlugin()
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

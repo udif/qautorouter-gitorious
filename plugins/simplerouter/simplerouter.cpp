@@ -3,7 +3,12 @@
 * Author: Mike Sharkey <mike@pikeaero.com>                                     *
 *******************************************************************************/
 #include "simplerouter.h"
+
+#include <QString>
+
+#include <cspecctraobject.h>
 #include <cpcb.h>
+#include <cpcbnetwork.h>
 
 /**
   * @return plugin type
@@ -54,6 +59,23 @@ QString SimpleRouter::description() const
 }
 
 /**
+  * @return A status message for the status line
+  */
+QString SimpleRouter::status()
+{
+	QString msg;
+	if ( pcb() != NULL )
+	{
+		CPcbNetwork* network = pcb()->network();
+		if ( network )
+		{
+			msg += tr("Nets: ")+QString::number(network->nets()) + " " + tr("Routed: ")+QString::number(network->routed());
+		}
+	}
+	return msg;
+}
+
+/**
   * @brief perform initialization
   */
 bool SimpleRouter::initialize(CPcb* pcb)
@@ -67,7 +89,7 @@ bool SimpleRouter::initialize(CPcb* pcb)
   */
 bool SimpleRouter::exec()
 {
-	bool rc=false;
+	bool rc=true;
 	return rc;
 }
 

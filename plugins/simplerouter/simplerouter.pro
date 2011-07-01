@@ -5,5 +5,6 @@ QT += gui
 INCLUDEPATH += ../../include
 TARGET = simpleplugin
 TEMPLATE = lib
+CONFIG += plugin
 SOURCES += simplerouter.cpp
 HEADERS += simplerouter.h
