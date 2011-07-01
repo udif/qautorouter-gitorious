@@ -12,6 +12,11 @@
 
 CPcb::CPcb(QGraphicsItem *parent)
 : inherited(parent)
+, mStructure(NULL)
+, mPlacement(NULL)
+, mLibrary(NULL)
+, mNetwork(NULL)
+
 {
 }
 
@@ -24,13 +29,11 @@ CPcb::~CPcb()
   */
 CPcbStructure* CPcb::structure()
 {
-	CSpecctraObject* i = child("structure");
-	if ( i != NULL )
+	if ( mStructure == NULL )
 	{
-		return (CPcbStructure*)i;
+		mStructure = (CPcbStructure*)child("structure");
 	}
-	return NULL;
-
+	return mStructure;
 }
 
 /**
@@ -38,13 +41,11 @@ CPcbStructure* CPcb::structure()
   */
 CPcbPlacement* CPcb::placement()
 {
-	CSpecctraObject* i = child("placement");
-	if ( i != NULL )
+	if ( mPlacement == NULL )
 	{
-		return (CPcbPlacement*)i;
+		mPlacement = (CPcbPlacement*)child("placement");
 	}
-	return NULL;
-
+	return mPlacement;
 }
 
 /**
@@ -52,13 +53,11 @@ CPcbPlacement* CPcb::placement()
   */
 CPcbLibrary* CPcb::library()
 {
-	CSpecctraObject* i = child("library");
-	if ( i != NULL )
+	if ( mLibrary == NULL )
 	{
-		return (CPcbLibrary*)i;
+		mLibrary = (CPcbLibrary*)child("library");
 	}
-	return NULL;
-
+	return mLibrary;
 }
 
 /**
@@ -66,12 +65,10 @@ CPcbLibrary* CPcb::library()
   */
 CPcbNetwork* CPcb::network()
 {
-	CSpecctraObject* i = child("network");
-	if ( i != NULL )
+	if ( mNetwork == NULL )
 	{
-		return (CPcbNetwork*)i;
+		mNetwork = (CPcbNetwork*)child("network");
 	}
-	return NULL;
-
+	return mNetwork;
 }
 

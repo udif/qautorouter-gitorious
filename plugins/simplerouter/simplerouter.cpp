@@ -59,18 +59,32 @@ QString SimpleRouter::description() const
 }
 
 /**
+  * @return elapsed time to string
+  */
+QString SimpleRouter::elapsed()
+{
+	QString rc;
+	QDateTime now = QDateTime::currentDateTime();
+	int tm,hour,min,sec;
+	tm = mStartTime.secsTo(now);
+	hour=tm/3600;
+	tm=tm%3600;
+	min=tm/60;
+	tm=tm%60;
+	sec=tm;
+	rc.sprintf("%02d:%02d:%02d",hour,min,sec);
+	return rc;
+}
+
+/**
   * @return A status message for the status line
   */
 QString SimpleRouter::status()
 {
 	QString msg;
-	if ( pcb() != NULL )
+	if ( pcb() != NULL && pcb()->network() != NULL )
 	{
-		CPcbNetwork* network = pcb()->network();
-		if ( network )
-		{
-			msg += tr("Nets: ")+QString::number(network->nets()) + " " + tr("Routed: ")+QString::number(network->routed());
-		}
+		msg += elapsed()+tr(" Nets: ")+QString::number(pcb()->network()->nets()) + " " + tr("Routed: ")+QString::number(pcb()->network()->routed());
 	}
 	return msg;
 }
@@ -81,6 +95,7 @@ QString SimpleRouter::status()
 bool SimpleRouter::initialize(CPcb* pcb)
 {
 	mPcb = pcb;
+	mStartTime = QDateTime::currentDateTime();
 	return( mPcb != NULL );
 }
 

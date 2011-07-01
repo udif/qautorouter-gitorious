@@ -7,6 +7,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QDateTime>
 
 #include <cplugininterface.h>
 
@@ -32,9 +33,11 @@ class SimpleRouter : public QObject, public CPluginInterface
 
 	protected:
 		CPcb*						pcb() {return mPcb;}
+		QString						elapsed();
 
 	private:
 		CPcb*						mPcb;
+		QDateTime					mStartTime;
 
 };
 

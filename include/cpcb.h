@@ -23,7 +23,11 @@ class CPcb : public CSpecctraObject
 		CPcbPlacement*				placement();
 		CPcbLibrary*				library();
 		CPcbNetwork*				network();
-
+	private:
+		CPcbStructure*				mStructure;
+		CPcbPlacement*				mPlacement;
+		CPcbLibrary*				mLibrary;
+		CPcbNetwork*				mNetwork;
 };
 
 #endif // CPCB_H
