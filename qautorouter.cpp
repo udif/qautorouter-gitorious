@@ -528,6 +528,7 @@ void QAutoRouter::stop()
 bool QAutoRouter::load(QFile& file)
 {
 	bool rc=false;
+	stop();
 	if ( file.open(QIODevice::ReadOnly))
 	{
 		QTextStream in(&file);
