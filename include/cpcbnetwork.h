@@ -22,6 +22,8 @@ class CPcbNetwork : public CSpecctraObject
 		int								nets();
 		CPcbNet*						net(int idx);
 		CPcbNet*						net(QString ref);
+		QList<CPcbNet*>&				netsRef();
+
 
 		int								netClasses();
 		CPcbClass*						netClass(int idx);

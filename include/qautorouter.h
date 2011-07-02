@@ -43,6 +43,7 @@ class QAutoRouter : public QMainWindow
 		void					updateZoom();
 		bool					load(QFile& file);
 		void					faultHandler(QString txt);
+		void					status(QString txt);
 
 	protected slots:
 		void					newNetClass();

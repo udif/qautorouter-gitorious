@@ -60,7 +60,7 @@ void CSpecctraObject::clearCache()
 {
 	for(int n=0; n < children().count(); n++)
 	{
-		CSpecctraObject* child = children().at(0);
+		CSpecctraObject* child = children().at(n);
 		child->clearCache();
 	}
 }

@@ -68,9 +68,26 @@ QString SimpleRouter::elapsed()
 }
 
 /**
+  * @return current state
+  */
+SimpleRouter::tRunState SimpleRouter::state()
+{
+	return mState;
+}
+
+/**
+  * @brief set surrent run state
+  */
+void SimpleRouter::setState(tRunState state)
+{
+	mState=state;
+	emit status(currentStatus());
+}
+
+/**
   * @return A status message for the status line
   */
-QString SimpleRouter::status()
+QString SimpleRouter::currentStatus()
 {
 	QString msg="[";
 	if ( pcb() != NULL && pcb()->network() != NULL )
@@ -78,11 +95,11 @@ QString SimpleRouter::status()
 		switch(state())
 		{
 			default:
-			case Idle:			msg+="Idle";			break;
-			case SortingNets:	msg+="Sorting Nets";	break;
-			case Selecting:		msg+="Selecting";		break;
-			case Searching:		msg+="Searching";		break;
-			case Routing:		msg+="Routing";			break;
+			case Idle:			msg+="Idle  ";	break;
+			case SortingNets:	msg+="Sort  ";	break;
+			case Selecting:		msg+="Select";	break;
+			case Searching:		msg+="Search";	break;
+			case Routing:		msg+="Route ";	break;
 		}
 		msg += QString("] ")+elapsed()+tr(" Nets: ")+QString::number(pcb()->network()->nets()) + " " + tr("Routed: ")+QString::number(pcb()->network()->routed());
 	}
@@ -94,17 +111,14 @@ QString SimpleRouter::status()
   */
 bool SimpleRouter::start(CPcb* pcb)
 {
-	mNets.clear();
 	mPcb = pcb;
-	mState=Idle;
+	setState(Idle);
 	mStartTime = QDateTime::currentDateTime();
 	if ( mPcb != NULL && mPcb->network() != NULL )
 	{
-		for(int n=0; n < mPcb->network()->nets(); n++)
-		{
-			mNets.append(mPcb->network()->net(n));
-		}
-		mState=SortingNets;
+		setState(SortingNets);
+		QObject::connect(this,SIGNAL(status(QString)),mPcb,SIGNAL(status(QString)));
+		QObject::connect(this,SIGNAL(clearCache()),mPcb,SLOT(clearCache()));
 		return true;
 	}
 	return false;
@@ -116,12 +130,29 @@ bool SimpleRouter::start(CPcb* pcb)
 void SimpleRouter::stop()
 {
 	setState(Idle);
-	mNets.clear();
+	QObject::disconnect(this,SIGNAL(status(QString)),mPcb,SIGNAL(status(QString)));
+	QObject::disconnect(this,SIGNAL(clearCache()),mPcb,SLOT(clearCache()));
 }
 
+/**
+  * Sort padstack lists and net lists.
+  */
 void SimpleRouter::sort()
 {
-
+	if ( pcb() != NULL && pcb()->network() != NULL )
+	{
+		emit clearCache();
+		/* sort the padstack lists associated with each net relative to distance from center point of PCB */
+		QPointF centerPt = pcb()->boundingRect().center();
+		for( int n=0; n < pcb()->network()->nets(); n++)
+		{
+			pcb()->network()->net(n)->sort(centerPt);
+		}
+		/* sort the bet lists based on closeness to PCB center point */
+		CUtil::sort(pcb()->network()->netsRef(),centerPt);
+		/* redraw */
+		CSpecctraObject::scene()->update();
+	}
 }
 
 void SimpleRouter::select()
@@ -142,9 +173,12 @@ void SimpleRouter::route()
 bool SimpleRouter::exec()
 {
 	bool rc=true;
+	emit status(currentStatus());
 	switch(state())
 	{
 		default:
+			setState(SortingNets);
+			break;
 		case Idle:
 			rc=false;
 			break;
@@ -167,8 +201,6 @@ bool SimpleRouter::exec()
 	}
 	return rc;
 }
-
-
 
 Q_EXPORT_PLUGIN2(simplerouter, SimpleRouter);
 

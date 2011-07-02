@@ -561,6 +561,7 @@ bool QAutoRouter::load(QFile& file)
 			root()->dump(); /** DEBUG */
 			if ( root()->objectClass() == "pcb" )
 			{
+				QObject::connect(pcb(),SIGNAL(status(QString)),this,SLOT(status(QString)));
 				readSettings();
 				populateLayersForm();
 				populateNetsForm();
@@ -677,6 +678,14 @@ void QAutoRouter::zoomFit()
 	ui->graphicsView->fitInView(bounds,Qt::KeepAspectRatio);
 }
 
+/**
+  * @brief Show a status message
+  */
+void QAutoRouter::status(QString txt)
+{
+	this->statusBar()->showMessage(txt);
+}
+
 void QAutoRouter::about()
 {
 	QMessageBox::about (this, "QAutoRouter V0.0", "QAutoRouter "+version()+" "
@@ -712,11 +721,11 @@ void QAutoRouter::timerEvent(QTimerEvent* e)
 	if ( e->timerId() == mTimer )
 	{
 		QString msg;
-		if ( autorouter()!=NULL ) /* running? */
-			msg = autorouter()->status();
-		else
+		if ( autorouter()==NULL ) /* running? */
+		{
 			msg = tr("[Idle] ");
-		statusBar()->showMessage( msg );
+			statusBar()->showMessage( msg );
+		}
 	}
 }
 

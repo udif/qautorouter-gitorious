@@ -30,6 +30,16 @@ CPcbNet::~CPcbNet()
 }
 
 /**
+  * @brief clear the chahe
+  */
+void CPcbNet::clearCache()
+{
+	QPainterPath empty;
+	mShape = empty;
+	inherited::clearCache();
+}
+
+/**
   * @return the name of the net
   */
 QString CPcbNet::name()
@@ -69,7 +79,7 @@ double CPcbNet::width()
 /**
   * @return enumerated list of pin references in this net.
   */
-QStringList CPcbNet::pinRefs()
+QStringList& CPcbNet::pinRefs()
 {
 	if ( mPinRefs.count()==0 )
 	{
@@ -129,12 +139,33 @@ CGPadstack* CPcbNet::padstack(QString ref)
 {
 	for(int n=0; n < padstacks(); n++)
 	{
-		if ( padstack(n)->unitRef() == CUtil::unitRef(ref) && padstack(n)->pinRef() == CUtil::pinRef(ref) )
+		if ( padstack(n)->placeRef() == ref )
 		{
 			return padstack(n);
 		}
 	}
 	return NULL;
+}
+
+/**
+  * @return a reference to the padstacks list.
+  */
+QList<CGPadstack*>& CPcbNet::padstacksRef()
+{
+	padstacks(); /** prime the padstacks list */
+	return mPadstacks;
+}
+
+/**
+  * @brief sort the netlist with respect to distance from a point.
+  */
+void CPcbNet::sort(QPointF pt,CUtil::tSortOrder order)
+{
+	clearCache();
+	/* sort the padstack lists associated with each net relative to distance from center point of PCB */
+	CUtil::sort(padstacksRef(),pt);
+	/* redraw */
+	CSpecctraObject::scene()->update();
 }
 
 /**
@@ -182,23 +213,15 @@ QPainterPath CPcbNet::shape() const
 	CPcbNet* me=(CPcbNet*)this;
 	if ( me->mShape.isEmpty())
 	{
-		for( int iPins=0; iPins < me->children().count(); iPins++)
+		for(int n=0; n < me->padstacks(); n++ )
 		{
-			CSpecctraObject* pObj = (CPcbPins*)me->children().at(iPins);
-			if ( pObj->objectClass()=="pins")
+			CGPadstack* pad = me->padstack(n);
+			if ( pad != NULL )
 			{
-				CPcbPins* pins = (CPcbPins*)pObj;
-				for(int n=0; n < pins->pinRefs(); n++)
-				{
-					CGPadstack* padstack = CGPadstack::padstack(pins->pinRef(n));
-					if ( padstack != NULL )
-					{
-						if ( n== 0 )
-							me->mShape.moveTo(padstack->pos());
-						else
-							me->mShape.lineTo(padstack->pos());
-					}
-				}
+				if ( n== 0 )
+					me->mShape.moveTo(pad->pos());
+				else
+					me->mShape.lineTo(pad->pos());
 			}
 		}
 	}

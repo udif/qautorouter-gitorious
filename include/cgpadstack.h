@@ -33,6 +33,7 @@ class CGPadstack : public CGSegment
 		QStringList					layers();
 		QString						pinRef();
 		QString						unitRef();
+		QString						placeRef() {return unitRef()+"-"+pinRef();}
 		QPointF						pos();
 
 		static void					clear();

@@ -78,6 +78,15 @@ CPcbNet* CPcbNetwork::net(QString ref)
 }
 
 /**
+  * @return a references to the net list
+  */
+QList<CPcbNet*>& CPcbNetwork::netsRef()
+{
+	nets(); /* prime the net list */
+	return mNets;
+}
+
+/**
   * @return the number of net classes
   */
 int CPcbNetwork::netClasses()

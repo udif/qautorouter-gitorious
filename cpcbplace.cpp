@@ -31,6 +31,11 @@ CPcbPlace::~CPcbPlace()
 {
 }
 
+void CPcbPlace::clearCache()
+{
+	inherited::clearCache();
+}
+
 /**
   * @return the unit identifier.
   */
@@ -207,6 +212,7 @@ void CPcbPlace::createPadstacks()
 					CPcbPin* pin = image->pin(iPin);
 					CPcbPadstack* padstack = pin->padstack();
 					CGPadstack* cgPadstack = new CGPadstack(this,pin->name());
+					mPads.append(cgPadstack);
 					for(int iShape=0;iShape<padstack->shapes();iShape++)
 					{
 						CPcbShape* shape = padstack->shape(iShape);

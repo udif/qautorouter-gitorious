@@ -8,3 +8,4 @@ TEMPLATE = lib
 CONFIG += plugin
 SOURCES += simplerouter.cpp
 HEADERS += simplerouter.h
+OTHER_FILES += README.txt
