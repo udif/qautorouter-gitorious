@@ -463,6 +463,8 @@ void QAutoRouter::setupActions()
 
 	QToolBar* help = addToolBar(("Help"));
 	help->addAction(ui->actionAbout);
+
+	ui->actionStop->setEnabled(false);
 }
 
 /**
@@ -503,10 +505,13 @@ void QAutoRouter::start()
 				QObject* plugin = mPluginLoader.instance();
 				if ( plugin != NULL )
 				{
+					ui->actionStart->setEnabled(false);
+					ui->actionStop->setEnabled(true);
 					mAutoRouter = qobject_cast<CPluginInterface *>(plugin);
 					if (autorouter() != NULL)
 					{
 						QEventLoop loop;
+						ui->actionStart->setEnabled(false);
 						autorouter()->start(pcb());
 						while ( autorouter() != NULL && autorouter()->exec() )
 						{
@@ -515,6 +520,8 @@ void QAutoRouter::start()
 						QMessageBox::information(this,tr("Routing Complete"),tr("Routing Completed. Total time: ")+autorouter()->elapsed());
 					}
 					mAutoRouter=NULL;
+					ui->actionStart->setEnabled(true);
+					ui->actionStop->setEnabled(false);
 				}
 			}
 		}
