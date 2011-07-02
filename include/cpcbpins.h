@@ -5,14 +5,15 @@
 #ifndef CPCBPINS_H
 #define CPCBPINS_H
 
-#include <QObject>
-#include <QString>
-#include <QPainterPath>
-
 #include "cspecctraobject.h"
 #include "cpcbpin.h"
 #include "cpcbplace.h"
 #include "cgpadstack.h"
+
+#include <QObject>
+#include <QString>
+#include <QPainterPath>
+#include <QList>
 
 class CPcbPins : public CSpecctraObject
 {
@@ -23,6 +24,7 @@ class CPcbPins : public CSpecctraObject
 
 		int							pinRefs();
 		QString						pinRef(int idx);
+
 };
 
 #endif // CPCBPINS_H

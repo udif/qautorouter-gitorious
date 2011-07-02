@@ -8,10 +8,12 @@
 #include <QObject>
 #include <QString>
 #include <QDateTime>
+#include <QList>
 
 #include <cplugininterface.h>
 
 class CPcb;
+class CPcbNet;
 class SimpleRouter : public QObject, public CPluginInterface
  {
 	Q_OBJECT
@@ -31,7 +33,7 @@ class SimpleRouter : public QObject, public CPluginInterface
 		virtual void				stop();							/** stop processing */
 		virtual bool				exec();							/** get's called repeatedly while exec() returns true, return false to stop */
 		virtual QString				status();						/** a brief status report for the status bar */
-		virtual int					elapsed();						/** elapsed time of the run */
+		virtual QString				elapsed();						/** elapsed time of the run in hh:mm:ss format */
 
 	protected:
 		typedef enum {
@@ -42,9 +44,10 @@ class SimpleRouter : public QObject, public CPluginInterface
 			Routing,												/** committing a route */
 		} tRunState;
 		CPcb*						pcb() {return mPcb;}
-		QString						elapsedTime();
 		tRunState					state() {return mState;}
 		void						setState(tRunState state) {mState=state;}
+		QList<CPcbNet*>				nets() {return mNets;}
+		CPcbNet*					net(int idx) {return mNets.at(idx);}
 
 		void						sort();
 		void						select();
@@ -55,6 +58,7 @@ class SimpleRouter : public QObject, public CPluginInterface
 		CPcb*						mPcb;
 		QDateTime					mStartTime;
 		tRunState					mState;
+		QList<CPcbNet*>				mNets;
 
 };
 

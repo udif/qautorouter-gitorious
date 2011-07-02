@@ -15,6 +15,7 @@
 
 #include "cgpadstack.h"
 #include "cgpad.h"
+#include "cutil.h"
 
 #define inherited CSpecctraObject
 
@@ -70,6 +71,43 @@ QString CPcbPlace::side()
 	}
 	return sd;
 }
+
+/**
+  * @return the number of pads
+  */
+int CPcbPlace::pads()
+{
+	return mPads.count();
+}
+
+/**
+  * @return a pad by index
+  */
+CGPadstack* CPcbPlace::pad(int idx)
+{
+	if ( idx < mPads.count() )
+	{
+		return mPads.at(idx);
+	}
+	return NULL;
+}
+
+/**
+  * @return a pad by PIN string reference.
+  */
+CGPadstack* CPcbPlace::pad(QString ref)
+{
+	for( int n=0; n < mPads.count(); n++)
+	{
+		CGPadstack* padstack = mPads.at(n);
+		if ( padstack->pinRef() == ref )
+		{
+			return padstack;
+		}
+	}
+	return NULL;
+}
+
 
 /**
   * @return a pin pointer by it's index name

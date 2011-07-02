@@ -5,13 +5,15 @@
 #ifndef CPCBNET_H
 #define CPCBNET_H
 
-#include <QObject>
-#include <QString>
-
 #include "cspecctraobject.h"
 #include "cgpadstack.h"
 
-class CPcbPins;
+#include <QObject>
+#include <QString>
+#include <QList>
+#include <QStringList>
+
+class CPcbPin;
 class CPcbClass;
 class CPcbNet : public CSpecctraObject
 {
@@ -22,6 +24,12 @@ class CPcbNet : public CSpecctraObject
 
 		virtual QString				name();
 		virtual QString				description();
+
+		QStringList					pinRefs();
+
+		int							padstacks();
+		CGPadstack*					padstack(int idx);
+		CGPadstack*					padstack(QString ref);
 
 		void						setWidth(double w) {mWidth=w;}
 		double						width();
@@ -34,6 +42,8 @@ class CPcbNet : public CSpecctraObject
 		QPainterPath				mShape;
 		bool						mRouted;
 		double						mWidth;			/* trace width */
+		QStringList					mPinRefs;
+		QList<CGPadstack*>			mPadstacks;		/* pin padstacks */
 };
 
 #endif // CPCBNET_H

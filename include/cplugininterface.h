@@ -30,7 +30,7 @@ class CPluginInterface
 		virtual void				stop()=0;						/** stop processing */
 		virtual bool				exec()=0;						/** get's called repeatedly while exec() returns true, return false to stop */
 		virtual QString				status()=0;						/** a brief status report for the status bar */
-		virtual int					elapsed()=0;					/** elapsed time in seconds */
+		virtual QString				elapsed()=0;					/** elapsed time in seconds */
 };
 
 

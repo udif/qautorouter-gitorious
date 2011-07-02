@@ -25,6 +25,9 @@ class CPcbPlace : public CSpecctraObject
 		QPointF							pos();
 		QString							side();
 		CPcbPin*						pin(QString ref);
+		int								pads();
+		CGPadstack*						pad(int idx);
+		CGPadstack*						pad(QString ref);
 		double							rotation();
 		QPainterPath					outlineShape() const;
 		virtual QRectF					boundingRect() const;

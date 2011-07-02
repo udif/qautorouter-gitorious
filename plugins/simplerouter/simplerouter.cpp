@@ -4,11 +4,12 @@
 *******************************************************************************/
 #include "simplerouter.h"
 
-#include <QString>
-
 #include <cspecctraobject.h>
 #include <cpcb.h>
 #include <cpcbnetwork.h>
+#include <cpcbnet.h>
+
+#include <cutil.h>
 
 /**
   * @return plugin type
@@ -59,29 +60,11 @@ QString SimpleRouter::description() const
 }
 
 /**
-  * @return elapsed time in seconds.
-  */
-{
-	QDateTime now = QDateTime::currentDateTime();
-	int tm = mStartTime.secsTo(now);
-	return tm;
-}
-
-/**
   * @return elapsed time to string
   */
-QString SimpleRouter::elapsedTime()
+QString SimpleRouter::elapsed()
 {
-	QString rc;
-	int tm,hour,min,sec;
-	tm = elapsed();
-	hour=tm/3600;
-	tm=tm%3600;
-	min=tm/60;
-	tm=tm%60;
-	sec=tm;
-	rc.sprintf("%02d:%02d:%02d",hour,min,sec);
-	return rc;
+	return CUtil::elapsed(mStartTime.secsTo(QDateTime::currentDateTime()));
 }
 
 /**
@@ -101,7 +84,7 @@ QString SimpleRouter::status()
 			case Searching:		msg+="Searching";		break;
 			case Routing:		msg+="Routing";			break;
 		}
-		msg += QString("] ")+elapsedTime()+tr(" Nets: ")+QString::number(pcb()->network()->nets()) + " " + tr("Routed: ")+QString::number(pcb()->network()->routed());
+		msg += QString("] ")+elapsed()+tr(" Nets: ")+QString::number(pcb()->network()->nets()) + " " + tr("Routed: ")+QString::number(pcb()->network()->routed());
 	}
 	return msg;
 }
@@ -111,10 +94,20 @@ QString SimpleRouter::status()
   */
 bool SimpleRouter::start(CPcb* pcb)
 {
+	mNets.clear();
 	mPcb = pcb;
-	mState=SortingNets;
+	mState=Idle;
 	mStartTime = QDateTime::currentDateTime();
-	return( mPcb != NULL );
+	if ( mPcb != NULL && mPcb->network() != NULL )
+	{
+		for(int n=0; n < mPcb->network()->nets(); n++)
+		{
+			mNets.append(mPcb->network()->net(n));
+		}
+		mState=SortingNets;
+		return true;
+	}
+	return false;
 }
 
 /**
@@ -123,6 +116,7 @@ bool SimpleRouter::start(CPcb* pcb)
 void SimpleRouter::stop()
 {
 	setState(Idle);
+	mNets.clear();
 }
 
 void SimpleRouter::sort()

@@ -56,14 +56,14 @@ QAutoRouter::QAutoRouter(QWidget *parent)
 	QObject::connect(preferences->newNetClassButton,SIGNAL(clicked()),this,SLOT(newNetClass()));
 	QObject::connect(preferences->deleteNetClassButton,SIGNAL(clicked()),this,SLOT(deleteNetClass()));
 	this->setWindowIcon(QIcon(":/icons/qautorouter.png"));
-	this->setWindowTitle("QAutoRouter "+version);
+	this->setWindowTitle("QAutoRouter "+version());
 	mTimer = startTimer(2000);
 
 	preferences->pluginTree->setHeaderLabel(tr("Plugins"));
 
 	QStringList netsTreeLabels;
-	netsTreeLabels << "Net";
-	netsTreeLabels << "Class Properties";
+	netsTreeLabels << tr("Net");
+	netsTreeLabels << tr("Class Properties");
 	preferences->netsTree->setColumnCount(2);
 	preferences->netsTree->setHeaderLabels(netsTreeLabels);
 
@@ -512,7 +512,7 @@ void QAutoRouter::start()
 						{
 							loop.processEvents();
 						}
-						QMessageBox::information(this,tr("Routing Complete"),tr("Routing Complete"));
+						QMessageBox::information(this,tr("Routing Complete"),tr("Routing Completed. Total time: ")+autorouter()->elapsed());
 					}
 					mAutoRouter=NULL;
 				}

@@ -10,6 +10,10 @@
 #include "cpcbrule.h"
 #include "cpcbnetwork.h"
 #include "cpcbclass.h"
+#include "cpcbpins.h"
+#include "cutil.h"
+#include "cpcbplace.h"
+#include "cpcbplacement.h"
 
 #define inherited CSpecctraObject
 
@@ -60,6 +64,77 @@ double CPcbNet::width()
 		w = mWidth;
 	}
 	return w;
+}
+
+/**
+  * @return enumerated list of pin references in this net.
+  */
+QStringList CPcbNet::pinRefs()
+{
+	if ( mPinRefs.count()==0 )
+	{
+		CPcbPins* objPins = (CPcbPins*)child("pins");
+		if ( objPins != NULL )
+		{
+			for(int n=0; n < objPins->pinRefs(); n++)
+			{
+				mPinRefs.append(objPins->pinRef(n));
+			}
+		}
+	}
+	return mPinRefs;
+}
+
+/**
+  * @return the number of pads in the net
+  */
+int CPcbNet::padstacks()
+{
+	if ( mPadstacks.count() == 0 )
+	{
+		for(int n=0; n < pinRefs().count(); n++)
+		{
+			QString unitRef = CUtil::unitRef(pinRefs().at(n));
+			QString pinRef = CUtil::pinRef(pinRefs().at(n));
+			CPcbPlace* place = pcb()->placement()->place(unitRef);
+			if ( place != NULL )
+			{
+				CGPadstack* padstack = place->pad(pinRef);
+				if ( padstack != NULL )
+				{
+					mPadstacks.append(padstack);
+				}
+			}
+		}
+	}
+	return mPadstacks.count();
+}
+
+/**
+  * @return a padstack by index
+  */
+CGPadstack* CPcbNet::padstack(int idx)
+{
+	if ( padstacks() > idx )
+	{
+		return mPadstacks.at(idx);
+	}
+	return NULL;
+}
+
+/**
+  * @return a padstack by UNIT-PIN string format reference
+  */
+CGPadstack* CPcbNet::padstack(QString ref)
+{
+	for(int n=0; n < padstacks(); n++)
+	{
+		if ( padstack(n)->unitRef() == CUtil::unitRef(ref) && padstack(n)->pinRef() == CUtil::pinRef(ref) )
+		{
+			return padstack(n);
+		}
+	}
+	return NULL;
 }
 
 /**
