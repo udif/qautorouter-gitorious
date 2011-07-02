@@ -263,7 +263,7 @@ bool CSpecctraReader::bof()
   */
 bool CSpecctraReader::eof()
 {
-	return (mTextIndex>=mTextBuffer.length());
+	return (mTextIndex>=(unsigned)mTextBuffer.length());
 }
 
 

@@ -59,14 +59,22 @@ QString SimpleRouter::description() const
 }
 
 /**
+  * @return elapsed time in seconds.
+  */
+{
+	QDateTime now = QDateTime::currentDateTime();
+	int tm = mStartTime.secsTo(now);
+	return tm;
+}
+
+/**
   * @return elapsed time to string
   */
-QString SimpleRouter::elapsed()
+QString SimpleRouter::elapsedTime()
 {
 	QString rc;
-	QDateTime now = QDateTime::currentDateTime();
 	int tm,hour,min,sec;
-	tm = mStartTime.secsTo(now);
+	tm = elapsed();
 	hour=tm/3600;
 	tm=tm%3600;
 	min=tm/60;
@@ -81,10 +89,19 @@ QString SimpleRouter::elapsed()
   */
 QString SimpleRouter::status()
 {
-	QString msg;
+	QString msg="[";
 	if ( pcb() != NULL && pcb()->network() != NULL )
 	{
-		msg += elapsed()+tr(" Nets: ")+QString::number(pcb()->network()->nets()) + " " + tr("Routed: ")+QString::number(pcb()->network()->routed());
+		switch(state())
+		{
+			default:
+			case Idle:			msg+="Idle";			break;
+			case SortingNets:	msg+="Sorting Nets";	break;
+			case Selecting:		msg+="Selecting";		break;
+			case Searching:		msg+="Searching";		break;
+			case Routing:		msg+="Routing";			break;
+		}
+		msg += QString("] ")+elapsedTime()+tr(" Nets: ")+QString::number(pcb()->network()->nets()) + " " + tr("Routed: ")+QString::number(pcb()->network()->routed());
 	}
 	return msg;
 }
@@ -92,11 +109,36 @@ QString SimpleRouter::status()
 /**
   * @brief perform initialization
   */
-bool SimpleRouter::initialize(CPcb* pcb)
+bool SimpleRouter::start(CPcb* pcb)
 {
 	mPcb = pcb;
+	mState=SortingNets;
 	mStartTime = QDateTime::currentDateTime();
 	return( mPcb != NULL );
+}
+
+/**
+  * @brief stop processing
+  */
+void SimpleRouter::stop()
+{
+	setState(Idle);
+}
+
+void SimpleRouter::sort()
+{
+}
+
+void SimpleRouter::select()
+{
+}
+
+void SimpleRouter::search()
+{
+}
+
+void SimpleRouter::route()
+{
 }
 
 /**
@@ -105,6 +147,29 @@ bool SimpleRouter::initialize(CPcb* pcb)
 bool SimpleRouter::exec()
 {
 	bool rc=true;
+	switch(state())
+	{
+		default:
+		case Idle:
+			rc=false;
+			break;
+		case SortingNets:
+			sort();
+			setState(Selecting);
+			break;
+		case Selecting:
+			select();
+			setState(Searching);
+			break;
+		case Searching:
+			search();
+			setState(Routing);
+			break;
+		case Routing:
+			route();
+			setState(SortingNets);
+			break;
+	}
 	return rc;
 }
 

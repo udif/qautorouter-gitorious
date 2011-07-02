@@ -192,7 +192,7 @@ QPainterPath CPcbPlace::shape() const
 	return p;
 }
 
-void CPcbPlace::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void CPcbPlace::paint(QPainter *painter, const QStyleOptionGraphicsItem* /* option */, QWidget* /* widget */)
 {
 	painter->setRenderHint(QPainter::Antialiasing);
 	painter->scale(scale(),scale());

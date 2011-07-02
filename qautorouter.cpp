@@ -38,7 +38,6 @@ QAutoRouter::QAutoRouter(QWidget *parent)
 , layerpreferences(new Ui::layerpreferences)
 , mRoot(NULL)
 , mZoom(0.125/2)
-, mRunning(false)
 , mAutoRouter(NULL)
 {
 	preferences->setupUi(&mPreferencesDialog);
@@ -57,7 +56,7 @@ QAutoRouter::QAutoRouter(QWidget *parent)
 	QObject::connect(preferences->newNetClassButton,SIGNAL(clicked()),this,SLOT(newNetClass()));
 	QObject::connect(preferences->deleteNetClassButton,SIGNAL(clicked()),this,SLOT(deleteNetClass()));
 	this->setWindowIcon(QIcon(":/icons/qautorouter.png"));
-	this->setWindowTitle("QAutoRouter "+QString(VERSION_STRING));
+	this->setWindowTitle("QAutoRouter "+version);
 	mTimer = startTimer(2000);
 
 	preferences->pluginTree->setHeaderLabel(tr("Plugins"));
@@ -154,7 +153,7 @@ void QAutoRouter::layerColorClicked()
 /**
   * @brief A layer was clicked.
   */
-void QAutoRouter::layerClicked(QModelIndex idx)
+void QAutoRouter::layerClicked(QModelIndex /* idx */)
 {
 	QListWidgetItem* item = preferences->layerList->currentItem();
 	if ( item != NULL && pcb()!=NULL && pcb()->structure()!=NULL )
@@ -213,7 +212,7 @@ void QAutoRouter::populateLayersForm()
 	}
 }
 
-void QAutoRouter::netsClicked(QModelIndex idx)
+void QAutoRouter::netsClicked(QModelIndex /* idx */)
 {
 	/** FIXME - get here on a nets click - open net class picker. (embed ComboBox in the nets tree?) */
 }
@@ -283,6 +282,9 @@ void QAutoRouter::deleteNetClass()
 	/** FIXME delete from the table and from the Pcb object tree - do we need to have a *write protect* on original sourced Pcb objects? */
 }
 
+/**
+  * @brief present the preferences dialog and save the changes if requested
+  */
 void QAutoRouter::editPreferences()
 {
 	populateLayersForm();
@@ -295,6 +297,14 @@ void QAutoRouter::editPreferences()
 }
 
 /**
+  * @return the current release version
+  */
+QString QAutoRouter::version()
+{
+	return VERSION_STRING;
+}
+
+/**
   * @brief store settings and preferences.
   */
 void QAutoRouter::writeSettings()
@@ -304,6 +314,7 @@ void QAutoRouter::writeSettings()
 	settings.beginGroup("MainWindow");
 		settings.setValue("size", size());
 		settings.setValue("pos", pos());
+		settings.setValue("version",version());
 	settings.endGroup();
 
 	settings.beginGroup("layers");
@@ -340,6 +351,11 @@ void QAutoRouter::readSettings()
 	settings.beginGroup("MainWindow");
 		resize(settings.value("size", QSize(800, 600)).toSize());
 		move(settings.value("pos", QPoint(100, 100)).toPoint());
+		QString settingsVersion = settings.value("version",version()).toString();
+		if ( settingsVersion != version() )
+		{
+			QMessageBox::information(this,tr("Version Mismatch"),tr("Settings version ")+settingsVersion+tr(" does not match current version ")+version());
+		}
 	settings.endGroup();
 
 	settings.beginGroup("layers");
@@ -488,20 +504,15 @@ void QAutoRouter::start()
 				if ( plugin != NULL )
 				{
 					mAutoRouter = qobject_cast<CPluginInterface *>(plugin);
-					if (autorouter())
+					if (autorouter() != NULL)
 					{
 						QEventLoop loop;
-						autorouter()->initialize(pcb());
-						mRunning=true;
-						while ( mRunning )
+						autorouter()->start(pcb());
+						while ( autorouter() != NULL && autorouter()->exec() )
 						{
 							loop.processEvents();
-							if ( !autorouter()->exec() )
-							{
-								mRunning = false;
-							}
 						}
-						emit fault(tr("Routing Complete"));
+						QMessageBox::information(this,tr("Routing Complete"),tr("Routing Complete"));
 					}
 					mAutoRouter=NULL;
 				}
@@ -519,7 +530,10 @@ void QAutoRouter::start()
   */
 void QAutoRouter::stop()
 {
-	mRunning=false;
+	if (autorouter()!=NULL)
+	{
+		autorouter()->stop();
+	}
 }
 
 /**
@@ -592,6 +606,7 @@ bool QAutoRouter::saveAs()
 			}
 		}
 	}
+	return true;
 }
 
 /**
@@ -657,7 +672,7 @@ void QAutoRouter::zoomFit()
 
 void QAutoRouter::about()
 {
-	QMessageBox::about (this, "QAutoRouter V0.0", "QAutoRouter "+QString(VERSION_STRING)+" "
+	QMessageBox::about (this, "QAutoRouter V0.0", "QAutoRouter "+version()+" "
 													"(c) 2011 Pike Aerospace Research Corporation\n"
 													"\n"
 													"Mike Sharkey <mike@pikeaero.com>\n"
@@ -690,18 +705,10 @@ void QAutoRouter::timerEvent(QTimerEvent* e)
 	if ( e->timerId() == mTimer )
 	{
 		QString msg;
-		if ( mRunning )
-		{
-			msg = tr("[Running] ");
-			if ( autorouter() != NULL )
-			{
-				msg += autorouter()->status();
-			}
-		}
+		if ( autorouter()!=NULL ) /* running? */
+			msg = autorouter()->status();
 		else
-		{
-			msg = tr("[Stopped] ");
-		}
+			msg = tr("[Idle] ");
 		statusBar()->showMessage( msg );
 	}
 }

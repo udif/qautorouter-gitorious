@@ -35,6 +35,7 @@ class QAutoRouter : public QMainWindow
 		double					zoom() {return mZoom;}
 		CSpecctraObject*		root() {return mRoot;}
 		CPcb*					pcb();
+		QString					version();
 	signals:
 		void					fault(QString txt);
 	public slots:
@@ -82,12 +83,11 @@ class QAutoRouter : public QMainWindow
 		Ui::layerpreferences*	layerpreferences;
 		QDialog					mPreferencesDialog;
 		QDialog					mLayerPreferencesDialog;
-		double					mZoom;
 		CSpecctraObject*		mRoot;
+		double					mZoom;
 		int						mTimer;
 		QString					mFileName;
 		QPluginLoader			mPluginLoader;
-		bool					mRunning;
 		CPluginInterface*		mAutoRouter;
 };
 

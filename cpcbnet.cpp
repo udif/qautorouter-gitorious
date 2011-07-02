@@ -130,7 +130,7 @@ QPainterPath CPcbNet::shape() const
 	return me->mShape;
 }
 
-void CPcbNet::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void CPcbNet::paint(QPainter *painter, const QStyleOptionGraphicsItem* /* option */, QWidget* /* widget */)
 {
 	QPainterPath p = shape();
 	painter->setRenderHint(QPainter::Antialiasing);

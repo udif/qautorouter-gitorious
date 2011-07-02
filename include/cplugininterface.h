@@ -26,9 +26,11 @@ class CPluginInterface
 		virtual QString				website() const = 0;			/* the author's website */
 		virtual QString				description() const = 0;		/* a brief description of the plugin */
 
-		virtual bool				initialize(CPcb* pcb)=0;		/** initialize, gets' called once prior to exec() being called */
+		virtual bool				start(CPcb* pcb)=0;				/** initialize, gets' called once prior to exec() being called */
+		virtual void				stop()=0;						/** stop processing */
 		virtual bool				exec()=0;						/** get's called repeatedly while exec() returns true, return false to stop */
 		virtual QString				status()=0;						/** a brief status report for the status bar */
+		virtual int					elapsed()=0;					/** elapsed time in seconds */
 };
 
 

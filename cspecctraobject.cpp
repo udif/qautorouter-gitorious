@@ -18,7 +18,8 @@ CSpecctraObject::CSpecctraObject(QGraphicsItem* parent)
 }
 
 CSpecctraObject::CSpecctraObject( const CSpecctraObject& other,QGraphicsItem* parent)
-: inherited(parent)
+: QObject()
+, inherited(parent)
 , mParentObject(NULL)
 {
 	copy(other);

@@ -37,7 +37,8 @@ SOURCES += main.cpp \
     cpcbvia.cpp \
     cgvia.cpp \
     cgsegment.cpp \
-    cgwire.cpp
+    cgwire.cpp \
+    cutil.cpp
 HEADERS += include/qautorouter.h \
     include/cspecctrareader.h \
     include/cspecctraobject.h \
@@ -69,7 +70,8 @@ HEADERS += include/qautorouter.h \
     include/cplugininterface.h \
     include/cgvia.h \
     include/cgsegment.h \
-    include/cgwire.h
+    include/cgwire.h \
+	include/cutil.h
 FORMS += forms/qautorouter.ui \
     forms/preferences.ui \
     forms/layerpreferences.ui

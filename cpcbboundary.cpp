@@ -47,7 +47,7 @@ QPainterPath CPcbBoundary::shape() const
 	return p;
 }
 
-void CPcbBoundary::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void CPcbBoundary::paint(QPainter *painter, const QStyleOptionGraphicsItem* /* option */, QWidget* /* widget */)
 {
 	QPainterPath p = shape();
 	painter->setRenderHint(QPainter::Antialiasing);

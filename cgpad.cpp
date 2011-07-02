@@ -81,7 +81,7 @@ QPainterPath CGPad::shape() const
 	return mShape;
 }
 
-void CGPad::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget)
+void CGPad::paint(QPainter *painter, const QStyleOptionGraphicsItem* /* option */,QWidget* /* widget */)
 {
 	QPainterPath ppath = shape();
 	painter->setRenderHint(QPainter::Antialiasing);
