@@ -186,7 +186,7 @@ void SimpleRouter::route()
 			CGSegment* segment = wire.segment(n);
 			route(segment);
 			pcb()->scene()->update(pcb()->structure()->boundary()->boundingRect()); /* FIXME  - don't update the whole pcb */
-			pcb()->yield();
+			pcb()->yield();				/* give up some CPU to the main app */
 			emit status(currentStatus());
 		}
 		net->setSelected(false);
