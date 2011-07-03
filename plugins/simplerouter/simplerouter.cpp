@@ -8,7 +8,8 @@
 #include <cpcb.h>
 #include <cpcbnetwork.h>
 #include <cpcbnet.h>
-
+#include <cpcbstructure.h>
+#include <cpcbboundary.h>
 #include <cutil.h>
 
 /**
@@ -81,7 +82,6 @@ SimpleRouter::tRunState SimpleRouter::state()
 void SimpleRouter::setState(tRunState state)
 {
 	mState=state;
-	emit status(currentStatus());
 }
 
 /**
@@ -96,9 +96,7 @@ QString SimpleRouter::currentStatus()
 		{
 			default:
 			case Idle:			msg+="Idle  ";	break;
-			case SortingNets:	msg+="Sort  ";	break;
 			case Selecting:		msg+="Select";	break;
-			case Searching:		msg+="Search";	break;
 			case Routing:		msg+="Route ";	break;
 		}
 		msg += QString("] ")+elapsed()+tr(" Nets: ")+QString::number(pcb()->network()->nets()) + " " + tr("Routed: ")+QString::number(pcb()->network()->routed());
@@ -116,7 +114,7 @@ bool SimpleRouter::start(CPcb* pcb)
 	mStartTime = QDateTime::currentDateTime();
 	if ( mPcb != NULL && mPcb->network() != NULL )
 	{
-		setState(SortingNets);
+		setState(Selecting);
 		QObject::connect(this,SIGNAL(status(QString)),mPcb,SIGNAL(status(QString)));
 		QObject::connect(this,SIGNAL(clearCache()),mPcb,SLOT(clearCache()));
 		return true;
@@ -134,32 +132,7 @@ void SimpleRouter::stop()
 	QObject::disconnect(this,SIGNAL(clearCache()),mPcb,SLOT(clearCache()));
 }
 
-/**
-  * Sort padstack lists and net lists.
-  */
-void SimpleRouter::sort()
-{
-	if ( pcb() != NULL && pcb()->network() != NULL )
-	{
-		emit clearCache();
-		/* sort the padstack lists associated with each net relative to distance from center point of PCB */
-		QPointF centerPt = pcb()->boundingRect().center();
-		for( int n=0; n < pcb()->network()->nets(); n++)
-		{
-			pcb()->network()->net(n)->sort(centerPt);
-		}
-		/* sort the bet lists based on closeness to PCB center point */
-		CUtil::sort(pcb()->network()->netsRef(),centerPt);
-		/* redraw */
-		CSpecctraObject::scene()->update();
-	}
-}
-
 void SimpleRouter::select()
-{
-}
-
-void SimpleRouter::search()
 {
 }
 
@@ -177,26 +150,18 @@ bool SimpleRouter::exec()
 	switch(state())
 	{
 		default:
-			setState(SortingNets);
+			setState(Selecting);
 			break;
 		case Idle:
 			rc=false;
 			break;
-		case SortingNets:
-			sort();
-			setState(Selecting);
-			break;
 		case Selecting:
 			select();
-			setState(Searching);
-			break;
-		case Searching:
-			search();
 			setState(Routing);
 			break;
 		case Routing:
 			route();
-			setState(SortingNets);
+			setState(Selecting);
 			break;
 	}
 	return rc;

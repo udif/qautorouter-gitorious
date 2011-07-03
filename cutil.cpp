@@ -70,16 +70,16 @@ QString CUtil::placeRef(QString unitRef, QString pinRef)
   */
 static bool comparePadstackPosAscending(CGPadstack* s1,CGPadstack* s2)
 {
-	QPointF p1 = s1->pos() - gSortPt;
-	QPointF p2 = s2->pos() - gSortPt;
+	QPointF p1 = s1->origin() - gSortPt;
+	QPointF p2 = s2->origin() - gSortPt;
 	double len1 = p1.manhattanLength();
 	double len2 = p2.manhattanLength();
 	return len1 < len2;
 }
 static bool comparePadstackPosDescending(CGPadstack* s1,CGPadstack* s2)
 {
-	QPointF p1 = s1->pos() - gSortPt;
-	QPointF p2 = s2->pos() - gSortPt;
+	QPointF p1 = s1->origin() - gSortPt;
+	QPointF p2 = s2->origin() - gSortPt;
 	double len1 = p1.manhattanLength();
 	double len2 = p2.manhattanLength();
 	return len1 > len2;
@@ -108,8 +108,8 @@ static bool compareNetsPosAscending(CPcbNet* s1,CPcbNet* s2)
 {
 	if ( s1->padstacks() > 0 && s2->padstacks() > 0 )
 	{
-		QPointF p1 = s1->padstack(0)->pos() - gSortPt;
-		QPointF p2 = s2->padstack(0)->pos() - gSortPt;
+		QPointF p1 = s1->padstack(0)->origin() - gSortPt;
+		QPointF p2 = s2->padstack(0)->origin() - gSortPt;
 		double len1 = p1.manhattanLength();
 		double len2 = p2.manhattanLength();
 		return len1 < len2;
@@ -120,8 +120,8 @@ static bool compareNetsPosDescending(CPcbNet* s1,CPcbNet* s2)
 {
 	if ( s1->padstacks() > 0 && s2->padstacks() > 0 )
 	{
-		QPointF p1 = s1->padstack(0)->pos() - gSortPt;
-		QPointF p2 = s2->padstack(0)->pos() - gSortPt;
+		QPointF p1 = s1->padstack(0)->origin() - gSortPt;
+		QPointF p2 = s2->padstack(0)->origin() - gSortPt;
 		double len1 = p1.manhattanLength();
 		double len2 = p2.manhattanLength();
 		return len1 > len2;

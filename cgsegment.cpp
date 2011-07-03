@@ -3,6 +3,7 @@
 * Author: Mike Sharkey <mike@pikeaero.com>                                     *
 *******************************************************************************/
 #include "cgsegment.h"
+#include "cspecctraobject.h"
 
 #include <QPainter>
 
@@ -12,11 +13,32 @@ CGSegment::CGSegment(QObject *parent)
 : inherited(parent)
 , mWidth(0.0)
 , mLayer(NULL)
+, mParentSegment(NULL)
 {
+	CSpecctraObject::scene()->addItem(this);
 }
 
 CGSegment::~CGSegment()
 {
+	clear();
+}
+
+/**
+  * @brief clear
+  */
+void CGSegment::clear()
+{
+	for(int n=0; n < mSegments.count(); n++)
+	{
+		if ( mSegments.at(n)->isA(CGSegment::Padstack) && !mSegments.at(n)->isA(CGSegment::Via) ) /* is it a placed pad? */
+		{
+			mSegments.at(n)->clear();					/* yes...skip it... */
+			mSegments.at(n)->setParentSegment(NULL);	/* ...and disconnect it from the wire */
+		}
+		else
+			delete mSegments.at(n);						/* no, delete it */
+	}
+	mSegments.clear();
 }
 
 /**
@@ -57,6 +79,7 @@ CPcbLayer* CGSegment::layer()
 void CGSegment::append(CGSegment* segment)
 {
 	mSegments.append(segment);
+	segment->setParentSegment(this);
 }
 
 /**
@@ -85,24 +108,38 @@ QRectF CGSegment::boundingRect() const
 }
 
 /**
+  * @return the parent position point or of parent is NULL, then this position pont.
+  */
+QPointF CGSegment::parentOrigin()
+{
+	if ( parentSegment() != NULL )
+	{
+		return parentSegment()->origin();
+	}
+	return origin();
+}
+
+/**
   * @return the segment shape.
   */
 QPainterPath CGSegment::shape() const
 {
 	CGSegment* me=(CGSegment*)this;
 	QPainterPath ppath;
-	for(int n=0; n < me->segments(); n++)
-	{
-		ppath.addPath(me->segment(n)->shape());
-	}
+	ppath.moveTo(me->parentOrigin());
+	ppath.lineTo(me->origin());
 	return ppath;
 }
 
 void CGSegment::paint(QPainter *painter, const QStyleOptionGraphicsItem* /* option */, QWidget* /* widget */)
 {
 	QPainterPath p = shape();
-	painter->setRenderHint(QPainter::Antialiasing);
-	painter->scale(scale(),scale());
-	painter->setPen(QPen(QColor(255, 255, 255), 3, Qt::SolidLine,Qt::FlatCap,Qt::MiterJoin));
-	painter->drawPath(shape());
+	if ( !p.isEmpty() )
+	{
+		p = shape();
+		painter->setRenderHint(QPainter::Antialiasing);
+		painter->scale(scale(),scale());
+		painter->setPen(QPen(QColor(0, 0, 0), 3, Qt::SolidLine,Qt::FlatCap,Qt::MiterJoin));
+		painter->drawPath(shape());
+	}
 }

@@ -472,12 +472,16 @@ void QAutoRouter::setupActions()
   */
 void QAutoRouter::clear()
 {
+	if ( pcb() != NULL )
+	{
+		pcb()->clearCache();
+	}
 	if ( mRoot != NULL )
 	{
 		delete mRoot;
 		mRoot = NULL;
 	}
-	CGPadstack::clear();
+	CGPadstack::erase();
 }
 
 /**

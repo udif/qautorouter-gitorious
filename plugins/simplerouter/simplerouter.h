@@ -39,9 +39,7 @@ class SimpleRouter : public QObject, public CPluginInterface
 	protected:
 		typedef enum {
 			Idle,													/** there is nothing happening */
-			SortingNets,											/** sorting netlists */
 			Selecting,												/** selecting which net(s) to route */
-			Searching,												/** searching for a route on curent net(s) */
 			Routing,												/** committing a route */
 		} tRunState;
 		CPcb*						pcb() {return mPcb;}
@@ -49,9 +47,7 @@ class SimpleRouter : public QObject, public CPluginInterface
 		void						setState(tRunState state);
 		QString						currentStatus();				/** a brief status report for the status bar */
 
-		void						sort();
 		void						select();
-		void						search();
 		void						route();
 
 	private:

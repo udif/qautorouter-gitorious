@@ -32,7 +32,7 @@ CGPadstack::~CGPadstack()
 /**
   * @brief (static) clear the pastack statics
   */
-void CGPadstack::clear()
+void CGPadstack::erase()
 {
 	QList<QString> keys = mGPadstacks.keys();
 	for(int n=0; n < keys.count(); n++)
@@ -83,6 +83,14 @@ QString CGPadstack::unitRef()
 	return rc;
 }
 
+/**
+  * @return the pin reference for this padstack.
+  */
+QString CGPadstack::pinRef()
+{
+	return mPinRef;
+}
+
 CPcbPlace* CGPadstack::place()
 {
 	return mPlace;
@@ -104,7 +112,7 @@ CGPad* CGPadstack::pad(QString layer)
 /**
   * @return a point which is the center of the padstack
   */
-QPointF CGPadstack::pos()
+QPointF CGPadstack::origin()
 {
 	QPointF pt;
 	for(int n=0; n < layers().count(); n++)
@@ -128,26 +136,19 @@ QStringList CGPadstack::layers()
 }
 
 /**
-  * @return the pin reference for this padstack.
-  */
-QString CGPadstack::pinRef()
-{
-	return mPinRef;
-}
-
-/**
   * @return the shape outline of the padstack.
   */
 QPainterPath CGPadstack::shape() const
 {
 	CGPadstack* me = (CGPadstack*)this;
 	QPainterPath ppath;
+#if 0
 	for(int n=0; n < me->layers().count(); n++)
 	{
 		CGPad* pPad = me->pad(me->layers().at(n));
 		ppath.addPath(pPad->shape());
 	}
-	ppath.addPath(inherited::shape());
+#endif
 	return ppath;
 }
 

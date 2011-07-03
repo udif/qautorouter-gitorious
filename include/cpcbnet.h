@@ -8,6 +8,7 @@
 #include "cspecctraobject.h"
 #include "cgpadstack.h"
 #include "cutil.h"
+#include "cgwire.h"
 
 #include <QObject>
 #include <QString>
@@ -33,8 +34,10 @@ class CPcbNet : public CSpecctraObject
 		CGPadstack*					padstack(int idx);
 		CGPadstack*					padstack(QString ref);
 		QList<CGPadstack*>&			padstacksRef();
+		CGWire&						wire();
 
 		void						sort(QPointF pt,CUtil::tSortOrder order=CUtil::Ascending);
+		void						dumpLength();
 
 		void						setWidth(double w) {mWidth=w;}
 		double						width();
@@ -45,12 +48,18 @@ class CPcbNet : public CSpecctraObject
 		virtual void				paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget);
 	public slots:
 		virtual void				clearCache();
+	protected:
+		CGPadstack*					closest(int n,QPointF pt);
+		CGPadstack*					farthest(int n,QPointF pt);
+		void						swap(CGPadstack* p1,CGPadstack* p2);
+
 	private:
 		QPainterPath				mShape;
 		bool						mRouted;
 		double						mWidth;			/* trace width */
 		QStringList					mPinRefs;
 		QList<CGPadstack*>			mPadstacks;		/* pin padstacks */
+		CGWire						mWire;
 };
 
 #endif // CPCBNET_H

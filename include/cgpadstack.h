@@ -33,10 +33,9 @@ class CGPadstack : public CGSegment
 		QStringList					layers();
 		QString						pinRef();
 		QString						unitRef();
-		QString						placeRef() {return unitRef()+"-"+pinRef();}
-		QPointF						pos();
+		virtual QPointF				origin();
 
-		static void					clear();
+		static void					erase();
 		static CGPadstack*			padstack(QString unitRef);
 		static QMap<QString,CGPadstack*> padstacks() {return mGPadstacks;}
 
