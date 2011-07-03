@@ -13,11 +13,12 @@
 
 #include "cgpadstack.h"
 
+class CPcbNet;
 class CGVia : public CGPadstack
 {
 	Q_OBJECT
 	public:
-		CGVia(QObject *parent = 0);
+		CGVia(CPcbNet* net);
 		virtual ~CGVia();
 
 		virtual tSegment			segmentType() {return CGSegment::Via;}

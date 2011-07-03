@@ -8,6 +8,8 @@
 #include "cpcblibrary.h"
 #include "cpcbnetwork.h"
 
+#include <QEventLoop>
+
 #define inherited CSpecctraObject
 
 CPcb::CPcb(QGraphicsItem *parent)
@@ -22,6 +24,15 @@ CPcb::CPcb(QGraphicsItem *parent)
 
 CPcb::~CPcb()
 {
+}
+
+/**
+  * @brief provide a hook for plugin to yield...
+  */
+void CPcb::yield()
+{
+	QEventLoop loop;
+	loop.processEvents();
 }
 
 /**

@@ -211,7 +211,7 @@ void CPcbPlace::createPadstacks()
 					QPainterPath pinShape;
 					CPcbPin* pin = image->pin(iPin);
 					CPcbPadstack* padstack = pin->padstack();
-					CGPadstack* cgPadstack = new CGPadstack(this,pin->name());
+					CGPadstack* cgPadstack = new CGPadstack((CPcbNet*)NULL,this,pin->name());
 					mPads.append(cgPadstack);
 					for(int iShape=0;iShape<padstack->shapes();iShape++)
 					{

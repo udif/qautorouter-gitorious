@@ -9,11 +9,13 @@
 #include <QString>
 #include <QDateTime>
 #include <QList>
-
+#include <QRectF>
+#include <QStack>
 #include <cplugininterface.h>
 
 class CPcb;
 class CPcbNet;
+class CGSegment;
 class SimpleRouter : public QObject, public CPluginInterface
  {
 	Q_OBJECT
@@ -44,16 +46,25 @@ class SimpleRouter : public QObject, public CPluginInterface
 		} tRunState;
 		CPcb*						pcb() {return mPcb;}
 		tRunState					state();
+		bool						running() {return state() != Idle;}
 		void						setState(tRunState state);
 		QString						currentStatus();				/** a brief status report for the status bar */
 
 		void						select();
 		void						route();
+		void						route(CGSegment*);
+
+		void						initializeBox();				/** initialize the expanding box */
+		void						expandBox();					/** expand the bounding box */
+
+		QStack<CPcbNet*>&			netStack()	{return mNetStack;}
 
 	private:
 		CPcb*						mPcb;
 		QDateTime					mStartTime;
 		tRunState					mState;
+		QStack<CPcbNet*>			mNetStack;						/** the current work stack */
+		QRectF						mBoundingBox;					/** the expanding bounding box */
 };
 
 #endif // SIMPLEROUTER_H

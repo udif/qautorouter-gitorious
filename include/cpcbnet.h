@@ -6,7 +6,6 @@
 #define CPCBNET_H
 
 #include "cspecctraobject.h"
-#include "cgpadstack.h"
 #include "cutil.h"
 #include "cgwire.h"
 
@@ -18,6 +17,8 @@
 
 class CPcbPin;
 class CPcbClass;
+class CGPadstack;
+class CGWire;
 class CPcbNet : public CSpecctraObject
 {
 	Q_OBJECT
@@ -36,12 +37,12 @@ class CPcbNet : public CSpecctraObject
 		QList<CGPadstack*>&			padstacksRef();
 		CGWire&						wire();
 
-		void						sort(QPointF pt,CUtil::tSortOrder order=CUtil::Ascending);
+		void						sort();
 		void						dumpLength();
 
 		void						setWidth(double w) {mWidth=w;}
 		double						width();
-		bool						routed() {return mRouted;}
+		bool						routed();
 		CPcbClass*					netClass();
 		virtual QRectF				boundingRect() const;
 		virtual QPainterPath		shape() const;
@@ -55,11 +56,10 @@ class CPcbNet : public CSpecctraObject
 
 	private:
 		QPainterPath				mShape;
-		bool						mRouted;
 		double						mWidth;			/* trace width */
 		QStringList					mPinRefs;
 		QList<CGPadstack*>			mPadstacks;		/* pin padstacks */
-		CGWire						mWire;
+		CGWire*						mWire;
 };
 
 #endif // CPCBNET_H

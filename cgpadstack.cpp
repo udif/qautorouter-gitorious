@@ -12,11 +12,12 @@ QMap<QString,CGPadstack*>	CGPadstack::mGPadstacks; /** indexed by "UNIT-PIN" str
 
 #define inherited CGSegment
 
-CGPadstack::CGPadstack(CPcbPlace* place,QString pinRef, QObject *parent)
-: inherited(parent)
+CGPadstack::CGPadstack(CPcbNet* net,CPcbPlace* place,QString pinRef, QObject *parent)
+: inherited(net)
 , mPlace(place)
 , mPinRef(pinRef)
 {
+
 	mGPadstacks.insert(unitRef(),this);
 }
 

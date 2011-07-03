@@ -11,6 +11,8 @@
 #include <cpcbstructure.h>
 #include <cpcbboundary.h>
 #include <cutil.h>
+#include <cgsegment.h>
+#include <cgwire.h>
 
 /**
   * @return plugin type
@@ -109,6 +111,7 @@ QString SimpleRouter::currentStatus()
   */
 bool SimpleRouter::start(CPcb* pcb)
 {
+	netStack().clear();
 	mPcb = pcb;
 	setState(Idle);
 	mStartTime = QDateTime::currentDateTime();
@@ -132,12 +135,63 @@ void SimpleRouter::stop()
 	QObject::disconnect(this,SIGNAL(clearCache()),mPcb,SLOT(clearCache()));
 }
 
+/**
+  * @brief select a net for routing.
+  */
 void SimpleRouter::select()
 {
+	netStack().clear();
+	if ( pcb() != NULL && pcb()->network() != NULL )
+	{
+		for(int n=0; n < pcb()->network()->nets(); n++)
+		{
+			CPcbNet* net = pcb()->network()->net(n);
+			if ( !net->routed() )
+			{
+				netStack().push(net);
+				setState(Routing);
+			}
+			pcb()->yield();
+		}
+	}
 }
 
+/**
+  * @brief route a segment
+  */
+void SimpleRouter::route(CGSegment* segment)
+{
+	segment->setWidth(20);
+	segment->setRouted(true);
+	for(int n=0; n < segment->segments(); n++)
+	{
+		CGSegment* child = segment->segment(n);
+		route(child);
+	}
+}
+
+/**
+  * @brief route the current net.
+  */
 void SimpleRouter::route()
 {
+	while( netStack().count() )
+	{
+		CPcbNet* net = netStack().pop();
+		CGWire& wire = net->wire();
+		net->setSelected(true);
+		pcb()->scene()->update(pcb()->structure()->boundary()->boundingRect()); /* FIXME  - don't update the whole pcb */
+		for( int n=0; running() && n < wire.segments(); n++)
+		{
+			CGSegment* segment = wire.segment(n);
+			route(segment);
+			pcb()->scene()->update(pcb()->structure()->boundary()->boundingRect()); /* FIXME  - don't update the whole pcb */
+			pcb()->yield();
+			emit status(currentStatus());
+		}
+		net->setSelected(false);
+		pcb()->scene()->update(pcb()->structure()->boundary()->boundingRect()); /* FIXME  - don't update the whole pcb */
+	}
 }
 
 /**
@@ -157,11 +211,13 @@ bool SimpleRouter::exec()
 			break;
 		case Selecting:
 			select();
-			setState(Routing);
+			if ( running() )
+				setState(Routing);
 			break;
 		case Routing:
 			route();
-			setState(Selecting);
+			if ( running() )
+				setState(Selecting);
 			break;
 	}
 	return rc;

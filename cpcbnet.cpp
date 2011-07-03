@@ -14,6 +14,8 @@
 #include "cutil.h"
 #include "cpcbplace.h"
 #include "cpcbplacement.h"
+#include "cgwire.h"
+#include "cgsegment.h"
 
 #include <stdio.h>
 
@@ -21,14 +23,16 @@
 
 CPcbNet::CPcbNet(QGraphicsItem *parent)
 : inherited(parent)
-, mRouted(false)
 , mWidth(-1.0)
 {
+	this->setFlag(QGraphicsItem::ItemIsSelectable);
+	mWire = new CGWire(this);
 	CSpecctraObject::scene()->addItem(this);
 }
 
 CPcbNet::~CPcbNet()
 {
+	delete mWire;
 }
 
 /**
@@ -38,7 +42,7 @@ void CPcbNet::clearCache()
 {
 	QPainterPath empty;
 	mShape = empty;
-	mWire.clear();
+	mWire->clear();
 	inherited::clearCache();
 }
 
@@ -53,6 +57,25 @@ QString CPcbNet::name()
 		nm = properties().at(0);
 	}
 	return nm;
+}
+
+/**
+  * @brief determine of the net is routed.
+  */
+bool CPcbNet::routed()
+{
+	bool rc=true;
+	CGWire& w = wire();
+	for(int n=0; n < w.segments(); n++)
+	{
+		CGSegment* seg = w.segment(n);
+		if ( !seg->routed() )
+		{
+			rc=false;
+			break;
+		}
+	}
+	return rc;
 }
 
 /**
@@ -121,9 +144,7 @@ int CPcbNet::padstacks()
 		}
 		if ( mPadstacks.count() )
 		{
-			QRectF bounds = boundingRect();
-			QPointF pt = bounds.center();
-			sort(pt);
+			sort();
 		}
 	}
 	return mPadstacks.count();
@@ -220,6 +241,9 @@ CGPadstack* CPcbNet::farthest(int n, QPointF pt)
 	return far;
 }
 
+/**
+  * @brief exchange one padstack with another.
+  */
 void CPcbNet::swap(CGPadstack* p1,CGPadstack* p2)
 {
 	if ( p1 != p2)
@@ -228,9 +252,7 @@ void CPcbNet::swap(CGPadstack* p1,CGPadstack* p2)
 		int idx2 = padstacksRef().indexOf(p2);
 		if ( idx1 >= 0 && idx2 >= 0 )
 		{
-			CGPadstack* tmp = padstacksRef().at(idx1);
-			padstacksRef()[idx1] = padstacksRef().at(idx2);
-			padstacksRef()[idx2] = tmp;
+			padstacksRef().swap(idx1,idx2);
 		}
 	}
 }
@@ -238,24 +260,16 @@ void CPcbNet::swap(CGPadstack* p1,CGPadstack* p2)
 /**
   * @brief sort the netlist with respect to distance from a point.
   */
-void CPcbNet::sort(QPointF pt,CUtil::tSortOrder order)
+void CPcbNet::sort()
 {
-	CGPadstack* ref=(order==CUtil::Ascending)?closest(0,pt):farthest(0,pt);
-	if ( ref != NULL )
+	/* sort the padstack lists associated with each net relative to distance from center point of PCB */
+	for(int n=1; n < padstacks(); n++ )
 	{
-		QPointF originPt = ref->origin();
-		clearCache();
-		/* sort the padstack lists associated with each net relative to distance from center point of PCB */
-		CUtil::sort(padstacksRef(),originPt);
-		for(int n=1; n < padstacks(); n++ )
-		{
-			CGPadstack* pad = closest(n,padstack(n-1)->origin());
-			swap(pad,padstack(n));
-		}
-		/* redraw */
-		CSpecctraObject::scene()->update();
-		//dumpLength();
+		CGPadstack* pad = closest(n,padstack(n-1)->origin());
+		swap(pad,padstack(n));
 	}
+	/* redraw */
+	CSpecctraObject::scene()->update();
 }
 
 void CPcbNet::dumpLength()
@@ -298,7 +312,7 @@ CPcbClass* CPcbNet::netClass()
   */
 CGWire& CPcbNet::wire()
 {
-	if ( mWire.isEmpty() )
+	if ( mWire->isEmpty() )
 	{
 		CGSegment* obj = NULL;
 		for( int n=0; n < this->padstacks(); n++)
@@ -306,11 +320,11 @@ CGWire& CPcbNet::wire()
 			CGPadstack* pad = padstack(n);
 			if ( n == 0 )
 			{
-				obj = &mWire;
+				obj = mWire;
 			}
 			else
 			{
-				CGWire* child = new CGWire();
+				CGWire* child = new CGWire(this);
 				obj->append(child);
 				obj = child;
 			}
@@ -319,6 +333,7 @@ CGWire& CPcbNet::wire()
 			obj = pad;
 		}
 	}
+	return *mWire;
 }
 
 /**

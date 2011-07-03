@@ -4,16 +4,22 @@
 *******************************************************************************/
 #include "cgsegment.h"
 #include "cspecctraobject.h"
+#include "cpcb.h"
+#include "cpcbnetwork.h"
+#include "cspecctraobject.h"
+#include "cpcbnet.h"
 
 #include <QPainter>
 
 #define inherited QObject
 
-CGSegment::CGSegment(QObject *parent)
-: inherited(parent)
+CGSegment::CGSegment(CPcbNet* net)
+: inherited(NULL)
 , mWidth(0.0)
 , mLayer(NULL)
 , mParentSegment(NULL)
+, mRouted(false)
+, mNet(net)
 {
 	CSpecctraObject::scene()->addItem(this);
 }
@@ -30,7 +36,7 @@ void CGSegment::clear()
 {
 	for(int n=0; n < mSegments.count(); n++)
 	{
-		if ( mSegments.at(n)->isA(CGSegment::Padstack) && !mSegments.at(n)->isA(CGSegment::Via) ) /* is it a placed pad? */
+		if ( mSegments.at(n)->isStatic() ) /* is it a placed pad? */
 		{
 			mSegments.at(n)->clear();					/* yes...skip it... */
 			mSegments.at(n)->setParentSegment(NULL);	/* ...and disconnect it from the wire */
@@ -39,6 +45,39 @@ void CGSegment::clear()
 			delete mSegments.at(n);						/* no, delete it */
 	}
 	mSegments.clear();
+}
+
+/**
+  * @return the net that this segmetn belongs to
+  */
+CPcbNet* CGSegment::net()
+{
+	if ( mNet == NULL )
+	{
+		if ( parentSegment() != NULL )
+			mNet = parentSegment()->net();
+	}
+	return mNet;
+}
+
+/**
+  * @return true of the net is selected.
+  */
+bool CGSegment::selected()
+{
+	if ( net() != NULL )
+	{
+		return net()->isSelected();
+	}
+	return false;
+}
+
+/**
+  * @brief determine if the segment is a permanent fixture?
+  */
+bool CGSegment::isStatic()
+{
+	return isA(CGSegment::Padstack) && isA(CGSegment::Via);
 }
 
 /**
@@ -136,10 +175,18 @@ void CGSegment::paint(QPainter *painter, const QStyleOptionGraphicsItem* /* opti
 	QPainterPath p = shape();
 	if ( !p.isEmpty() )
 	{
+		int w=width();
 		p = shape();
 		painter->setRenderHint(QPainter::Antialiasing);
 		painter->scale(scale(),scale());
-		painter->setPen(QPen(QColor(0, 0, 0), 3, Qt::SolidLine,Qt::FlatCap,Qt::MiterJoin));
+		if ( !selected() )
+		{
+			painter->setPen(QPen(QColor(255,255,255), w<=0?3:width(), Qt::SolidLine,Qt::FlatCap,Qt::MiterJoin));
+		}
+		else
+		{
+			painter->setPen(QPen(QColor(255,255,0), w<=0?10:width(), Qt::SolidLine,Qt::FlatCap,Qt::MiterJoin));
+		}
 		painter->drawPath(shape());
 	}
 }

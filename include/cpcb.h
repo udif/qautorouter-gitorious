@@ -23,7 +23,8 @@ class CPcb : public CSpecctraObject
 		CPcbPlacement*				placement();
 		CPcbLibrary*				library();
 		CPcbNetwork*				network();
-
+	public slots:
+		void						yield();
 	signals:
 		void						status(QString txt);
 	private:

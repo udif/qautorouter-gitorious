@@ -10,15 +10,20 @@
 
 #include "cgsegment.h"
 
+class CPcbNet;
 class CGWire : public CGSegment
 {
 	Q_OBJECT
 	public:
-		CGWire(QObject *parent = 0);
+		CGWire(CPcbNet *net);
 		virtual ~CGWire();
+
+		virtual CPcbNet*			net();
 
 		virtual tSegment			segmentType() {return CGSegment::Wire;}
 		virtual bool				isA(CGSegment::tSegment t) {return t==CGSegment::Wire || CGSegment::isA(t);}
+
+		virtual bool				insertBreak(QPointF pt,CGSegment::tSegment style);
 
 		virtual QPainterPath		shape() const;
 };

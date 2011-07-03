@@ -16,11 +16,12 @@
 
 class CPcb;
 class CPcbPlace;
+class CPcbNet;
 class CGPadstack : public CGSegment
 {
 	Q_OBJECT
 	public:
-		CGPadstack(CPcbPlace* place,QString pinRef,QObject *parent = 0);
+		CGPadstack(CPcbNet* net,CPcbPlace* place=NULL,QString pinRef=QString(),QObject *parent = 0);
 		virtual ~CGPadstack();
 
 		virtual tSegment			segmentType() {return CGSegment::Padstack;}

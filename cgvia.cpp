@@ -6,9 +6,8 @@
 
 #define inherited CGPadstack
 
-CGVia::CGVia(QObject *parent)
-: inherited(NULL,QString(),parent)
-
+CGVia::CGVia(CPcbNet* net)
+: inherited(net,NULL,QString(),NULL)
 {
 }
 
