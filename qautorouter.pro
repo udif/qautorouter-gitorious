@@ -1,9 +1,8 @@
 # -------------------------------------------------
 # Project created by QtCreator 2011-06-16T09:55:28
 # -------------------------------------------------
-QT += gui \
-    svg
-QMAKE_LFLAGS += -rdynamic
+QT += gui
+unix: QMAKE_LFLAGS += -rdynamic
 INCLUDEPATH += include
 TARGET = qautorouter
 TEMPLATE = app
