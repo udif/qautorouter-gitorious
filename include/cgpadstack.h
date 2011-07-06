@@ -37,7 +37,7 @@ class CGPadstack : public CGSegment
 		virtual QPointF				origin();
 
 		static void					erase();
-		static CGPadstack*			padstack(QString unitRef);
+		static CGPadstack*			padstack(QString& unitRef);
 		static QMap<QString,CGPadstack*> padstacks() {return mGPadstacks;}
 
 		virtual QPainterPath		shape() const;
