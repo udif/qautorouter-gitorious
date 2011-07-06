@@ -2,11 +2,15 @@
 # Project created by QtCreator 2011-06-16T09:55:28
 # -------------------------------------------------
 QT += gui
-win32: CONFIG += qt dll
+win32: CONFIG += qt dll debug
 unix: CONFIG += dll debug
 INCLUDEPATH += include ../include ../graphics/include
 TARGET = specctra
 TEMPLATE = lib
+unix {
+	target.path = /usr/local/lib
+	INSTALLS += target
+}
 SOURCES += cpcb.cpp \
 		cpcbboundary.cpp \
 		cpcbcircle.cpp \

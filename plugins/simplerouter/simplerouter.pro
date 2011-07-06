@@ -4,9 +4,13 @@
 QT += gui
 win32: CONFIG += qt plugin
 unix: CONFIG += dll plugin debug
-INCLUDEPATH += ../../include
+INCLUDEPATH += ../../include ../../graphics/include ../../specctra/include
 TARGET = simpleplugin
 TEMPLATE = lib
+unix {
+	target.path = /usr/local/lib
+	INSTALLS += target
+}
 SOURCES += simplerouter.cpp
 HEADERS += simplerouter.h
 OTHER_FILES += README.txt
