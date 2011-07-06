@@ -19,9 +19,9 @@ class CPcbRect : public CSpecctraObject
 		CPcbRect(QGraphicsItem *parent = 0);
 		virtual ~CPcbRect();
 
-		QRectF			rect();
-		QString			layer();
-		QPainterPath	path();
+		QRectF					rect();
+		QString					layer();
+		QPainterPath			path();
 };
 
 #endif // CPCBRECT_H

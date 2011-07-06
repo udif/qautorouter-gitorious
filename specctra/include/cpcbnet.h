@@ -6,6 +6,7 @@
 #define CPCBNET_H
 
 #include "cspecctraobject.h"
+
 #include "cutil.h"
 #include "cgwire.h"
 
