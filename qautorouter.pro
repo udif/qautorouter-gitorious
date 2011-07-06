@@ -4,4 +4,5 @@
 TEMPLATE = subdirs
 SUBDIRS = graphics \
 		specctra \
+		plugins \
 		qautorouter

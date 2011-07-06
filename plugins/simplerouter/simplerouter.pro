@@ -8,9 +8,11 @@ INCLUDEPATH += ../../include ../../graphics/include ../../specctra/include
 TARGET = simpleplugin
 TEMPLATE = lib
 unix {
-	target.path = /usr/local/lib
+	target.path = /opt/qautorouter/plugins
 	INSTALLS += target
 }
 SOURCES += simplerouter.cpp
 HEADERS += simplerouter.h
 OTHER_FILES += README.txt
+LIBS += -L../../graphics -L../../specctra -lqagraphics -lqaspecctra
+

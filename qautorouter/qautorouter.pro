@@ -9,7 +9,7 @@ unix {
 	QMAKE_LFLAGS_DEBUG += -pg
 }
 INCLUDEPATH += include ../graphics/include ../specctra/include
-TARGET = qautorouter
+TARGET = qa
 TEMPLATE = app
 unix {
 	target.path = /usr/bin
@@ -26,4 +26,4 @@ FORMS += forms/qautorouter.ui \
     forms/preferences.ui \
     forms/layerpreferences.ui
 RESOURCES += qautorouter.qrc
-LIBS += -Lgraphics -Lspecctra -lqagraphics -lqaspecctra
+LIBS += -L../graphics -L../specctra  -lqagraphics -lqaspecctra
