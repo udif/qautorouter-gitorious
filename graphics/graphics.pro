@@ -5,7 +5,7 @@ QT += gui
 win32: CONFIG += qt dll debug
 unix: CONFIG += dll debug
 INCLUDEPATH += include ../include ../specctra/include
-TARGET = graphics
+TARGET = qagraphics
 TEMPLATE = lib
 unix {
 	target.path = /usr/local/lib

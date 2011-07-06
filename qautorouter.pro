@@ -10,11 +10,13 @@ unix {
 }
 INCLUDEPATH += include graphics/include specctra/include
 TARGET = qautorouter
-TEMPLATE = app
+TEMPLATE = subdirs app
 unix {
 	target.path = /usr/local/bin
 	INSTALLS += target
 }
+SUBDIRS = graphics \
+		specctra
 SOURCES += main.cpp \
 		cspecctrareader.cpp \
 		qautorouter.cpp
@@ -24,4 +26,4 @@ FORMS += forms/qautorouter.ui \
     forms/preferences.ui \
     forms/layerpreferences.ui
 RESOURCES += qautorouter.qrc
-LIBS += -Lgraphics -Lspecctra -lgraphics -lspecctra
+LIBS += -Lgraphics -Lspecctra -lqagraphics -lqaspecctra
