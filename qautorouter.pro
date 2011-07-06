@@ -2,7 +2,12 @@
 # Project created by QtCreator 2011-06-16T09:55:28
 # -------------------------------------------------
 QT += gui
-unix: QMAKE_LFLAGS += -rdynamic
+#QMAKE_LFLAGS += -rdynamic
+unix {
+	QMAKE_LFLAGS += -rdynamic -pg
+	QMAKE_CXXFLAGS_DEBUG += -pg
+	QMAKE_LFLAGS_DEBUG += -pg
+}
 INCLUDEPATH += include
 TARGET = qautorouter
 TEMPLATE = app
