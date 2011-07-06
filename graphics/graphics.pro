@@ -4,11 +4,11 @@
 QT += gui
 win32: CONFIG += qt dll debug
 unix: CONFIG += dll debug
-INCLUDEPATH += include ../include ../specctra/include
+INCLUDEPATH += include ../qautorouter/include ../specctra/include
 TARGET = qagraphics
 TEMPLATE = lib
 unix {
-	target.path = /usr/local/lib
+	target.path = /usr/lib
 	INSTALLS += target
 }
 SOURCES += cgpad.cpp \
