@@ -154,6 +154,8 @@ void SimpleRouter::select()
 			pcb()->yield();
 		}
 	}
+	if (netStack().isEmpty())
+		stop();
 }
 
 /**
