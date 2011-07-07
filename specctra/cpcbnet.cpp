@@ -268,8 +268,6 @@ void CPcbNet::sort()
 		CGPadstack* pad = closest(n,padstack(n-1)->origin());
 		swap(pad,padstack(n));
 	}
-	/* redraw */
-	CSpecctraObject::scene()->update();
 }
 
 void CPcbNet::dumpLength()

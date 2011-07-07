@@ -182,17 +182,17 @@ void SimpleRouter::route()
 		CPcbNet* net = netStack().pop();
 		CGWire& wire = net->wire();
 		net->setSelected(true);
-		pcb()->scene()->update(pcb()->structure()->boundary()->boundingRect()); /* FIXME  - don't update the whole pcb */
+		net->update();
 		for( int n=0; running() && n < wire.segments(); n++)
 		{
 			CGSegment* segment = wire.segment(n);
 			route(segment);
-			pcb()->scene()->update(pcb()->structure()->boundary()->boundingRect()); /* FIXME  - don't update the whole pcb */
+			segment->update();
 			pcb()->yield();				/* give up some CPU to the main app */
 			emit status(currentStatus());
 		}
 		net->setSelected(false);
-		pcb()->scene()->update(pcb()->structure()->boundary()->boundingRect()); /* FIXME  - don't update the whole pcb */
+		net->update();
 	}
 }
 

@@ -681,6 +681,7 @@ void QAutoRouter::zoomFit()
 {
 	QRectF bounds = CSpecctraObject::scene()->itemsBoundingRect();
 	ui->graphicsView->fitInView(bounds,Qt::KeepAspectRatio);
+	CSpecctraObject::scene()->update();
 }
 
 /**
