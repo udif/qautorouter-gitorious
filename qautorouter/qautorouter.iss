@@ -5,7 +5,7 @@
 #define MyAppVersion "0.0.2"
 #define MyAppPublisher "EightBitGeek"
 #define MyAppURL "http://qautorouter.sourceforge.net"
-#define MyAppExeName "qautorouter.exe"
+#define MyAppExeName "qa.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -25,7 +25,7 @@ AllowNoIcons=yes
 LicenseFile=C:\Documents and Settings\Administrator\My Documents\qautorouter\LICENSE
 OutputDir=C:\Documents and Settings\Administrator\My Documents
 OutputBaseFilename=QAutoRouter-Setup
-SetupIconFile=C:\Documents and Settings\Administrator\My Documents\qautorouter\icons\qautorouter.ico
+SetupIconFile=C:\Documents and Settings\Administrator\My Documents\qautorouter\qautorouter\icons\qautorouter.ico
 Compression=lzma
 SolidCompression=yes
 
@@ -37,7 +37,15 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
 [Files]
-Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter-build-desktop\debug\qautorouter.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter-build-desktop\qautorouter\debug\qa.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter-build-desktop\specctra\debug\specctra.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter-build-desktop\plugins\simplerouter\debug\simplerouter.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
+Source: "C:\QtSDK\mingw\bin\mingwm10.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\QtSDK\mingw\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Qt\4.7.3\bin\QtCored4.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Qt\4.7.3\bin\QtGuid4.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\PA10.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
+Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\spi4.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
