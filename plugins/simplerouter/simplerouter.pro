@@ -5,7 +5,7 @@ QT += gui
 win32: CONFIG += qt plugin
 unix: CONFIG += dll plugin debug
 INCLUDEPATH += ../../include ../../graphics/include ../../specctra/include
-TARGET = simpleplugin
+TARGET = simplerouter
 TEMPLATE = lib
 unix {
 	target.path = /opt/qautorouter/plugins
@@ -14,5 +14,6 @@ unix {
 SOURCES += simplerouter.cpp
 HEADERS += simplerouter.h
 OTHER_FILES += README.txt
-LIBS += -L../../specctra -lspecctra
+unix: LIBS += -L../../specctra -lspecctra
+win32: LIBS += -L../../../qautorouter-build-desktop/specctra/release -L../../../qautorouter-build-desktop/specctra/debug -lspecctra
 

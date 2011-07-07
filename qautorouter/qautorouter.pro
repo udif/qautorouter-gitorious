@@ -24,4 +24,5 @@ FORMS += forms/qautorouter.ui \
     forms/preferences.ui \
     forms/layerpreferences.ui
 RESOURCES += qautorouter.qrc
-LIBS += -L../specctra -lspecctra
+unix: LIBS += -L../../specctra -lspecctra
+win32: LIBS += -L../../qautorouter-build-desktop/specctra/release -L../../qautorouter-build-desktop/specctra/debug -lspecctra

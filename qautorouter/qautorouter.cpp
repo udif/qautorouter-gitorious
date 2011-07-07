@@ -11,6 +11,7 @@
 #include "cpcb.h"
 #include "cpcblayer.h"
 #include "cpcbclass.h"
+#include "cpcbboundary.h"
 
 #include <QTextStream>
 #include <QFileDialog>
@@ -730,6 +731,10 @@ void QAutoRouter::timerEvent(QTimerEvent* e)
 			msg = tr("[Idle] ");
 			statusBar()->showMessage( msg );
 		}
+		else
+		{
+			pcb()->scene()->update(pcb()->structure()->boundary()->boundingRect());
+		}
 	}
 }
 
@@ -805,7 +810,11 @@ bool QAutoRouter::loadPlugin(QString filename,QString& errorString)
   */
 void QAutoRouter::addPlugin()
 {
+#ifdef Q_OS_WIN32
+	QFileDialog dialog(this,tr("Open"),QDir::currentPath(),tr("Plug-In Files (*.dll)"));
+#else
 	QFileDialog dialog(this,tr("Open"),QDir::currentPath(),tr("Plug-In Files (*.so)"));
+#endif
 	if (dialog.exec())
 	{
 		QString filename = dialog.selectedFiles().at(0);
