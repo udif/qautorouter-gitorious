@@ -154,7 +154,7 @@ QRectF CPcbPlace::boundingRect() const
 	return bounds;
 }
 
-QPainterPath CPcbPlace::outlineShape() const
+QPainterPath& CPcbPlace::outlineShape()
 {
 	if ( mOutlineShape.isEmpty() )
 	{
@@ -232,7 +232,8 @@ void CPcbPlace::createPadstacks()
 
 QPainterPath CPcbPlace::shape() const
 {
-	QPainterPath p = outlineShape();
+	CPcbPlace* me = (CPcbPlace*)this;
+	QPainterPath p = me->outlineShape();
 	return p;
 }
 
@@ -240,8 +241,7 @@ void CPcbPlace::paint(QPainter *painter, const QStyleOptionGraphicsItem* /* opti
 {
 	painter->setRenderHint(QPainter::Antialiasing);
 	painter->scale(scale(),scale());
-	QPainterPath outlinePath = outlineShape();
 	painter->setPen(QPen(QColor(0,255,255), 10, Qt::SolidLine,Qt::RoundCap,Qt::RoundJoin));
-	painter->drawPath(outlinePath);
+	painter->drawPath(outlineShape());
 
 }

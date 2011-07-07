@@ -29,7 +29,7 @@ class CPcbPlace : public CSpecctraObject
 		CGPadstack*						pad(int idx);
 		CGPadstack*						pad(QString ref);
 		double							rotation();
-		QPainterPath					outlineShape() const;
+		QPainterPath&					outlineShape();
 		virtual QRectF					boundingRect() const;
 		virtual QPainterPath			shape() const;
 		virtual void					paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget);

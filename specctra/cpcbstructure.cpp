@@ -57,7 +57,7 @@ CPcbLayer* CPcbStructure::layer(int idx)
 /**
   * @return a layer by reference
   */
-CPcbLayer* CPcbStructure::layer(QString ref)
+CPcbLayer* CPcbStructure::layer(QString& ref)
 {
 	for(int n=0;n<children().count();n++)
 	{

@@ -172,21 +172,16 @@ QPainterPath CGSegment::shape() const
 
 void CGSegment::paint(QPainter *painter, const QStyleOptionGraphicsItem* /* option */, QWidget* /* widget */)
 {
-	QPainterPath p = shape();
-	if ( !p.isEmpty() )
+	int w=width();
+	painter->setRenderHint(QPainter::Antialiasing);
+	painter->scale(scale(),scale());
+	if ( !selected() )
 	{
-		int w=width();
-		p = shape();
-		painter->setRenderHint(QPainter::Antialiasing);
-		painter->scale(scale(),scale());
-		if ( !selected() )
-		{
-			painter->setPen(QPen(QColor(255,255,255), w<=0?3:width(), Qt::SolidLine,Qt::FlatCap,Qt::MiterJoin));
-		}
-		else
-		{
-			painter->setPen(QPen(QColor(255,255,0), w<=0?10:width(), Qt::SolidLine,Qt::FlatCap,Qt::MiterJoin));
-		}
-		painter->drawPath(shape());
+		painter->setPen(QPen(QColor(255,255,255), w<=0?3:width(), Qt::SolidLine,Qt::FlatCap,Qt::MiterJoin));
 	}
+	else
+	{
+		painter->setPen(QPen(QColor(255,255,0), w<=0?10:width(), Qt::SolidLine,Qt::FlatCap,Qt::MiterJoin));
+	}
+	painter->drawPath(shape());
 }

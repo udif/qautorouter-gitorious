@@ -174,6 +174,8 @@ void SimpleRouter::route(CGSegment* segment)
 {
 	segment->setWidth(20);
 	segment->setRouted(true);
+	segment->update();
+	pcb()->yield();				/* give up some CPU to the main app */
 	for(int n=0; n < segment->segments(); n++)
 	{
 		CGSegment* child = segment->segment(n);
@@ -198,7 +200,6 @@ void SimpleRouter::route()
 			emit status(currentStatus());
 		}
 		selectNet(net,false);
-		pcb()->yield();				/* give up some CPU to the main app */
 	}
 }
 

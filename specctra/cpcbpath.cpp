@@ -48,16 +48,18 @@ double CPcbPath::width()
   */
 QPainterPath CPcbPath::shape()
 {
-	QPainterPath ppath;
-	QPointF startPt(properties().at(2).toDouble(),properties().at(3).toDouble());
-	ppath.moveTo(startPt);
-	for(int n=4; n < properties().count(); n+=2)
+	if ( mShape.isEmpty() )
 	{
-		QPointF pt(properties().at(n).toDouble(),properties().at(n+1).toDouble());
-		ppath.lineTo(pt);
+		QPointF startPt(properties().at(2).toDouble(),properties().at(3).toDouble());
+		mShape.moveTo(startPt);
+		for(int n=4; n < properties().count(); n+=2)
+		{
+			QPointF pt(properties().at(n).toDouble(),properties().at(n+1).toDouble());
+			mShape.lineTo(pt);
+		}
+		mShape.lineTo(startPt);
 	}
-	ppath.lineTo(startPt);
-	return ppath;
+	return mShape;
 }
 
 /**
@@ -65,28 +67,29 @@ QPainterPath CPcbPath::shape()
   */
 QPainterPath CPcbPath::oval()
 {
-	double radius = width()/2.0;
-	QPainterPath ppath;
-	QPointF centerPt1(properties().at(2).toDouble(),properties().at(3).toDouble());
-	QPointF centerPt2(properties().at(4).toDouble(),properties().at(5).toDouble());
-	if ( centerPt1.x() != centerPt2.x() )
+	if ( mOval.isEmpty() )
 	{
-		ppath.moveTo(QPointF(centerPt1.x(),centerPt1.y()-radius));
-		ppath.lineTo(QPointF(centerPt2.x(),centerPt2.y()-radius));
-		ppath.moveTo(QPointF(centerPt1.x(),centerPt1.y()+radius));
-		ppath.lineTo(QPointF(centerPt2.x(),centerPt2.y()+radius));
+		double radius = width()/2.0;
+		QPointF centerPt1(properties().at(2).toDouble(),properties().at(3).toDouble());
+		QPointF centerPt2(properties().at(4).toDouble(),properties().at(5).toDouble());
+		if ( centerPt1.x() != centerPt2.x() )
+		{
+			mOval.moveTo(QPointF(centerPt1.x(),centerPt1.y()-radius));
+			mOval.lineTo(QPointF(centerPt2.x(),centerPt2.y()-radius));
+			mOval.moveTo(QPointF(centerPt1.x(),centerPt1.y()+radius));
+			mOval.lineTo(QPointF(centerPt2.x(),centerPt2.y()+radius));
+		}
+		else
+		{
+			mOval.moveTo(QPointF(centerPt1.x()-radius,centerPt1.y()));
+			mOval.lineTo(QPointF(centerPt2.x()-radius,centerPt2.y()));
+			mOval.moveTo(QPointF(centerPt1.x()+radius,centerPt1.y()));
+			mOval.lineTo(QPointF(centerPt2.x()+radius,centerPt2.y()));
+		}
+		mOval.connectPath(circle(centerPt1,radius));
+		mOval.connectPath(circle(centerPt2,radius));
 	}
-	else
-	{
-		ppath.moveTo(QPointF(centerPt1.x()-radius,centerPt1.y()));
-		ppath.lineTo(QPointF(centerPt2.x()-radius,centerPt2.y()));
-		ppath.moveTo(QPointF(centerPt1.x()+radius,centerPt1.y()));
-		ppath.lineTo(QPointF(centerPt2.x()+radius,centerPt2.y()));
-	}
-	ppath.connectPath(circle(centerPt1,radius));
-	ppath.connectPath(circle(centerPt2,radius));
-
-	return ppath;
+	return mOval;
 }
 
 /**

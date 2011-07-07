@@ -159,7 +159,8 @@ void QAutoRouter::layerClicked(QModelIndex /* idx */)
 	QListWidgetItem* item = preferences->layerList->currentItem();
 	if ( item != NULL && pcb()!=NULL && pcb()->structure()!=NULL )
 	{
-		CPcbLayer* layer = pcb()->structure()->layer(item->data(Qt::UserRole).toString());
+		QString layerName = item->data(Qt::UserRole).toString();
+		CPcbLayer* layer = pcb()->structure()->layer(layerName);
 		if ( layer != NULL )
 		{
 			QPalette palette = layerpreferences->colorButton->palette();

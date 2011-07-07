@@ -19,6 +19,7 @@ CGPad::CGPad(CGPadstack* padstack, QPainterPath shape, QString layer, QObject *p
 , mPadstack(padstack)
 , mShape(shape)
 , mLayer(layer)
+, mLayerObject(NULL)
 {
 	padstack->addPad(this);
 	CSpecctraObject::scene()->addItem(this);
@@ -36,13 +37,16 @@ CPcb* CGPad::pcb()
 QColor CGPad::color()
 {
 	QColor c(0xa0,0,0);
-	if (pcb()!=NULL && pcb()->structure()!=NULL)
+	if ( mLayerObject==NULL )
 	{
-		CPcbLayer* l = pcb()->structure()->layer(layer());
-		if ( l!=NULL )
+		if (pcb()!=NULL && pcb()->structure()!=NULL)
 		{
-			c = l->color();
+			mLayerObject = pcb()->structure()->layer(layer());
 		}
+	}
+	if ( mLayerObject!=NULL )
+	{
+		c = mLayerObject->color();
 	}
 	return c;
 }

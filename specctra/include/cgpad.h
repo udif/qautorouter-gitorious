@@ -12,6 +12,7 @@
 
 class CPcb;
 class CGPadstack;
+class CPcbLayer;
 class CGPad : public QObject, public QGraphicsItem
 {
 	Q_OBJECT
@@ -20,7 +21,7 @@ class CGPad : public QObject, public QGraphicsItem
 
 		CGPadstack*					padstack() {return mPadstack;}
 		CPcb*						pcb();
-		QString						layer() {return mLayer;}
+		QString&					layer() {return mLayer;}
 		QString						pinRef();
 		QPointF						pos();
 		QColor						color();
@@ -33,6 +34,7 @@ class CGPad : public QObject, public QGraphicsItem
 		QPainterPath				mShape;
 		QString						mLayer;
 		QRectF						mBoundingRect;
+		CPcbLayer*					mLayerObject;
 };
 
 #endif // CGPAD_H
