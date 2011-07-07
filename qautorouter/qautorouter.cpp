@@ -732,10 +732,6 @@ void QAutoRouter::timerEvent(QTimerEvent* e)
 			msg = tr("[Idle] ");
 			statusBar()->showMessage( msg );
 		}
-		else
-		{
-			pcb()->scene()->update(pcb()->structure()->boundary()->boundingRect());
-		}
 	}
 }
 

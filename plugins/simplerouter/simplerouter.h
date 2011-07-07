@@ -50,6 +50,7 @@ class SimpleRouter : public QObject, public CPluginInterface
 		void						setState(tRunState state);
 		QString						currentStatus();				/** a brief status report for the status bar */
 
+		void						selectNet(CPcbNet* net,bool selected);
 		void						select();
 		void						route();
 		void						route(CGSegment*);
