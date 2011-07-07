@@ -46,6 +46,7 @@ Source: "C:\Qt\4.7.3\bin\QtCored4.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Qt\4.7.3\bin\QtGuid4.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\PA10.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
 Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\spi4.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
+Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\alu.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
