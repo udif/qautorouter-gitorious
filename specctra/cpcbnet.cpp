@@ -144,7 +144,7 @@ int CPcbNet::padstacks()
 		}
 		if ( mPadstacks.count() )
 		{
-			sort();
+//			sort();
 		}
 	}
 	return mPadstacks.count();
