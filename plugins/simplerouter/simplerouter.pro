@@ -14,5 +14,5 @@ unix {
 SOURCES += simplerouter.cpp
 HEADERS += simplerouter.h
 OTHER_FILES += README.txt
-LIBS += -L../../graphics -L../../specctra -lqagraphics -lqaspecctra
+LIBS += -L../../specctra -lspecctra
 

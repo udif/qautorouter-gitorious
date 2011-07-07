@@ -8,15 +8,13 @@ unix {
 	QMAKE_CXXFLAGS_DEBUG += -pg
 	QMAKE_LFLAGS_DEBUG += -pg
 }
-INCLUDEPATH += include ../graphics/include ../specctra/include
+INCLUDEPATH += include ../specctra/include
 TARGET = qa
 TEMPLATE = app
 unix {
 	target.path = /usr/bin
 	INSTALLS += target
 }
-SUBDIRS = graphics \
-		specctra
 SOURCES += main.cpp \
 		cspecctrareader.cpp \
 		qautorouter.cpp
@@ -26,4 +24,4 @@ FORMS += forms/qautorouter.ui \
     forms/preferences.ui \
     forms/layerpreferences.ui
 RESOURCES += qautorouter.qrc
-LIBS += -L../graphics -L../specctra  -lqagraphics -lqaspecctra
+LIBS += -L../specctra -lspecctra

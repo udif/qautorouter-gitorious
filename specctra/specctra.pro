@@ -4,14 +4,20 @@
 QT += gui
 win32: CONFIG += qt dll debug
 unix: CONFIG += dll debug
-INCLUDEPATH += include ../qautorouter/include ../graphics/include
-TARGET = qaspecctra
+INCLUDEPATH += include ../qautorouter/include
+TARGET = specctra
 TEMPLATE = lib
 unix {
 	target.path = /usr/lib
 	INSTALLS += target
 }
-SOURCES += cpcb.cpp \
+SOURCES += cgpad.cpp \
+		cgpadstack.cpp \
+		cgsegment.cpp \
+		cgvia.cpp \
+		cgwire.cpp \
+		cutil.cpp \
+		cpcb.cpp \
 		cpcbboundary.cpp \
 		cpcbcircle.cpp \
 		cpcbclass.cpp \
@@ -35,7 +41,14 @@ SOURCES += cpcb.cpp \
 		cpcbvia.cpp \
 		cspecctraobject.cpp
 
-HEADERS += include/cpcb.h \
+HEADERS += include/cgpad.h \
+		include/cgpadstack.h \
+		include/cgraphics.h \
+		include/cgsegment.h \
+		include/cgvia.h \
+		include/cgwire.h \
+		include/cutil.h \
+		include/cpcb.h \
 		include/cpcbboundary.h \
 		include/cpcbcircle.h \
 		include/cpcbclass.h \
