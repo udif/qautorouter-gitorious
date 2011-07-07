@@ -142,6 +142,7 @@ void SimpleRouter::selectNet(CPcbNet *net, bool selected)
 {
 	net->setSelected(selected);
 	net->update();
+	pcb()->yield();				/* give up some CPU to the main app */
 }
 
 /**
@@ -160,7 +161,6 @@ void SimpleRouter::select()
 				netStack().push(net);
 				setState(Routing);
 			}
-			pcb()->yield();
 		}
 	}
 	if (netStack().isEmpty())
@@ -174,12 +174,10 @@ void SimpleRouter::route(CGSegment* segment)
 {
 	segment->setWidth(20);
 	segment->setRouted(true);
-	segment->update();
 	for(int n=0; n < segment->segments(); n++)
 	{
 		CGSegment* child = segment->segment(n);
 		route(child);
-		pcb()->yield();				/* give up some CPU to the main app */
 	}
 }
 
@@ -197,10 +195,10 @@ void SimpleRouter::route()
 		{
 			CGSegment* segment = wire.segment(n);
 			route(segment);
-			pcb()->yield();				/* give up some CPU to the main app */
 			emit status(currentStatus());
 		}
 		selectNet(net,false);
+		pcb()->yield();				/* give up some CPU to the main app */
 	}
 }
 
