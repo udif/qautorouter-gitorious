@@ -2,6 +2,7 @@
 Unix/Linux build depends on libqt4-dev package.
 
 $ qmake && make
+$ sudo make install
 
 
 Windows:
