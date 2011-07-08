@@ -53,7 +53,7 @@ class SimpleRouter : public QObject, public CPluginInterface
 		void						selectNet(CPcbNet* net,bool selected);
 		void						select();
 		void						route();
-		void						route(CGSegment*);
+		void						route(CPcbNet* net,CGSegment*);
 
 		void						initializeBox();				/** initialize the expanding box */
 		void						expandBox();					/** expand the bounding box */

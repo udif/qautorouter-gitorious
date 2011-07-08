@@ -170,7 +170,7 @@ void SimpleRouter::select()
 /**
   * @brief route a segment
   */
-void SimpleRouter::route(CGSegment* segment)
+void SimpleRouter::route(CPcbNet* net, CGSegment* segment)
 {
 	segment->setWidth(20);
 	segment->setRouted(true);
@@ -196,7 +196,7 @@ void SimpleRouter::route()
 		for( int n=0; running() && n < wire.segments(); n++)
 		{
 			CGSegment* segment = wire.segment(n);
-			route(segment);
+			route(net,segment);
 			emit status(currentStatus());
 		}
 		selectNet(net,false);
