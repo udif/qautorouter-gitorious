@@ -179,7 +179,7 @@ void SimpleRouter::route(CPcbNet* net, CGSegment* segment)
 	for(int n=0; n < segment->segments(); n++)
 	{
 		CGSegment* child = segment->segment(n);
-		route(child);
+		route(net,child);
 	}
 }
 
