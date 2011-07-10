@@ -33,8 +33,6 @@ class CPcbPlace : public CSpecctraObject
 		virtual QRectF					boundingRect() const;
 		virtual QPainterPath			shape() const;
 		virtual void					paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget);
-	public slots:
-		virtual void					clearCache();
 	protected:
 		void							createPadstacks();
 	private:

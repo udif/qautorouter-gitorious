@@ -10,7 +10,7 @@
 CPcbBoundary::CPcbBoundary(QGraphicsItem *parent)
 : inherited(parent)
 {
-	CSpecctraObject::scene()->addItem(this);
+	CSpecctraObject::globalScene()->addItem(this);
 }
 
 CPcbBoundary::~CPcbBoundary()
@@ -22,12 +22,7 @@ CPcbBoundary::~CPcbBoundary()
   */
 CPcbPath* CPcbBoundary::path()
 {
-	CSpecctraObject* obj = child("path");
-	if ( obj!=NULL )
-	{
-		return (CPcbPath*)obj;
-	}
-	return NULL;
+	return (CPcbPath*)child("path");
 }
 
 QRectF CPcbBoundary::boundingRect() const

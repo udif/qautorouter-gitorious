@@ -21,7 +21,7 @@ CGSegment::CGSegment(CPcbNet* net)
 , mRouted(false)
 , mNet(net)
 {
-	CSpecctraObject::scene()->addItem(this);
+	CSpecctraObject::globalScene()->addItem(this);
 }
 
 CGSegment::~CGSegment()
@@ -34,16 +34,6 @@ CGSegment::~CGSegment()
   */
 void CGSegment::clear()
 {
-	for(int n=0; n < mSegments.count(); n++)
-	{
-		if ( mSegments.at(n)->isStatic() ) /* is it a placed pad? */
-		{
-			mSegments.at(n)->clear();					/* yes...skip it... */
-			mSegments.at(n)->setParentSegment(NULL);	/* ...and disconnect it from the wire */
-		}
-		else
-			delete mSegments.at(n);						/* no, delete it */
-	}
 	mSegments.clear();
 }
 

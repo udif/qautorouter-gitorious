@@ -19,8 +19,8 @@ class CPcbOutline : public CSpecctraObject
 		virtual ~CPcbOutline();
 
 		int							paths();
-		CPcbPath*					path(int comp);
-		CPcbPath*					path() {return path(0);}
+		CPcbPath*					path(int idx);
+		CPcbPath*					path();
 };
 
 #endif // CPCBOUTLINE_H

@@ -32,11 +32,10 @@ class CGPadstack : public CGSegment
 		CPcb*						pcb();
 		CGPad*						pad(QString layer);
 		QStringList					layers();
-		QString						pinRef();
-		QString						unitRef();
+		QString&					pinRef();
+		QString&					unitRef();
 		virtual QPointF				origin();
 
-		static void					erase();
 		static CGPadstack*			padstack(QString& unitRef);
 		static QMap<QString,CGPadstack*> padstacks() {return mGPadstacks;}
 
@@ -47,6 +46,7 @@ class CGPadstack : public CGSegment
 
 		CPcbPlace*					mPlace;
 		QString						mPinRef;
+		QString						mUnitRef;
 		QMap<QString,CGPad*>		mPads;
 
 };

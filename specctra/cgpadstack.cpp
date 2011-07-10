@@ -28,19 +28,7 @@ CGPadstack::~CGPadstack()
 	{
 		delete mPads[keys[n]];
 	}
-}
-
-/**
-  * @brief (static) clear the pastack statics
-  */
-void CGPadstack::erase()
-{
-	QList<QString> keys = mGPadstacks.keys();
-	for(int n=0; n < keys.count(); n++)
-	{
-		CGPadstack* padstack = mGPadstacks.take(keys[n]);
-		delete padstack;
-	}
+	mGPadstacks.take(unitRef());
 }
 
 /**
@@ -78,16 +66,19 @@ CGPadstack* CGPadstack::padstack(QString& unitRef)
 /**
   * @return UNIT-PIN notation.
   */
-QString CGPadstack::unitRef()
+QString& CGPadstack::unitRef()
 {
-	QString rc = place()->unit()+"-"+pinRef();
-	return rc;
+	if ( mUnitRef.isEmpty() )
+	{
+		mUnitRef = place()->unit()+"-"+pinRef();
+	}
+	return mUnitRef;
 }
 
 /**
   * @return the pin reference for this padstack.
   */
-QString CGPadstack::pinRef()
+QString& CGPadstack::pinRef()
 {
 	return mPinRef;
 }

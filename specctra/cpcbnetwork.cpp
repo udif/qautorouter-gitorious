@@ -17,13 +17,6 @@ CPcbNetwork::~CPcbNetwork()
 {
 }
 
-void CPcbNetwork::clearCache()
-{
-	mNets.clear();
-	mClasses.clear();
-	inherited::clearCache();
-}
-
 /**
   * @return the net count
   */

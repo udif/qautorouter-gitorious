@@ -48,8 +48,6 @@ class CPcbNet : public CSpecctraObject
 		virtual QRectF				boundingRect() const;
 		virtual QPainterPath		shape() const;
 		virtual void				paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget);
-	public slots:
-		virtual void				clearCache();
 	protected:
 		CGPadstack*					closest(int n,QPointF pt);
 		CGPadstack*					farthest(int n,QPointF pt);

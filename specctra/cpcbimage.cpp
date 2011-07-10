@@ -17,14 +17,6 @@ CPcbImage::~CPcbImage()
 {
 }
 
-void CPcbImage::clearCache()
-{
-	mOutlines.clear();
-	mPins.clear();
-	inherited::clearCache();
-}
-
-
 QString CPcbImage::name()
 {
 	return properties().at(0);

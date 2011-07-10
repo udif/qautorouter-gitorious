@@ -22,7 +22,7 @@ CGPad::CGPad(CGPadstack* padstack, QPainterPath shape, QString layer, QObject *p
 , mLayerObject(NULL)
 {
 	padstack->addPad(this);
-	CSpecctraObject::scene()->addItem(this);
+	CSpecctraObject::globalScene()->addItem(this);
 	setOpacity(0.45);
 }
 

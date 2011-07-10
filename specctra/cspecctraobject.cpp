@@ -8,7 +8,7 @@
 //#define inherited QGraphicsPathItem
 #define inherited QGraphicsItem
 
-QGraphicsScene* CSpecctraObject::mScene=NULL;					/** The graphics scheen */
+QGraphicsScene* CSpecctraObject::mGlobalScene=NULL;					/** The graphics scheen */
 
 CSpecctraObject::CSpecctraObject(QGraphicsItem* parent)
 : inherited(parent)
@@ -17,9 +17,9 @@ CSpecctraObject::CSpecctraObject(QGraphicsItem* parent)
 	//setCacheMode(QGraphicsItem::NoCache);
 }
 
-CSpecctraObject::CSpecctraObject( const CSpecctraObject& other,QGraphicsItem* parent)
+CSpecctraObject::CSpecctraObject( const CSpecctraObject& other)
 : QObject()
-, inherited(parent)
+, inherited(NULL)
 , mParentObject(NULL)
 {
 	copy(other);
@@ -29,9 +29,61 @@ CSpecctraObject::~CSpecctraObject()
 {
 	for(int n=0; n < mChildren.count(); n++)
 	{
-		delete mChildren.at(n);
+		CSpecctraObject* child = children().at(n);
+		if ( child->scene() == NULL )
+			delete child;
 	}
 	mChildren.clear();
+}
+
+QString CSpecctraObject::name()
+{
+	return objectClass();
+}
+
+QString CSpecctraObject::description()
+{
+	return name();
+}
+
+void CSpecctraObject::setParent(CSpecctraObject* p)
+{
+	mParentObject=p;
+}
+
+void CSpecctraObject::setObjectClass(QString& objectClass)
+{
+	mObjectClass = objectClass.toLower();
+}
+
+void CSpecctraObject::appendProperty(QString& property)
+{
+	mProperties.append(property);
+}
+
+void CSpecctraObject::appendProperty(QStringList& property)
+{
+	mProperties += property;
+}
+
+void CSpecctraObject::appendChild(CSpecctraObject* child)
+{
+	mChildren.append(child);child->setParent(this);
+}
+
+QString& CSpecctraObject::objectClass()
+{
+	return mObjectClass;
+}
+
+QStringList& CSpecctraObject::CSpecctraObject::properties()
+{
+	return mProperties;
+}
+
+QList<CSpecctraObject*>& CSpecctraObject::children()
+{
+	return mChildren;
 }
 
 QString CSpecctraObject::toText(int lvl)
@@ -56,15 +108,6 @@ QString CSpecctraObject::toText(int lvl)
 	return text;
 }
 
-void CSpecctraObject::clearCache()
-{
-	for(int n=0; n < children().count(); n++)
-	{
-		CSpecctraObject* child = children().at(n);
-		child->clearCache();
-	}
-}
-
 CSpecctraObject* CSpecctraObject::root()
 {
 	if ( parentObject() != NULL )
@@ -74,19 +117,16 @@ CSpecctraObject* CSpecctraObject::root()
 
 CPcb* CSpecctraObject::pcb()
 {
-	CSpecctraObject* obj = root();
-	if (obj->objectClass()=="pcb")
-	{
-		return (CPcb*)obj;
-	}
+	if ( root() != NULL && root()->objectClass() == "pcb" )
+		return (CPcb*)root();
 	return NULL;
 }
 
-QGraphicsScene* CSpecctraObject::scene()
+QGraphicsScene* CSpecctraObject::globalScene()
 {
-	if ( mScene == NULL )
-		mScene = new QGraphicsScene;
-	return mScene;
+	if ( mGlobalScene == NULL )
+		mGlobalScene = new QGraphicsScene;
+	return mGlobalScene;
 }
 
 
@@ -100,13 +140,53 @@ CSpecctraObject& CSpecctraObject::copy( const CSpecctraObject& other )
 	return *this;
 }
 
-CSpecctraObject* CSpecctraObject::child(QString o)
+CSpecctraObject* CSpecctraObject::parentObject(QString o)
+{
+	if ( mParentObject != NULL )
+	{
+		if ( o.isEmpty() || (!o.isEmpty() && mParentObject->objectClass() == o) )
+		{
+			return mParentObject;
+		}
+		if ( !o.isEmpty() )
+		{
+			return mParentObject->parentObject(o);
+		}
+	}
+	if (!o.isEmpty() && objectClass() == o)
+		return this;
+	return NULL;
+}
+
+/**
+  * @count the number of children of a particular object class.
+  */
+int CSpecctraObject::childCount(QString o)
+{
+	int count=0;
+	for(int n=0; n < children().count(); n++)
+	{
+		if ( children().at(n)->objectClass()==o)
+		{
+			++count;
+		}
+	}
+	return count;
+
+}
+
+/**
+  * @return a child of class
+  */
+CSpecctraObject* CSpecctraObject::child(QString o,int idx)
 {
 	for(int n=0; n < children().count(); n++)
 	{
 		if ( children().at(n)->objectClass()==o)
 		{
-			return children().at(n);
+			if ( idx == 0 )
+				return children().at(n);
+			--idx;
 		}
 	}
 	return NULL;
@@ -131,10 +211,16 @@ void CSpecctraObject::dump(int lvl)
 
 CPcbRule* CSpecctraObject::rule()
 {
-	for(int n=0; n < children().count(); n++)
-	{
-		if ( children().at(n)->objectClass()=="rule")
-			return (CPcbRule*)children().at(n);
-	}
-	return NULL;
+	return (CPcbRule*)child("rule");
 }
+
+QRectF CSpecctraObject::boundingRect() const
+{
+	QRectF r;
+	return r;
+}
+
+void CSpecctraObject::paint(QPainter*,const QStyleOptionGraphicsItem*, QWidget*)
+{
+}
+

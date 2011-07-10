@@ -26,40 +26,38 @@ class CSpecctraObject : public QObject, public QGraphicsItem /* QGraphicsPathIte
 	Q_OBJECT
 	public:
 		CSpecctraObject(QGraphicsItem* parent=NULL);
-		CSpecctraObject( const CSpecctraObject& other,QGraphicsItem* paernt=NULL);
+		CSpecctraObject( const CSpecctraObject& other);
 		virtual ~CSpecctraObject();
 
-		virtual QString					name()			{return objectClass();}
-		virtual QString					description()	{return name();}
+		virtual QString					name();
+		virtual QString					description();
 		virtual QString					toText(int lvl=0);
 
 		CSpecctraObject&				copy( const CSpecctraObject& other );
 		CSpecctraObject&				operator=( const CSpecctraObject & other )		{return copy( other ); }
 
-		virtual void					setParent(CSpecctraObject* p)			{mParentObject=p;}
-		virtual void					setObjectClass(QString& objectClass)		{mObjectClass = objectClass;}
-		virtual void					appendProperty(QString& property)		{mProperties.append(property);}
-		virtual void					appendProperty(QStringList& property)	{mProperties += property;}
-		virtual void					appendChild(CSpecctraObject* child)		{mChildren.append(child);child->setParent(this);}
+		virtual void					setParent(CSpecctraObject* p);
+		virtual void					setObjectClass(QString& objectClass);
+		virtual void					appendProperty(QString& property);
+		virtual void					appendProperty(QStringList& property);
+		virtual void					appendChild(CSpecctraObject* child);
 
-		CSpecctraObject*				parentObject()	{return mParentObject;}
-		QString&						objectClass()	{return mObjectClass;}
-		QStringList&					properties()	{return mProperties;}
-		QList<CSpecctraObject*>&		children()		{return mChildren;}
-		CSpecctraObject*				child(QString o);
+		CSpecctraObject*				parentObject(QString o="");
+		QString&						objectClass();
+		QStringList&					properties();
+		int								childCount(QString o);
+		QList<CSpecctraObject*>&		children();
+		CSpecctraObject*				child(QString o,int idx=0);
 		CSpecctraObject*				root();
 		CPcb*							pcb();
 
-		virtual QRectF					boundingRect() const {QRectF r; return r;}
-		virtual void					paint(QPainter*,const QStyleOptionGraphicsItem*, QWidget*) {}
+		virtual QRectF					boundingRect() const;
+		virtual void					paint(QPainter*,const QStyleOptionGraphicsItem*, QWidget*);
 		virtual void					dump(int lvl=0);
 
 		virtual CPcbRule*				rule();
 
-		static QGraphicsScene*			scene();
-
-	public slots:
-		virtual void					clearCache();
+		static QGraphicsScene*			globalScene();
 
 	signals:
 		void							fault(QString txt);
@@ -69,7 +67,7 @@ class CSpecctraObject : public QObject, public QGraphicsItem /* QGraphicsPathIte
 		QStringList						mProperties;			/** The properties of the object */
 		QList<CSpecctraObject*>			mChildren;				/** The offspring of this object */
 		CSpecctraObject*				mParentObject;			/** The parent object */
-		static	QGraphicsScene*			mScene;					/** The graphics scheen */
+		static	QGraphicsScene*			mGlobalScene;			/** The graphics scheen */
 
 };
 

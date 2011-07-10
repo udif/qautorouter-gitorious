@@ -33,33 +33,13 @@ QString CPcbComponent::footprint()
   */
 int CPcbComponent::places()
 {
-	int count=0;
-	for(int n=0;n<children().count();n++)
-	{
-		if ( children().at(n)->objectClass() == "place" )
-		{
-			++count;
-		}
-	}
-	return count;
+	return childCount("place");
 }
 
 /**
   * @return a component by index
   */
-CPcbPlace* CPcbComponent::place(int comp)
+CPcbPlace* CPcbComponent::place(int idx)
 {
-	int count=0;
-	for(int n=0;n<children().count();n++)
-	{
-		if ( children().at(n)->objectClass() == "place" )
-		{
-			if ( count == comp )
-			{
-				return (CPcbPlace*)children().at(n);
-			}
-			++count;
-		}
-	}
-	return NULL;
+	return (CPcbPlace*)child("place",idx);
 }

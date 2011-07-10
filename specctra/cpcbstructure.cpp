@@ -23,15 +23,7 @@ CPcbStructure::~CPcbStructure()
  */
 int CPcbStructure::layers()
 {
-	int count=0;
-	for(int n=0;n<children().count();n++)
-	{
-		if ( children().at(n)->objectClass() == "layer" )
-		{
-			++count;
-		}
-	}
-	return count;
+	return childCount("layer");
 }
 
 /**
@@ -39,19 +31,7 @@ int CPcbStructure::layers()
   */
 CPcbLayer* CPcbStructure::layer(int idx)
 {
-	int count=0;
-	for(int n=0;n<children().count();n++)
-	{
-		if ( children().at(n)->objectClass() == "layer" )
-		{
-			if ( count == idx )
-			{
-				return (CPcbLayer*)children().at(n);
-			}
-			++count;
-		}
-	}
-	return NULL;
+	return (CPcbLayer*)child("layer",idx);
 }
 
 /**
@@ -59,16 +39,13 @@ CPcbLayer* CPcbStructure::layer(int idx)
   */
 CPcbLayer* CPcbStructure::layer(QString& ref)
 {
-	for(int n=0;n<children().count();n++)
+	int cc=childCount("layer");
+	for(int n=0; n < cc; n++)
 	{
-		CSpecctraObject* obj = children().at(n);
-		if ( obj->objectClass() == "layer" )
+		CPcbLayer* layer = (CPcbLayer*)child("layer",n);
+		if ( layer->name() == ref )
 		{
-			CPcbLayer* layer = (CPcbLayer*)obj;
-			if ( layer->name() == ref )
-			{
-				return layer;
-			}
+			return layer;
 		}
 	}
 	return NULL;
@@ -80,11 +57,6 @@ CPcbLayer* CPcbStructure::layer(QString& ref)
   */
 CPcbBoundary* CPcbStructure::boundary()
 {
-	CSpecctraObject* obj = child("boundary");
-	if ( obj != NULL )
-	{
-		return (CPcbBoundary*)obj;
-	}
-	return NULL;
+	return (CPcbBoundary*)child("boundary");
 }
 

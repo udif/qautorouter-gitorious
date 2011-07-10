@@ -20,7 +20,7 @@ class CPcbComponent : public CSpecctraObject
 
 		QString							footprint();
 		int								places();
-		CPcbPlace*						place(int n);
+		CPcbPlace*						place(int idx);
 };
 
 #endif // CPCBCOMPONENT_H

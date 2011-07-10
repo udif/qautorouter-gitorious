@@ -26,8 +26,6 @@ class CPcbImage : public CSpecctraObject
 		int								pins();
 		CPcbPin*						pin(int idx);
 		CPcbPin*						pin(QString ref);
-	public slots:
-		virtual void					clearCache();
 	private:
 		QList<CPcbOutline*>				mOutlines;
 		QList<CPcbPin*>					mPins;

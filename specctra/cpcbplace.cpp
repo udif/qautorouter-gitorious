@@ -23,17 +23,12 @@ CPcbPlace::CPcbPlace(QGraphicsItem *parent)
 : inherited(parent)
 , mPadstacksCreated(false)
 {
-	CSpecctraObject::scene()->addItem(this);
+	CSpecctraObject::globalScene()->addItem(this);
 	setOpacity(0.35);
 }
 
 CPcbPlace::~CPcbPlace()
 {
-}
-
-void CPcbPlace::clearCache()
-{
-	inherited::clearCache();
 }
 
 /**
@@ -159,34 +154,37 @@ QPainterPath& CPcbPlace::outlineShape()
 	if ( mOutlineShape.isEmpty() )
 	{
 		CPcbPlace* me = (CPcbPlace*)this;
-		QPainterPath p;
-		CSpecctraObject* pObj = me->parentObject();
-		if ( pObj->objectClass() == "component")
+		if ( me->pcb() != NULL )
 		{
-			CPcbComponent* component = (CPcbComponent*)pObj;
-			CPcbLibrary* library = ((CPcb*)me->root())->library();
-			if ( library != NULL )
+			QPainterPath p;
+			CSpecctraObject* pObj = me->parentObject();
+			if ( pObj->objectClass() == "component")
 			{
-				QPainterPath outlineShape;
-				CPcbImage* image = library->image(component->footprint());
-				int nOutlines = image->outlines();
-				int iOutline;
-				for(iOutline=0;iOutline<nOutlines;iOutline++)
+				CPcbComponent* component = (CPcbComponent*)pObj;
+				CPcbLibrary* library = me->pcb()->library();
+				if ( library != NULL )
 				{
-					CPcbOutline* outline = image->outline(iOutline);
-					if ( outline!=NULL && outline->path()!=NULL )
+					QPainterPath outlineShape;
+					CPcbImage* image = library->image(component->footprint());
+					int nOutlines = image->outlines();
+					int iOutline;
+					for(iOutline=0;iOutline<nOutlines;iOutline++)
 					{
-						outlineShape.addPath(outline->path()->shape());
+						CPcbOutline* outline = image->outline(iOutline);
+						if ( outline!=NULL && outline->path()!=NULL )
+						{
+							outlineShape.addPath(outline->path()->shape());
+						}
 					}
+					outlineShape.translate(me->pos());
+					p.addPath(outlineShape);
 				}
-				outlineShape.translate(me->pos());
-				p.addPath(outlineShape);
 			}
+			me->setTransformOriginPoint(me->pos());
+			me->setRotation(me->rotation());
+			me->mOutlineShape =  p;
+			me->createPadstacks();
 		}
-		me->setTransformOriginPoint(me->pos());
-		me->setRotation(me->rotation());
-		me->mOutlineShape =  p;
-		me->createPadstacks();
 	}
 	return mOutlineShape;
 }
@@ -224,9 +222,9 @@ void CPcbPlace::createPadstacks()
 						pad->setRotation(rotation());
 					}
 				}
+				mPadstacksCreated = true;
 			}
 		}
-		mPadstacksCreated = true;
 	}
 }
 

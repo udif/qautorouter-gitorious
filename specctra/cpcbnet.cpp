@@ -27,23 +27,12 @@ CPcbNet::CPcbNet(QGraphicsItem *parent)
 {
 	this->setFlag(QGraphicsItem::ItemIsSelectable);
 	mWire = new CGWire(this);
-	CSpecctraObject::scene()->addItem(this);
+	CSpecctraObject::globalScene()->addItem(this);
 }
 
 CPcbNet::~CPcbNet()
 {
-	delete mWire;
-}
-
-/**
-  * @brief clear the chahe
-  */
-void CPcbNet::clearCache()
-{
-	QPainterPath empty;
-	mShape = empty;
-	mWire->clear();
-	inherited::clearCache();
+	//delete mWire;
 }
 
 /**
@@ -128,23 +117,22 @@ int CPcbNet::padstacks()
 {
 	if ( mPadstacks.count() == 0 )
 	{
-		for(int n=0; n < pinRefs().count(); n++)
+		if ( pcb() != NULL && pcb()->placement() != NULL )
 		{
-			QString unitRef = CUtil::unitRef(pinRefs().at(n));
-			QString pinRef = CUtil::pinRef(pinRefs().at(n));
-			CPcbPlace* place = pcb()->placement()->place(unitRef);
-			if ( place != NULL )
+			for(int n=0; n < pinRefs().count(); n++)
 			{
-				CGPadstack* padstack = place->pad(pinRef);
-				if ( padstack != NULL )
+				QString unitRef = CUtil::unitRef(pinRefs().at(n));
+				QString pinRef = CUtil::pinRef(pinRefs().at(n));
+				CPcbPlace* place = pcb()->placement()->place(unitRef);
+				if ( place != NULL )
 				{
-					mPadstacks.append(padstack);
+					CGPadstack* padstack = place->pad(pinRef);
+					if ( padstack != NULL )
+					{
+						mPadstacks.append(padstack);
+					}
 				}
 			}
-		}
-		if ( mPadstacks.count() )
-		{
-//			sort();
 		}
 	}
 	return mPadstacks.count();

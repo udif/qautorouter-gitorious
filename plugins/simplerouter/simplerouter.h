@@ -37,7 +37,6 @@ class SimpleRouter : public QObject, public CPluginInterface
 		virtual QString				elapsed();						/** elapsed time of the run in hh:mm:ss format */
 	signals:
 		void						status(QString txt);			/** emit a status text */
-		void						clearCache();					/** clear the object caches */
 	protected:
 		typedef enum {
 			Idle,													/** there is nothing happening */

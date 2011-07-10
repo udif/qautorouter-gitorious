@@ -17,13 +17,6 @@ CPcbPlacement::~CPcbPlacement()
 {
 }
 
-void CPcbPlacement::clearCache()
-{
-	mComponents.clear();
-	mPlaces.clear();
-	inherited::clearCache();
-}
-
 /**
   * @return the component count
   */

@@ -22,35 +22,15 @@ CPcbLibrary::~CPcbLibrary()
   */
 int CPcbLibrary::images()
 {
-	int count=0;
-	for(int n=0;n<children().count();n++)
-	{
-		if ( children().at(n)->objectClass() == "image" )
-		{
-			++count;
-		}
-	}
-	return count;
+	return childCount("image");
 }
 
 /**
   * @return a image by index
   */
-CPcbImage* CPcbLibrary::image(int comp)
+CPcbImage* CPcbLibrary::image(int idx)
 {
-	int count=0;
-	for(int n=0;n<children().count();n++)
-	{
-		if ( children().at(n)->objectClass() == "image" )
-		{
-			if ( count == comp )
-			{
-				return (CPcbImage*)children().at(n);
-			}
-			++count;
-		}
-	}
-	return NULL;
+	return (CPcbImage*)child("image",idx);
 }
 
 /**
@@ -58,17 +38,12 @@ CPcbImage* CPcbLibrary::image(int comp)
   */
 CPcbImage* CPcbLibrary::image(QString name)
 {
-	for(int n=0;n<children().count();n++)
+	int cc = childCount("image");
+	for(int n=0; n<cc; n++)
 	{
-		CSpecctraObject* obj = children().at(n);
-		if ( obj->objectClass() == "image" )
-		{
-			CPcbImage* image = (CPcbImage*)obj;
-			if ( image->name() == name )
-			{
-				return image;
-			}
-		}
+		CPcbImage* image = (CPcbImage*)child("image",n);
+		if ( image->name() == name )
+			return image;
 	}
 	return NULL;
 }
@@ -78,15 +53,7 @@ CPcbImage* CPcbLibrary::image(QString name)
   */
 int CPcbLibrary::padstacks()
 {
-	int count=0;
-	for(int n=0;n<children().count();n++)
-	{
-		if ( children().at(n)->objectClass() == "padstack" )
-		{
-			++count;
-		}
-	}
-	return count;
+	return childCount("padstack" );
 }
 
 /**
@@ -94,18 +61,7 @@ int CPcbLibrary::padstacks()
   */
 CPcbPadstack* CPcbLibrary::padstack(int idx)
 {
-	int count=0;
-	for(int n=0;n<children().count();n++)
-	{
-		if ( children().at(n)->objectClass() == "padstack" )
-		{
-			if ( count == idx )
-			{
-				return (CPcbPadstack*)children().at(n);
-			}
-			++count;
-		}
-	}
+	return (CPcbPadstack*)child("padstack",idx);
 	return NULL;
 }
 
@@ -114,17 +70,12 @@ CPcbPadstack* CPcbLibrary::padstack(int idx)
   */
 CPcbPadstack* CPcbLibrary::padstack(QString name)
 {
-	for(int n=0;n<children().count();n++)
+	int cc = childCount("padstack");
+	for(int n=0; n<cc; n++)
 	{
-		CSpecctraObject* obj = children().at(n);
-		if ( obj->objectClass() == "padstack" )
-		{
-			CPcbPadstack* padstack = (CPcbPadstack*)obj;
-			if ( padstack->name() == name )
-			{
-				return padstack;
-			}
-		}
+		CPcbPadstack* padstack = (CPcbPadstack*)child("padstack",n);
+		if ( padstack->name() == name )
+			return padstack;
 	}
 	return NULL;
 }

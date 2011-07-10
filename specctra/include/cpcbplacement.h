@@ -29,9 +29,6 @@ class CPcbPlacement : public CSpecctraObject
 		CPcbPlace*						place(int idx);
 		CPcbPlace*						place(QString uid);
 
-	public slots:
-		virtual void					clearCache();
-
 	private:
 		QList<CPcbComponent*>			mComponents;
 		QList<CPcbPlace*>				mPlaces;
