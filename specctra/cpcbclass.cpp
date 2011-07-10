@@ -5,6 +5,7 @@
 #include "cpcbclass.h"
 #include "cpcbnet.h"
 #include "cpcbrule.h"
+#include "cpcbwidth.h"
 
 #define inherited CSpecctraObject
 
@@ -60,9 +61,7 @@ QStringList& CPcbClass::nets()
   */
 double CPcbClass::width()
 {
-	double w=12;
-	CPcbRule* r = rule();
-	if ( r != NULL )
-		w = r->width();
-	return w;
+	if ( rule() != NULL && rule()->width() != NULL )
+		return rule()->width()->data();
+	return 1;
 }

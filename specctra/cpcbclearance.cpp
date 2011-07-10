@@ -2,25 +2,37 @@
 * Copyright (C) Pike Aerospace Research Corporation                            *
 * Author: Mike Sharkey <mike@pikeaero.com>                                     *
 *******************************************************************************/
-#include "cpcbrule.h"
-#include "cpcbwidth.h"
+#include "cpcbclearance.h"
 
 #define inherited CSpecctraObject
 
-CPcbRule::CPcbRule(QGraphicsItem *parent)
+CPcbClearance::CPcbClearance(QGraphicsItem *parent)
 : inherited(parent)
 {
 }
 
-CPcbRule::~CPcbRule()
+CPcbClearance::~CPcbClearance()
 {
 }
 
+/**
+  * @brief set the track width
+  */
+void CPcbClearance::setData(double w)
+{
+	QString wStr = QString::number(w);
+	if ( properties().isEmpty() )
+		properties().append(wStr);
+	properties()[0]=wStr;
+}
 
 /**
   * @return the default track width
   */
-CPcbWidth* CPcbRule::width()
+double CPcbClearance::data()
 {
-	return (CPcbWidth*)child("width");
+	double w=0;
+	if ( !properties().isEmpty() )
+		w = properties()[0].toDouble();
+	return w;
 }

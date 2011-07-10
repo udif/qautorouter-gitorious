@@ -12,6 +12,7 @@
 
 #include "cspecctraobject.h"
 
+class CPcbType;
 class CPcbLayer : public CSpecctraObject
 {
 	Q_OBJECT
@@ -30,7 +31,7 @@ class CPcbLayer : public CSpecctraObject
 		virtual QString					description();
 
 		QColor							color() {return mColor;}
-		QString							type();
+		CPcbType*						type();
 		int								index();
 		void							setDirection(tDirection direction) {mDirection = direction;}
 		tDirection						direction() {return mDirection;}

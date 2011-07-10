@@ -16,6 +16,7 @@
 #include "cpcbplacement.h"
 #include "cgwire.h"
 #include "cgsegment.h"
+#include "cpcbwidth.h"
 
 #include <stdio.h>
 
@@ -81,7 +82,7 @@ double CPcbNet::width()
 		}
 		else if (pcb()!=NULL && pcb()->structure()!=NULL && pcb()->structure()->rule()!=NULL)
 		{
-			w = pcb()->structure()->rule()->width();
+			w = pcb()->structure()->rule()->width()->data();
 		}
 	}
 	else

@@ -23,6 +23,10 @@
 #include "cpcbrule.h"
 #include "cpcbvia.h"
 #include "cpcbclass.h"
+#include "cpcbwidth.h"
+#include "cpcbclearance.h"
+#include "cpcbtype.h"
+#include "cpcbrect.h"
 
 #include "qautorouter.h"
 
@@ -58,25 +62,29 @@ CSpecctraObject* CSpecctraReader::make(QString& oClass,CSpecctraObject* parentOb
 {
 	CSpecctraObject* obj;
 	oClass = oClass.toLower();
-	if (oClass == "pcb")				obj = new CPcb();
-	else if (oClass == "structure")		obj = new CPcbStructure();
-	else if (oClass == "layer")			obj = new CPcbLayer();
-	else if (oClass == "boundary")		obj = new CPcbBoundary();
-	else if (oClass == "placement")		obj = new CPcbPlacement();
-	else if (oClass == "component")		obj = new CPcbComponent();
-	else if (oClass == "place")			obj = new CPcbPlace();
-	else if (oClass == "image")			obj = new CPcbImage();
-	else if (oClass == "library")		obj = new CPcbLibrary();
-	else if (oClass == "outline")		obj = new CPcbOutline();
-	else if (oClass == "pin")			obj = new CPcbPin();
-	else if (oClass == "path")			obj = new CPcbPath();
-	else if (oClass == "padstack")		obj = new CPcbPadstack();
-	else if (oClass == "network")		obj = new CPcbNetwork();
-	else if (oClass == "net")			obj = new CPcbNet();
-	else if (oClass == "pins")			obj = new CPcbPins();
-	else if (oClass == "rule")			obj = new CPcbRule();
-	else if (oClass == "via")			obj = new CPcbVia();
-	else if (oClass == "class")			obj = new CPcbClass();
+	if (oClass == "pcb")									obj = new CPcb();
+	else if (oClass == "structure")							obj = new CPcbStructure();
+	else if (oClass == "layer")								obj = new CPcbLayer();
+	else if (oClass == "boundary")							obj = new CPcbBoundary();
+	else if (oClass == "placement")							obj = new CPcbPlacement();
+	else if (oClass == "component")							obj = new CPcbComponent();
+	else if (oClass == "place")								obj = new CPcbPlace();
+	else if (oClass == "image")								obj = new CPcbImage();
+	else if (oClass == "library")							obj = new CPcbLibrary();
+	else if (oClass == "outline")							obj = new CPcbOutline();
+	else if (oClass == "pin")								obj = new CPcbPin();
+	else if (oClass == "path" || oClass == "polygon")		{obj = new CPcbPath(); oClass="path";}
+	else if (oClass == "padstack")							obj = new CPcbPadstack();
+	else if (oClass == "network")							obj = new CPcbNetwork();
+	else if (oClass == "net")								obj = new CPcbNet();
+	else if (oClass == "pins")								obj = new CPcbPins();
+	else if (oClass == "rule")								obj = new CPcbRule();
+	else if (oClass == "via")								obj = new CPcbVia();
+	else if (oClass == "class")								obj = new CPcbClass();
+	else if (oClass == "width")								obj = new CPcbWidth();
+	else if (oClass == "clearance" || oClass == "clear")	{obj = new CPcbClearance(); oClass="clearance";}
+	else if (oClass == "type")								obj = new CPcbType();
+	else if (oClass == "rect")								obj = new CPcbRect();
 	else
 		obj = new CSpecctraObject();
 	obj->setObjectClass(oClass);

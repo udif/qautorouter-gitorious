@@ -3,6 +3,7 @@
 * Author: Mike Sharkey <mike@pikeaero.com>                                     *
 *******************************************************************************/
 #include "cpcblayer.h"
+#include "cpcbtype.h"
 
 #include <QDataStream>
 #include <QByteArray>
@@ -31,17 +32,9 @@ QString CPcbLayer::name()
 /**
   * @return the later type, signal, etc...
   */
-QString CPcbLayer::type()
+CPcbType* CPcbLayer::type()
 {
-	CSpecctraObject* t = child("type");
-	if ( t!=NULL )
-	{
-		if ( t->properties().count() )
-		{
-			return t->properties().at(0);
-		}
-	}
-	return "";
+	return (CPcbType*)child("type");
 }
 
 /**
@@ -69,7 +62,7 @@ QString CPcbLayer::description()
 	QString rc;
 	rc += "["+QString::number(index())+"]";
 	rc += name();
-	rc += " ("+type()+") ";
+	rc += " ("+type()->data()+") ";
 	if ( direction() == Horizontal )
 		rc += "Horizontal";
 	else

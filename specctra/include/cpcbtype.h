@@ -2,8 +2,8 @@
 * Copyright (C) Pike Aerospace Research Corporation                            *
 * Author: Mike Sharkey <mike@pikeaero.com>                                     *
 *******************************************************************************/
-#ifndef CPCBRULE_H
-#define CPCBRULE_H
+#ifndef CPCBTYPE_H
+#define CPCBTYPE_H
 
 #include <QObject>
 #include <QString>
@@ -12,17 +12,16 @@
 
 #include "cspecctraobject.h"
 
-class CPcbWidth;
-class CPcbRule : public CSpecctraObject
+class CPcbType : public CSpecctraObject
 {
 	Q_OBJECT
 	public:
-		CPcbRule(QGraphicsItem *parent = 0);
-		virtual ~CPcbRule();
+		CPcbType(QGraphicsItem *parent = 0);
+		virtual ~CPcbType();
 
-		CPcbWidth*					width();
-
+		void					setData(QString w);
+		QString					data();
 };
 
-#endif // CPCBRULE_H
+#endif // CPCBTYPE_H
 
