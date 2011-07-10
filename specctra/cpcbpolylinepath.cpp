@@ -57,13 +57,23 @@ QPainterPath CPcbPolylinePath::shape() const
 {
 	CPcbPolylinePath* me=(CPcbPolylinePath*)this;
 	QPainterPath ppath;
-	for(int n=0; n < me->points(); n++)
+	QPointF pt;
+	for(int n=0; n < me->coords(); n+=2)
 	{
-		QPointF pt = me->point(n);
+		int x = me->coord(n);
+		int y = me->coord(n+1);
 		if (n==0)
+		{
+			pt = QPointF(x,y);
 			ppath.moveTo(pt);
+		}
 		else
+		{
+			if ( fabs(x) <= 0.1 ) x = pt.x();
+			if ( fabs(y) <= 0.1 ) y = pt.y();
+			pt = QPointF(x,y);
 			ppath.lineTo(pt);
+		}
 	}
 	return ppath;
 }

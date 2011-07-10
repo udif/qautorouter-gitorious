@@ -14,6 +14,7 @@
 class CPcbNet;
 class CPcbClearanceClass;
 class CPcbPolylinePath;
+class CPcbLayer;
 class CPcbWire : public CSpecctraObject
 {
 	Q_OBJECT
@@ -22,7 +23,8 @@ class CPcbWire : public CSpecctraObject
 		virtual ~CPcbWire();
 
 		double						width();
-		QString						layer();
+		QString						layerRef();
+		CPcbLayer*					layer();
 
 		CPcbPolylinePath*			polylinePath();
 		CPcbNet*					net();
