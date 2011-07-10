@@ -7,6 +7,8 @@
 
 #include <QObject>
 #include <QList>
+#include <QPointF>
+#include <QPainterPath>
 
 #include "cgsegment.h"
 

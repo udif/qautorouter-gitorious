@@ -45,8 +45,12 @@ SOURCES += cgpad.cpp \
     cpcbvia.cpp \
     cspecctraobject.cpp \
     cpcbwidth.cpp \
-	cpcbclearance.cpp \
-	cpcbtype.cpp
+    cpcbclearance.cpp \
+    cpcbtype.cpp \
+    cpcbwiring.cpp \
+    cpcbwire.cpp \
+    cpcbpolylinepath.cpp \
+    cpcbclearanceclass.cpp
 HEADERS += include/cgpad.h \
     include/cgpadstack.h \
     include/cgraphics.h \
@@ -81,5 +85,9 @@ HEADERS += include/cgpad.h \
     include/specctra.h \
     include/cpcbwidth.h \
     include/cpcbclearance.h \
-    include/cpcbtype.h
+    include/cpcbtype.h \
+    include/cpcbwiring.h \
+    include/cpcbwire.h \
+    include/cpcbpolylinepath.h \
+    include/cpcbclearanceclass.h
 OTHER_FILES += README.txt

@@ -27,6 +27,10 @@
 #include "cpcbclearance.h"
 #include "cpcbtype.h"
 #include "cpcbrect.h"
+#include "cpcbwiring.h"
+#include "cpcbwire.h"
+#include "cpcbpolylinepath.h"
+#include "cpcbclearanceclass.h"
 
 #include "qautorouter.h"
 
@@ -85,6 +89,10 @@ CSpecctraObject* CSpecctraReader::make(QString& oClass,CSpecctraObject* parentOb
 	else if (oClass == "clearance" || oClass == "clear")	{obj = new CPcbClearance(); oClass="clearance";}
 	else if (oClass == "type")								obj = new CPcbType();
 	else if (oClass == "rect")								obj = new CPcbRect();
+	else if (oClass == "wiring")							obj = new CPcbWiring();
+	else if (oClass == "wire")								obj = new CPcbWire();
+	else if (oClass == "polyline_path")						obj = new CPcbPolylinePath();
+	else if (oClass == "clearance_class")					obj = new CPcbClearanceClass();
 	else
 		obj = new CSpecctraObject();
 	obj->setObjectClass(oClass);
