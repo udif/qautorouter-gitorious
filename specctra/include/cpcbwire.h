@@ -30,6 +30,7 @@ class CPcbWire : public CSpecctraObject
 		CPcbNet*					net();
 		CPcbClearanceClass*			clearanceClass();
 
+		/** QGraphicsItem overrides... */
 		virtual QRectF				boundingRect() const;
 		virtual QPainterPath		shape() const;
 		virtual void				paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget);

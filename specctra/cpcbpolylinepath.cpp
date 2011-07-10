@@ -17,12 +17,18 @@ CPcbPolylinePath::~CPcbPolylinePath()
 
 QString CPcbPolylinePath::layer()
 {
-	return properties()[0];
+	QString rc;
+	if ( properties().count() )
+		rc = properties()[0];
+	return rc;
 }
 
 double CPcbPolylinePath::width()
 {
-	return properties()[1].toDouble();
+	double w=0.0;
+	if ( properties().count() >= 2 )
+		w = properties()[1].toDouble();
+	return w;
 }
 
 int CPcbPolylinePath::coords()
