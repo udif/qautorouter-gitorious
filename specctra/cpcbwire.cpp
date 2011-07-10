@@ -82,10 +82,12 @@ QPainterPath CPcbWire::shape() const
 		}
 		else
 		{
-			if ( fabs(x) <= 0.1 ) x = pt.x();
-			if ( fabs(y) <= 0.1 ) y = pt.y();
-			pt = QPointF(x,y);
-			ppath.lineTo(pt);
+			/** FIXME */
+			if ( fabs(x) > 0.1 && fabs(y) > 0.1 )
+			{
+				pt = QPointF(x,y);
+				ppath.lineTo(pt);
+			}
 		}
 	}
 	return ppath;
@@ -97,7 +99,7 @@ void CPcbWire::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,Q
 	{
 		painter->setRenderHint(QPainter::Antialiasing);
 		painter->scale(scale(),scale());
-		painter->setPen(QPen(layer()->color(), width(), Qt::SolidLine,Qt::RoundCap,Qt::MiterJoin));
+		painter->setPen(QPen(layer()->color(), width(), Qt::SolidLine,Qt::RoundCap));
 		painter->drawPath(shape());
 	}
 }
