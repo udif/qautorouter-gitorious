@@ -18,6 +18,7 @@ QAutoRouter::QAutoRouter(QWidget *parent)
 	ui->setupUi(this);
 	ui->graphicsView->setBackgroundRole(QPalette::Dark);
 	ui->graphicsView->setScene(CSpecctraObject::globalScene());
+	ui->graphicsView->scale(1, -1);
 	setupActions();
 	readSettings();
 	QObject::connect(this,SIGNAL(fault(QString)),this,SLOT(faultHandler(QString)));
