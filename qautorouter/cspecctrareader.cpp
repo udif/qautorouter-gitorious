@@ -57,7 +57,7 @@ CSpecctraReader::~CSpecctraReader()
 CSpecctraObject* CSpecctraReader::make(QString& oClass,CSpecctraObject* parentObject)
 {
 	CSpecctraObject* obj;
-	oClass.toLower();
+	oClass = oClass.toLower();
 	if (oClass == "pcb")				obj = new CPcb();
 	else if (oClass == "structure")		obj = new CPcbStructure();
 	else if (oClass == "layer")			obj = new CPcbLayer();
