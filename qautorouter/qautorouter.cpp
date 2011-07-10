@@ -170,7 +170,7 @@ void QAutoRouter::status(QString txt)
 
 void QAutoRouter::about()
 {
-	QMessageBox::about (this, "QAutoRouter V0.0", "QAutoRouter "+version()+" "
+	QMessageBox::about (this, "About QAutoRouter", "QAutoRouter "+version()+" "
 													"(c) 2011 Pike Aerospace Research Corporation\n"
 													"\n"
 													"Mike Sharkey <mike@pikeaero.com>\n"

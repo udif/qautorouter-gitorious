@@ -28,6 +28,7 @@
 #include <QTreeWidgetItem>
 #include <QTableWidget>
 #include <QTableWidgetItem>
+#include <QFileInfo>
 
 #include "ui_qautorouter.h"
 #include "ui_preferences.h"

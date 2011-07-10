@@ -22,13 +22,14 @@ bool QAutoRouter::load(QFile& file)
 			root()->dump(); /** DEBUG */
 			if ( root()->objectClass() == "pcb" )
 			{
+				QFileInfo fi(file.fileName());
+				setWindowTitle(fi.fileName());
 				QObject::connect(pcb(),SIGNAL(status(QString)),this,SLOT(status(QString)));
 				readSettings();
 				populateLayersForm();
 				populateNetsForm();
 				populateNetClassesForm();
 				zoomFit();
-				setWindowTitle(file.fileName());
 				rc=true;
 			}
 			else
