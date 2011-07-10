@@ -153,7 +153,7 @@ void SimpleRouter::select()
 	netStack().clear();
 	if ( pcb() != NULL && pcb()->network() != NULL )
 	{
-		for(int n=0; n < pcb()->network()->nets(); n++)
+		for(int n=0; running() && n < pcb()->network()->nets(); n++)
 		{
 			CPcbNet* net = pcb()->network()->net(n);
 			if ( !net->routed() )
@@ -176,7 +176,7 @@ void SimpleRouter::route(CPcbNet* net, CGSegment* segment)
 	segment->setRouted(true);
 	segment->update();
 	pcb()->yield();				/* give up some CPU to the main app */
-	for(int n=0; n < segment->segments(); n++)
+	for(int n=0; running() && n < segment->segments(); n++)
 	{
 		CGSegment* child = segment->segment(n);
 		route(net,child);

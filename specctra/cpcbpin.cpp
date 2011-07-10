@@ -63,4 +63,11 @@ CPcbPadstack* CPcbPin::padstack()
 	return ps;
 }
 
+/**
+  * @brief return the clearance class
+  */
+CPcbClearanceClass* CPcbPin::clearanceClass()
+{
+	return (CPcbClearanceClass*)child("clearance_clsss");
+}
 

@@ -11,6 +11,7 @@
 
 #include "cspecctraobject.h"
 
+class CPcbClearanceClass;
 class CPcbPadstack;
 class CPcbPin : public CSpecctraObject
 {
@@ -23,7 +24,7 @@ class CPcbPin : public CSpecctraObject
 		QPointF					pos();
 		QString					padstackName();
 		CPcbPadstack*			padstack();
-
+		CPcbClearanceClass*		clearanceClass();
 };
 
 #endif // CPCBPIN_H
