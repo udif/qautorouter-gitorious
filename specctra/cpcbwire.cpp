@@ -70,23 +70,26 @@ QPainterPath CPcbWire::shape() const
 {
 	CPcbWire* me=(CPcbWire*)this;
 	QPainterPath ppath;
-	QPointF pt;
-	for(int n=0; n < me->polylinePath()->coords(); n+=2)
+	if ( me->polylinePath() != NULL )
 	{
-		int x = me->polylinePath()->coord(n);
-		int y = me->polylinePath()->coord(n+1);
-		if (n==0)
+		QPointF pt;
+		for(int n=0; n < me->polylinePath()->coords(); n+=2)
 		{
-			pt = QPointF(x,y);
-			ppath.moveTo(pt);
-		}
-		else
-		{
-			/** FIXME */
-			if ( fabs(x) > 0.1 && fabs(y) > 0.1 )
+			int x = me->polylinePath()->coord(n);
+			int y = me->polylinePath()->coord(n+1);
+			if (n==0)
 			{
 				pt = QPointF(x,y);
-				ppath.lineTo(pt);
+				ppath.moveTo(pt);
+			}
+			else
+			{
+				/** FIXME */
+				if ( fabs(x) > 0.1 && fabs(y) > 0.1 )
+				{
+					pt = QPointF(x,y);
+					ppath.lineTo(pt);
+				}
 			}
 		}
 	}

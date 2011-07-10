@@ -28,6 +28,7 @@ bool QAutoRouter::load(QFile& file)
 				populateNetsForm();
 				populateNetClassesForm();
 				zoomFit();
+				setWindowTitle(file.fileName());
 				rc=true;
 			}
 			else
