@@ -5,7 +5,7 @@
 #ifndef CPCBWIRE_H
 #define CPCBWIRE_H
 
-#include "cspecctraobject.h"
+#include "cpcbsegment.h"
 
 #include <QPointF>
 #include <QPainterPath>
@@ -15,25 +15,23 @@ class CPcbNet;
 class CPcbClearanceClass;
 class CPcbPolylinePath;
 class CPcbLayer;
-class CPcbWire : public CSpecctraObject
+class CPcbWire : public CPcbSegment
 {
 	Q_OBJECT
 	public:
 		CPcbWire(QGraphicsItem *parent = 0);
 		virtual ~CPcbWire();
 
-		double						width();
-		QString						layerRef();
-		CPcbLayer*					layer();
+		virtual bool				drawable();
+		virtual double				width();
+		virtual QColor				color();
+		virtual QString				layerRef();
+		virtual CPcbLayer*			layer();
 
-		CPcbPolylinePath*			polylinePath();
-		CPcbNet*					net();
-		CPcbClearanceClass*			clearanceClass();
+		virtual CPcbPolylinePath*	polylinePath();
 
 		/** QGraphicsItem overrides... */
-		virtual QRectF				boundingRect() const;
 		virtual QPainterPath		shape() const;
-		virtual void				paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget);
 };
 
 #endif // CPCBWIRE_H

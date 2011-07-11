@@ -50,7 +50,8 @@ SOURCES += cgpad.cpp \
     cpcbwiring.cpp \
     cpcbwire.cpp \
     cpcbpolylinepath.cpp \
-    cpcbclearanceclass.cpp
+    cpcbclearanceclass.cpp \
+    cpcbsegment.cpp
 HEADERS += include/cgpad.h \
     include/cgpadstack.h \
     include/cgraphics.h \
@@ -89,5 +90,6 @@ HEADERS += include/cgpad.h \
     include/cpcbwiring.h \
     include/cpcbwire.h \
     include/cpcbpolylinepath.h \
-    include/cpcbclearanceclass.h
+    include/cpcbclearanceclass.h \
+    include/cpcbsegment.h
 OTHER_FILES += README.txt

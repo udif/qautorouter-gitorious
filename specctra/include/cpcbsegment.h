@@ -2,32 +2,38 @@
 * Copyright (C) Pike Aerospace Research Corporation                            *
 * Author: Mike Sharkey <mike@pikeaero.com>                                     *
 *******************************************************************************/
-#ifndef CPCBVIA_H
-#define CPCBVIA_H
+#ifndef CPCBSEGMENT_H
+#define CPCBSEGMENT_H
 
 #include <QObject>
 #include <QGraphicsItem>
+#include <QColor>
 
-#include "cpcbsegment.h"
+#include "cspecctraobject.h"
 
-class CPcbPadstack;
-class CPcbVia : public CPcbSegment
+/**
+  * @brief Baseclass for drawable wires, vias and the like.
+  */
+
+class CPcbNet;
+class CPcbClearanceClass;
+class CPcbSegment : public CSpecctraObject
 {
 	Q_OBJECT
 	public:
-		CPcbVia(QGraphicsItem *parent = 0);
-		virtual ~CPcbVia();
+		CPcbSegment(QGraphicsItem *parent = 0);
+		virtual ~CPcbSegment();
 
+		virtual double					width()=0;
+		virtual QColor					color()=0;
 		virtual bool					drawable();
-		virtual QPointF					center();
-		virtual double					width();
-		virtual QColor					color();
-		virtual CPcbPadstack*			padstack();
+		virtual CPcbNet*				net();
+		virtual CPcbClearanceClass*		clearanceClass();
 
 		/** QGraphicsItem overrides... */
-		virtual QPainterPath			shape() const;
+		virtual QRectF					boundingRect() const;
 		virtual void					paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget);
 };
 
-#endif // CPCBVIA_H
+#endif // CPCBSEGMENT_H
 

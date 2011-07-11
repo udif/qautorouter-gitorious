@@ -10,16 +10,22 @@
 #include "cpcbstructure.h"
 #include "cpcblayer.h"
 
-#define inherited CSpecctraObject
+#define inherited CPcbSegment
 
 CPcbWire::CPcbWire(QGraphicsItem *parent)
 : inherited(parent)
 {
-	CSpecctraObject::globalScene()->addItem(this);
 }
 
 CPcbWire::~CPcbWire()
 {
+}
+
+bool CPcbWire::drawable()
+{
+	if ( width() >= 1 )
+		return true;
+	return false;
 }
 
 double CPcbWire::width()
@@ -44,26 +50,17 @@ CPcbLayer* CPcbWire::layer()
 	return NULL;
 }
 
+QColor CPcbWire::color()
+{
+	QColor c(0,255,0);
+	if ( layer() != NULL )
+		c = layer()->color();
+	return c;
+}
+
 CPcbPolylinePath* CPcbWire::polylinePath()
 {
 	return (CPcbPolylinePath*)child("polyline_path");
-}
-
-CPcbClearanceClass* CPcbWire::clearanceClass()
-{
-	return (CPcbClearanceClass*)child("clearance_class");
-}
-
-CPcbNet* CPcbWire::net()
-{
-	return (CPcbNet*)child("net");
-}
-
-QRectF CPcbWire::boundingRect() const
-{
-	CPcbWire* me=(CPcbWire*)this;
-	QRectF rect = me->shape().boundingRect();
-	return rect;
 }
 
 QPainterPath CPcbWire::shape() const
@@ -72,38 +69,17 @@ QPainterPath CPcbWire::shape() const
 	QPainterPath ppath;
 	if ( me->polylinePath() != NULL )
 	{
+		QPolygonF polygon;
 		QPointF pt;
-		for(int n=0; n < me->polylinePath()->coords(); n+=2)
+		for(int n=0; n < me->polylinePath()->points(); n++)
 		{
-			int x = me->polylinePath()->coord(n);
-			int y = me->polylinePath()->coord(n+1);
-			if (n==0)
-			{
-				pt = QPointF(x,y);
-				ppath.moveTo(pt);
-			}
-			else
-			{
-				/** FIXME */
-				if ( fabs(x) > 0.1 && fabs(y) > 0.1 )
-				{
-					pt = QPointF(x,y);
-					ppath.lineTo(pt);
-				}
-			}
+			pt = me->polylinePath()->point(n);
+			if ( fabs(pt.x()) > 0.1 && fabs(pt.y()) > 0.1 )
+				polygon.append(pt);
 		}
+		ppath.addPolygon(polygon);
 	}
 	return ppath;
 }
 
-void CPcbWire::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget)
-{
-	if ( width() > 0 )
-	{
-		painter->setRenderHint(QPainter::Antialiasing);
-		painter->scale(scale(),scale());
-		painter->setPen(QPen(layer()->color(), width(), Qt::SolidLine,Qt::RoundCap));
-		painter->drawPath(shape());
-	}
-}
 

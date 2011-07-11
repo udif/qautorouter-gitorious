@@ -27,9 +27,9 @@ CSpecctraObject::CSpecctraObject( const CSpecctraObject& other)
 
 CSpecctraObject::~CSpecctraObject()
 {
-	for(int n=0; n < mChildren.count(); n++)
+	while(mChildren.count())
 	{
-		CSpecctraObject* child = children().at(n);
+		CSpecctraObject* child = mChildren.takeFirst();
 		if ( child->scene() == NULL )
 			delete child;
 	}
