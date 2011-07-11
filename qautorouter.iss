@@ -42,8 +42,9 @@ Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter-build-
 Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter-build-desktop\plugins\simplerouter\debug\simplerouter.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "C:\QtSDK\mingw\bin\mingwm10.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\QtSDK\mingw\bin\libgcc_s_dw2-1.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Qt\4.7.3\bin\QtCored4.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Qt\4.7.3\bin\QtGuid4.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\QtSDK\Desktop\Qt\4.7.3\mingw\lib\QtNetworkd4.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\QtSDK\Desktop\Qt\4.7.3\mingw\lib\QtCored4.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\QtSDK\Desktop\Qt\4.7.3\mingw\lib\QtGuid4.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\PA10.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
 Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\spi4.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
 Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\alu.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
