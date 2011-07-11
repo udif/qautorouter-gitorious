@@ -66,7 +66,23 @@ class QAutoRouter : public QMainWindow
 		void					zoomOut();
 		void					zoomFit();
 		void					about();
+
+		void					opacityChangedTracks(double value);
+		void					opacityChangedVias(double value);
+		void					opacityChangedPads(double value);
+		void					opacityChangedPlanes(double value);
+		void					opacityChangedOutlines(double value);
+		void					opacityChangedBorders(double value);
+
+		void					visibilityChangedTracks(bool visible);
+		void					visibilityChangedVias(bool visible);
+		void					visibilityChangedPads(bool visible);
+		void					visibilityChangedPlanes(bool visible);
+		void					visibilityChangedOutlines(bool visible);
+		void					visibilityChangedBorders(bool visible);
+
 	protected:
+		void					setupConnections();
 		bool					maybeSave();
 		void					populateLayersForm();
 		void					populateNetsForm();

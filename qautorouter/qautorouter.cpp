@@ -15,6 +15,7 @@ QAutoRouter::QAutoRouter(QWidget *parent)
 {
 	preferences->setupUi(&mPreferencesDialog);
 	layerpreferences->setupUi(&mLayerPreferencesDialog);
+
 	ui->setupUi(this);
 	ui->graphicsView->setBackgroundRole(QPalette::Dark);
 	ui->graphicsView->setScene(CSpecctraObject::globalScene());
@@ -23,16 +24,11 @@ QAutoRouter::QAutoRouter(QWidget *parent)
 	ui->graphicsView->setRubberBandSelectionMode(Qt::IntersectsItemShape);
 	ui->graphicsView->setEnabled(true);
 	ui->graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
+
 	setupActions();
 	readSettings();
-	QObject::connect(this,SIGNAL(fault(QString)),this,SLOT(faultHandler(QString)));
-	QObject::connect(preferences->layerList,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(layerClicked(QModelIndex)));
-	QObject::connect(preferences->netsTree,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(netsClicked(QModelIndex)));
-	QObject::connect(layerpreferences->colorButton,SIGNAL(clicked()),this,SLOT(layerColorClicked()));
-	QObject::connect(preferences->addPluginButton,SIGNAL(clicked()),this,SLOT(addPlugin()));
-	QObject::connect(preferences->removePluginButton,SIGNAL(clicked()),this,SLOT(removePlugin()));
-	QObject::connect(preferences->newNetClassButton,SIGNAL(clicked()),this,SLOT(newNetClass()));
-	QObject::connect(preferences->deleteNetClassButton,SIGNAL(clicked()),this,SLOT(deleteNetClass()));
+	setupConnections();
+
 	this->setWindowIcon(QIcon(":/icons/qautorouter.png"));
 	this->setWindowTitle("QAutoRouter "+version());
 	mTimer = startTimer(2000);
@@ -52,6 +48,37 @@ QAutoRouter::~QAutoRouter()
 	clear();
 	delete ui;
 	delete preferences;
+}
+
+/**
+  * @brief Setup the initial connections.
+  */
+void QAutoRouter::setupConnections()
+{
+	QObject::connect(this,SIGNAL(fault(QString)),this,SLOT(faultHandler(QString)));
+
+	QObject::connect(preferences->layerList,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(layerClicked(QModelIndex)));
+	QObject::connect(preferences->netsTree,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(netsClicked(QModelIndex)));
+	QObject::connect(layerpreferences->colorButton,SIGNAL(clicked()),this,SLOT(layerColorClicked()));
+	QObject::connect(preferences->addPluginButton,SIGNAL(clicked()),this,SLOT(addPlugin()));
+	QObject::connect(preferences->removePluginButton,SIGNAL(clicked()),this,SLOT(removePlugin()));
+	QObject::connect(preferences->newNetClassButton,SIGNAL(clicked()),this,SLOT(newNetClass()));
+	QObject::connect(preferences->deleteNetClassButton,SIGNAL(clicked()),this,SLOT(deleteNetClass()));
+
+	QObject::connect(preferences->opacityTracks,SIGNAL(valueChanged(double)),this,SLOT(opacityChangedTracks(double)));
+	QObject::connect(preferences->opacityVias,SIGNAL(valueChanged(double)),this,SLOT(opacityChangedVias(double)));
+	QObject::connect(preferences->opacityPads,SIGNAL(valueChanged(double)),this,SLOT(opacityChangedPads(double)));
+	QObject::connect(preferences->opacityPlanes,SIGNAL(valueChanged(double)),this,SLOT(opacityChangedPlanes(double)));
+	QObject::connect(preferences->opacityOutlines,SIGNAL(valueChanged(double)),this,SLOT(opacityChangedOutlines(double)));
+	QObject::connect(preferences->opacityBorders,SIGNAL(valueChanged(double)),this,SLOT(opacityChangedBorders(double)));
+
+	QObject::connect(preferences->visibilityTracks,SIGNAL(toggled(bool)),this,SLOT(visibilityChangedTracks(bool)));
+	QObject::connect(preferences->visibilityVias,SIGNAL(toggled(bool)),this,SLOT(visibilityChangedVias(bool)));
+	QObject::connect(preferences->visibilityPads,SIGNAL(toggled(bool)),this,SLOT(visibilityChangedPads(bool)));
+	QObject::connect(preferences->visibilityPlanes,SIGNAL(toggled(bool)),this,SLOT(visibilityChangedPlanes(bool)));
+	QObject::connect(preferences->visibilityOutlines,SIGNAL(toggled(bool)),this,SLOT(visibilityChangedOutlines(bool)));
+	QObject::connect(preferences->visibilityBorders,SIGNAL(toggled(bool)),this,SLOT(visibilityChangedBorders(bool)));
+
 }
 
 CPcb* QAutoRouter::pcb()
@@ -240,5 +267,101 @@ void QAutoRouter::timerEvent(QTimerEvent* e)
 	}
 }
 
+
+void QAutoRouter::opacityChangedTracks(double value)
+{
+	if ( root() != NULL )
+	{
+		root()->setClassOpacity(CSpecctraObject::Track,value);
+	}
+}
+
+void QAutoRouter::opacityChangedVias(double value)
+{
+	if ( root() != NULL )
+	{
+		root()->setClassOpacity(CSpecctraObject::Via,value);
+	}
+}
+
+void QAutoRouter::opacityChangedPads(double value)
+{
+	if ( root() != NULL )
+	{
+		root()->setClassOpacity(CSpecctraObject::Pad,value);
+	}
+}
+
+void QAutoRouter::opacityChangedPlanes(double value)
+{
+	if ( root() != NULL )
+	{
+		root()->setClassOpacity(CSpecctraObject::Plane,value);
+	}
+}
+
+void QAutoRouter::opacityChangedOutlines(double value)
+{
+	if ( root() != NULL )
+	{
+		root()->setClassOpacity(CSpecctraObject::Outline,value);
+	}
+}
+
+void QAutoRouter::opacityChangedBorders(double value)
+{
+	if ( root() != NULL )
+	{
+		root()->setClassOpacity(CSpecctraObject::Border,value);
+	}
+}
+
+void QAutoRouter::visibilityChangedTracks(bool visible)
+{
+	if ( root() != NULL )
+	{
+		root()->setClassVisibility(CSpecctraObject::Track,visible);
+	}
+}
+
+void QAutoRouter::visibilityChangedVias(bool visible)
+{
+	if ( root() != NULL )
+	{
+		root()->setClassVisibility(CSpecctraObject::Via,visible);
+	}
+}
+
+void QAutoRouter::visibilityChangedPads(bool visible)
+{
+	if ( root() != NULL )
+	{
+		root()->setClassVisibility(CSpecctraObject::Pad,visible);
+	}
+}
+
+void QAutoRouter::visibilityChangedPlanes(bool visible)
+{
+	if ( root() != NULL )
+	{
+		root()->setClassVisibility(CSpecctraObject::Plane,visible);
+	}
+}
+
+void QAutoRouter::visibilityChangedOutlines(bool visible)
+{
+	if ( root() != NULL )
+	{
+		root()->setClassVisibility(CSpecctraObject::Outline,visible);
+	}
+}
+
+void QAutoRouter::visibilityChangedBorders(bool visible)
+{
+	if ( root() != NULL )
+	{
+		root()->setClassVisibility(CSpecctraObject::Border,visible);
+	}
+}
 
 

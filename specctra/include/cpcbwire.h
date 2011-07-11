@@ -22,6 +22,8 @@ class CPcbWire : public CPcbSegment
 		CPcbWire(QGraphicsItem *parent = 0);
 		virtual ~CPcbWire();
 
+		virtual CSpecctraObject::tDrawableClass			drawableClass();
+
 		virtual double					layerIndex();
 		virtual bool					drawable();
 		virtual double					width();

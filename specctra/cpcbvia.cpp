@@ -22,6 +22,14 @@ CPcbVia::~CPcbVia()
 }
 
 /**
+  * @return the class of drawable object which this is.
+  */
+CSpecctraObject::tDrawableClass CPcbVia::drawableClass()
+{
+	return CSpecctraObject::Via;
+}
+
+/**
   * @return a layer index used for Z-axis layering.
   */
 double CPcbVia::layerIndex()

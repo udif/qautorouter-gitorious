@@ -19,6 +19,8 @@ class CPcbPlane : public CPcbSegment
 		CPcbPlane(QGraphicsItem *parent = 0);
 		virtual ~CPcbPlane();
 
+		virtual CSpecctraObject::tDrawableClass			drawableClass();
+
 		virtual double					layerIndex();
 		virtual double					width();
 		virtual QColor					color();

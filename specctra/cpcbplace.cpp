@@ -24,11 +24,18 @@ CPcbPlace::CPcbPlace(QGraphicsItem *parent)
 , mPadstacksCreated(false)
 {
 	CSpecctraObject::globalScene()->addItem(this);
-	setOpacity(0.35);
 }
 
 CPcbPlace::~CPcbPlace()
 {
+}
+
+/**
+  * @return the class of drawable object which this is.
+  */
+CSpecctraObject::tDrawableClass CPcbPlace::drawableClass()
+{
+	return CSpecctraObject::Outline;
 }
 
 /**

@@ -15,13 +15,24 @@
 CPcbWire::CPcbWire(QGraphicsItem *parent)
 : inherited(parent)
 {
-	setOpacity(0.55);
 }
 
 CPcbWire::~CPcbWire()
 {
 }
 
+/**
+  * @return the class of drawable object which this is.
+  */
+CSpecctraObject::tDrawableClass CPcbWire::drawableClass()
+{
+	return CSpecctraObject::Track;
+}
+
+
+/**
+  * @return boolean indicating the drawability of the object.
+  */
 bool CPcbWire::drawable()
 {
 	if ( width() >= 1 )

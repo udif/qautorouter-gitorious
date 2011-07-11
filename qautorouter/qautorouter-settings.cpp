@@ -53,6 +53,21 @@ void QAutoRouter::writeSettings()
 
 	settings.setValue("defaultRouter", preferences->routerCombo->currentIndex());
 	settings.setValue("defaultPostRouter", preferences->postRouterCombo->currentIndex());
+
+	settings.setValue("opacityTracks",		preferences->opacityTracks->value());
+	settings.setValue("opacityVias",		preferences->opacityVias->value());
+	settings.setValue("opacityPads",		preferences->opacityPads->value());
+	settings.setValue("opacityPlanes",		preferences->opacityPlanes->value());
+	settings.setValue("opacityOutlines",	preferences->opacityOutlines->value());
+	settings.setValue("opacityBorders",		preferences->opacityBorders->value());
+
+	settings.setValue("visibilityTracks",	preferences->visibilityTracks->isChecked());
+	settings.setValue("visibilityVias",		preferences->visibilityVias->isChecked());
+	settings.setValue("visibilityPads",		preferences->visibilityPads->isChecked());
+	settings.setValue("visibilityPlanes",	preferences->visibilityPlanes->isChecked());
+	settings.setValue("visibilityOutlines",	preferences->visibilityOutlines->isChecked());
+	settings.setValue("visibilityBorders",	preferences->visibilityBorders->isChecked());
+
 }
 
 /**
@@ -101,6 +116,36 @@ void QAutoRouter::readSettings()
 
 	preferences->routerCombo->setCurrentIndex( settings.value("defaultRouter",-1).toInt());
 	preferences->postRouterCombo->setCurrentIndex(settings.value("defaultPostRouter",-1).toInt());
+
+	preferences->opacityTracks->setValue(settings.value("opacityTracks",0.45).toDouble());
+	preferences->opacityVias->setValue(settings.value("opacityVias",0.55).toDouble());
+	preferences->opacityPads->setValue(settings.value("opacityPads",0.55).toDouble());
+	preferences->opacityPlanes->setValue(settings.value("opacityPlanes",0.25).toDouble());
+	preferences->opacityOutlines->setValue(settings.value("opacityOutlines",0.75).toDouble());
+	preferences->opacityBorders->setValue(settings.value("opacityBorders",0.75).toDouble());
+
+	preferences->visibilityTracks->setChecked(settings.value("opacityTracks",true).toBool());
+	preferences->visibilityVias->setChecked(settings.value("opacityVias",true).toBool());
+	preferences->visibilityPads->setChecked(settings.value("opacityPads",true).toBool());
+	preferences->visibilityPlanes->setChecked(settings.value("opacityPlanes",true).toBool());
+	preferences->visibilityOutlines->setChecked(settings.value("opacityOutlines",true).toBool());
+	preferences->visibilityBorders->setChecked(settings.value("opacityBorders",true).toBool());
+
+	CSpecctraObject::globalOpacity()[CSpecctraObject::None]		=	0.5;
+	CSpecctraObject::globalOpacity()[CSpecctraObject::Track]	=	preferences->opacityTracks->value();
+	CSpecctraObject::globalOpacity()[CSpecctraObject::Via]		=	preferences->opacityVias->value();
+	CSpecctraObject::globalOpacity()[CSpecctraObject::Pad]		=	preferences->opacityPads->value();
+	CSpecctraObject::globalOpacity()[CSpecctraObject::Plane]	=	preferences->opacityPlanes->value();
+	CSpecctraObject::globalOpacity()[CSpecctraObject::Outline]	=	preferences->opacityOutlines->value();
+	CSpecctraObject::globalOpacity()[CSpecctraObject::Border]	=	preferences->opacityBorders->value();
+
+	CSpecctraObject::globalVisibility()[CSpecctraObject::None]		=	true;
+	CSpecctraObject::globalVisibility()[CSpecctraObject::Track]		=	preferences->visibilityTracks->isChecked();
+	CSpecctraObject::globalVisibility()[CSpecctraObject::Via]		=	preferences->visibilityVias->isChecked();
+	CSpecctraObject::globalVisibility()[CSpecctraObject::Pad]		=	preferences->visibilityPads->isChecked();
+	CSpecctraObject::globalVisibility()[CSpecctraObject::Plane]		=	preferences->visibilityPlanes->isChecked();
+	CSpecctraObject::globalVisibility()[CSpecctraObject::Outline]	=	preferences->visibilityOutlines->isChecked();
+	CSpecctraObject::globalVisibility()[CSpecctraObject::Border]	=	preferences->visibilityBorders->isChecked();
 }
 
 /**

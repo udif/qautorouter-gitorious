@@ -15,11 +15,18 @@
 CPcbPlane::CPcbPlane(QGraphicsItem *parent)
 : inherited(parent)
 {
-	setOpacity(0.15);
 }
 
 CPcbPlane::~CPcbPlane()
 {
+}
+
+/**
+  * @return the class of drawable object which this is.
+  */
+CSpecctraObject::tDrawableClass CPcbPlane::drawableClass()
+{
+	return CSpecctraObject::Plane;
 }
 
 bool CPcbPlane::drawable()

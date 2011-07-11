@@ -18,6 +18,14 @@ CPcbBoundary::~CPcbBoundary()
 }
 
 /**
+  * @return the class of drawable object which this is.
+  */
+CSpecctraObject::tDrawableClass CPcbBoundary::drawableClass()
+{
+	return CSpecctraObject::Border;
+}
+
+/**
   * @return the boundary polygon...
   */
 CPcbPath* CPcbBoundary::path()

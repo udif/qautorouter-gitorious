@@ -19,6 +19,8 @@ class CPcbBoundary : public CSpecctraObject
 		CPcbBoundary(QGraphicsItem *parent = 0);
 		virtual ~CPcbBoundary();
 
+		virtual CSpecctraObject::tDrawableClass			drawableClass();
+
 		CPcbPath*					path();
 		virtual QRectF				boundingRect() const;
 		virtual QPainterPath		shape() const;

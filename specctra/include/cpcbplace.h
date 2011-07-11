@@ -21,6 +21,8 @@ class CPcbPlace : public CSpecctraObject
 		CPcbPlace(QGraphicsItem *parent = 0);
 		virtual ~CPcbPlace();
 
+		virtual CSpecctraObject::tDrawableClass			drawableClass();
+
 		QString							unit();
 		QPointF							pos();
 		QString							side();

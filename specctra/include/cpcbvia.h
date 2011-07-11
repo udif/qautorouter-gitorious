@@ -18,6 +18,8 @@ class CPcbVia : public CPcbSegment
 		CPcbVia(QGraphicsItem *parent = 0);
 		virtual ~CPcbVia();
 
+		virtual CSpecctraObject::tDrawableClass			drawableClass();
+
 		virtual double					layerIndex();
 		virtual bool					drawable();
 		virtual QPointF					center();
