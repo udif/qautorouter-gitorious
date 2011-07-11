@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "QAutoRouter"
-#define MyAppVersion "0.0.2"
+#define MyAppVersion "0.0.3"
 #define MyAppPublisher "EightBitGeek"
 #define MyAppURL "http://qautorouter.sourceforge.net"
 #define MyAppExeName "qa.exe"
@@ -47,6 +47,15 @@ Source: "C:\Qt\4.7.3\bin\QtGuid4.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\PA10.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
 Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\spi4.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
 Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\alu.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
+Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\AT2XTKBD.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
+Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\DSKY.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
+Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\MSXCart.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
+Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\OPL2.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
+Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\P112.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
+Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\ppide.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
+Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\SCSI2IDE.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
+Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\sd.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
+Source: "C:\Documents and Settings\Administrator\My Documents\qautorouter\examples\XT-IDE.dsn"; DestDir: "{app}\examples"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
