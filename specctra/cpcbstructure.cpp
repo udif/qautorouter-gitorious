@@ -19,6 +19,21 @@ CPcbStructure::~CPcbStructure()
 }
 
 /**
+  * @brief determine the index of a layer
+  */
+int CPcbStructure::indexOf(CPcbLayer *layer)
+{
+	int lcnt=layers();
+	for( int idx=0; idx < lcnt; idx++ )
+	{
+		CPcbLayer* other = (CPcbLayer*)child("layer",idx);
+		if (other == layer)
+			return idx;
+	}
+	return 0;
+}
+
+/**
   * @return the number of layers
  */
 int CPcbStructure::layers()

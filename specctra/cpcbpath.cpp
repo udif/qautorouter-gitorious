@@ -48,18 +48,16 @@ double CPcbPath::width()
   */
 QPainterPath CPcbPath::shape()
 {
-	if ( mShape.isEmpty() )
+	QPainterPath ppath;
+	QPointF startPt(properties().at(2).toDouble(),properties().at(3).toDouble());
+	ppath.moveTo(startPt);
+	for(int n=4; n < properties().count(); n+=2)
 	{
-		QPointF startPt(properties().at(2).toDouble(),properties().at(3).toDouble());
-		mShape.moveTo(startPt);
-		for(int n=4; n < properties().count(); n+=2)
-		{
-			QPointF pt(properties().at(n).toDouble(),properties().at(n+1).toDouble());
-			mShape.lineTo(pt);
-		}
-		mShape.lineTo(startPt);
+		QPointF pt(properties().at(n).toDouble(),properties().at(n+1).toDouble());
+		ppath.lineTo(pt);
 	}
-	return mShape;
+	//path.lineTo(startPt);
+	return ppath;
 }
 
 /**

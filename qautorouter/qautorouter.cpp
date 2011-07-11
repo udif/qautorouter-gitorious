@@ -18,7 +18,11 @@ QAutoRouter::QAutoRouter(QWidget *parent)
 	ui->setupUi(this);
 	ui->graphicsView->setBackgroundRole(QPalette::Dark);
 	ui->graphicsView->setScene(CSpecctraObject::globalScene());
-	ui->graphicsView->scale(1, -1);
+	ui->graphicsView->scale(1, -1); /* flip Y axis */
+	ui->graphicsView->setInteractive(true);
+	ui->graphicsView->setRubberBandSelectionMode(Qt::IntersectsItemShape);
+	ui->graphicsView->setEnabled(true);
+	ui->graphicsView->setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
 	setupActions();
 	readSettings();
 	QObject::connect(this,SIGNAL(fault(QString)),this,SLOT(faultHandler(QString)));
@@ -155,7 +159,12 @@ void QAutoRouter::zoomOut()
 
 void QAutoRouter::zoomFit()
 {
-	QRectF bounds = CSpecctraObject::globalScene()->itemsBoundingRect();
+	QRectF bounds;
+	if ( pcb() != NULL && pcb()->structure() != NULL && pcb()->structure()->boundary() != NULL )
+		bounds = pcb()->structure()->boundary()->boundingRect();
+	else
+		bounds = CSpecctraObject::globalScene()->itemsBoundingRect();
+	ui->graphicsView->centerOn(bounds.center());
 	ui->graphicsView->fitInView(bounds,Qt::KeepAspectRatio);
 	CSpecctraObject::globalScene()->update();
 }

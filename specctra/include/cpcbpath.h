@@ -24,7 +24,6 @@ class CPcbPath : public CSpecctraObject
 		QPainterPath			oval();
 private:
 		QPainterPath			circle(QPointF center,double radius);
-		QPainterPath			mShape;
 		QPainterPath			mOval;
 };
 

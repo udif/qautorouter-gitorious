@@ -41,6 +41,7 @@ QRectF CPcbSegment::boundingRect() const
 	QRectF rect;
 	if ( me->drawable() )
 	{
+		me->setZValue(me->layerIndex());
 		rect = me->shape().boundingRect();
 	}
 	else

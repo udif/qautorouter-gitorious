@@ -2,37 +2,35 @@
 * Copyright (C) Pike Aerospace Research Corporation                            *
 * Author: Mike Sharkey <mike@pikeaero.com>                                     *
 *******************************************************************************/
-#include "cpcbwire.h"
-#include "cpcbpath.h"
-#include "cpcbnet.h"
-#include "cpcbclearanceclass.h"
+#include "cpcbplane.h"
 #include "cpcb.h"
 #include "cpcbstructure.h"
 #include "cpcblayer.h"
+#include "cpcbpath.h"
+#include "cpcbnetwork.h"
+#include "cpcbnet.h"
 
 #define inherited CPcbSegment
 
-CPcbWire::CPcbWire(QGraphicsItem *parent)
+CPcbPlane::CPcbPlane(QGraphicsItem *parent)
 : inherited(parent)
 {
-	setOpacity(0.55);
+	setOpacity(0.15);
 }
 
-CPcbWire::~CPcbWire()
+CPcbPlane::~CPcbPlane()
 {
 }
 
-bool CPcbWire::drawable()
+bool CPcbPlane::drawable()
 {
-	if ( width() >= 1 )
-		return true;
-	return false;
+	return true;
 }
 
 /**
   * @return a layer index used for Z-axis layering.
   */
-double CPcbWire::layerIndex()
+double CPcbPlane::layerIndex()
 {
 	if ( pcb() != NULL && pcb()->structure() != NULL )
 	{
@@ -46,14 +44,12 @@ double CPcbWire::layerIndex()
 /**
   * @return the width of the wire.
   */
-double CPcbWire::width()
+double CPcbPlane::width()
 {
-	if ( path() != NULL )
-		return path()->width();
-	return 0.0;
+	return 1;
 }
 
-QString CPcbWire::layerRef()
+QString CPcbPlane::layerRef()
 {
 	QString rc;
 	if ( path() != NULL )
@@ -61,14 +57,14 @@ QString CPcbWire::layerRef()
 	return rc;
 }
 
-CPcbLayer* CPcbWire::layer()
+CPcbLayer* CPcbPlane::layer()
 {
 	if ( pcb() != NULL && pcb()->structure() != NULL )
 		return pcb()->structure()->layer(layerRef());
 	return NULL;
 }
 
-QColor CPcbWire::color()
+QColor CPcbPlane::color()
 {
 	QColor c(0,255,0);
 	if ( layer() != NULL )
@@ -76,14 +72,24 @@ QColor CPcbWire::color()
 	return c;
 }
 
-CPcbPath* CPcbWire::path()
+CPcbNet* CPcbPlane::net()
+{
+	return pcb()->network()->net(netRef());
+}
+
+QString CPcbPlane::netRef()
+{
+	return properties()[0];
+}
+
+CPcbPath* CPcbPlane::path()
 {
 	return (CPcbPath*)child("path");
 }
 
-QPainterPath CPcbWire::shape() const
+QPainterPath CPcbPlane::shape() const
 {
-	CPcbWire* me=(CPcbWire*)this;
+	CPcbPlane* me=(CPcbPlane*)this;
 	QPainterPath ppath;
 	if ( me->path() != NULL )
 	{
@@ -92,4 +98,16 @@ QPainterPath CPcbWire::shape() const
 	return ppath;
 }
 
-
+void CPcbPlane::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget)
+{
+	if ( drawable() )
+	{
+		QPainterPath ppath = shape();
+		painter->setRenderHint(QPainter::Antialiasing);
+		painter->scale(scale(),scale());
+		ppath.setFillRule(Qt::WindingFill);
+		painter->setPen(QPen(color(), width(), Qt::SolidLine,Qt::RoundCap));
+		painter->drawPath(ppath);
+		painter->fillPath(ppath,color());
+	}
+}

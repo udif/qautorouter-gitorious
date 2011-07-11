@@ -51,7 +51,8 @@ SOURCES += cgpad.cpp \
     cpcbwire.cpp \
     cpcbpolylinepath.cpp \
     cpcbclearanceclass.cpp \
-    cpcbsegment.cpp
+    cpcbsegment.cpp \
+    cpcbplane.cpp
 HEADERS += include/cgpad.h \
     include/cgpadstack.h \
     include/cgraphics.h \
@@ -91,5 +92,6 @@ HEADERS += include/cgpad.h \
     include/cpcbwire.h \
     include/cpcbpolylinepath.h \
     include/cpcbclearanceclass.h \
-    include/cpcbsegment.h
+    include/cpcbsegment.h \
+    include/cpcbplane.h
 OTHER_FILES += README.txt

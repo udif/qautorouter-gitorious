@@ -24,6 +24,7 @@ class CPcbSegment : public CSpecctraObject
 		CPcbSegment(QGraphicsItem *parent = 0);
 		virtual ~CPcbSegment();
 
+		virtual double					layerIndex()=0;
 		virtual double					width()=0;
 		virtual QColor					color()=0;
 		virtual bool					drawable();

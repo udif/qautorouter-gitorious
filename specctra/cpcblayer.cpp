@@ -4,6 +4,7 @@
 *******************************************************************************/
 #include "cpcblayer.h"
 #include "cpcbtype.h"
+#include "cpcbstructure.h"
 
 #include <QDataStream>
 #include <QByteArray>
@@ -42,14 +43,11 @@ CPcbType* CPcbLayer::type()
   */
 int CPcbLayer::index()
 {
-	CSpecctraObject* i = child("property");
-	if ( i!=NULL )
+	CSpecctraObject* obj = parentObject();
+	if ( obj != NULL && obj->objectClass() == "structure" )
 	{
-		CSpecctraObject* t = i->child("index");
-		if ( t->properties().count() )
-		{
-			return t->properties().at(0).toInt();
-		}
+		CPcbStructure* structure = (CPcbStructure*)obj;
+		return structure->indexOf(this);
 	}
 	return 0;
 }

@@ -77,6 +77,7 @@ QRectF CGPad::boundingRect() const
 		QPainterPath ppath = me->shape();
 		me->mBoundingRect = ppath.boundingRect();
 	}
+	me->setZValue(100);
 	return me->mBoundingRect;
 }
 

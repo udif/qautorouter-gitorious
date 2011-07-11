@@ -21,6 +21,14 @@ CPcbVia::~CPcbVia()
 {
 }
 
+/**
+  * @return a layer index used for Z-axis layering.
+  */
+double CPcbVia::layerIndex()
+{
+	return 100;
+}
+
 bool CPcbVia::drawable()
 {
 	if ( properties().count() >= 3 && parentObject() != NULL ) // do we have coordinates?

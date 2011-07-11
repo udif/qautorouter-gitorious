@@ -2,37 +2,37 @@
 * Copyright (C) Pike Aerospace Research Corporation                            *
 * Author: Mike Sharkey <mike@pikeaero.com>                                     *
 *******************************************************************************/
-#ifndef CPCBWIRE_H
-#define CPCBWIRE_H
+#ifndef CPCBPLANE_H
+#define CPCBPLANE_H
+
+#include <QObject>
 
 #include "cpcbsegment.h"
 
-#include <QPointF>
-#include <QPainterPath>
-#include <QWidget>
-
 class CPcbNet;
-class CPcbClearanceClass;
 class CPcbPath;
 class CPcbLayer;
-class CPcbWire : public CPcbSegment
+class CPcbPlane : public CPcbSegment
 {
 	Q_OBJECT
 	public:
-		CPcbWire(QGraphicsItem *parent = 0);
-		virtual ~CPcbWire();
+		CPcbPlane(QGraphicsItem *parent = 0);
+		virtual ~CPcbPlane();
 
 		virtual double					layerIndex();
-		virtual bool					drawable();
 		virtual double					width();
 		virtual QColor					color();
+		virtual bool					drawable();
+		virtual CPcbNet*				net();
+		virtual QString					netRef();
 		virtual QString					layerRef();
 		virtual CPcbLayer*				layer();
 		virtual CPcbPath*				path();
 
 		/** QGraphicsItem overrides... */
 		virtual QPainterPath			shape() const;
+		virtual void					paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget);
 };
 
-#endif // CPCBWIRE_H
+#endif // CPCBPLANE_H
 
