@@ -18,7 +18,7 @@ QAutoRouter::QAutoRouter(QWidget *parent)
 	ui->setupUi(this);
 	ui->graphicsView->setBackgroundRole(QPalette::Dark);
 	ui->graphicsView->setScene(CSpecctraObject::globalScene());
-	ui->graphicsView->scale(1, -1); /* flip Y axis */
+	ui->graphicsView->scale(1, -1);								 /* flip Y axis */
 	ui->graphicsView->setInteractive(true);
 	ui->graphicsView->setRubberBandSelectionMode(Qt::IntersectsItemShape);
 	ui->graphicsView->setEnabled(true);
@@ -139,24 +139,36 @@ void QAutoRouter::clear()
 	CSpecctraObject::globalScene()->clear();
 }
 
+/**
+  * @brief Update the view after a zoom operation.
+  */
 void QAutoRouter::updateZoom()
 {
 	ui->graphicsView->scale(zoom(),zoom());
 	CSpecctraObject::globalScene()->update();
 }
 
+/**
+  * @brief Zoom one step in.
+  */
 void QAutoRouter::zoomIn()
 {
 	mZoom = 1.125;
 	updateZoom();
 }
 
+/**
+  * @brief Zoom one step out.
+  */
 void QAutoRouter::zoomOut()
 {
 	mZoom = 1.0-0.125;
 	updateZoom();
 }
 
+/**
+  * @brief Zoom to boundary of content and center view on center of contect rectangle.
+  */
 void QAutoRouter::zoomFit()
 {
 	QRectF bounds;
@@ -171,12 +183,16 @@ void QAutoRouter::zoomFit()
 
 /**
   * @brief Show a status message
+  * @param txt The text to show in the status bar
   */
 void QAutoRouter::status(QString txt)
 {
 	this->statusBar()->showMessage(txt);
 }
 
+/**
+  * @brief Display an "About" box.
+  */
 void QAutoRouter::about()
 {
 	QMessageBox::about (this, "About QAutoRouter", "QAutoRouter "+version()+" "
@@ -202,11 +218,17 @@ void QAutoRouter::about()
 													"59 Temple Place - Suite 330,\nBoston, MA 02111-1307,\nU.S.A.\n");
 }
 
+/**
+  * @brief A generic fault handler such that methods may emit a singal with text to get a fault message out.
+  */
 void QAutoRouter::faultHandler(QString txt)
 {
 	QMessageBox::information(this,tr("Information Message"),txt);
 }
 
+/**
+  * @brief A periodic timer. Default 2 seconds interval.
+  */
 void QAutoRouter::timerEvent(QTimerEvent* e)
 {
 	if ( e->timerId() == mTimer )
