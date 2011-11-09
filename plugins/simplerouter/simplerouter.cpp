@@ -13,6 +13,7 @@
 #include <cutil.h>
 #include <cgsegment.h>
 #include <cgwire.h>
+#include <boundingbox.h>
 
 /**
   * @return plugin type
@@ -168,22 +169,6 @@ void SimpleRouter::select()
 }
 
 /**
-  * @brief route a segment
-  */
-void SimpleRouter::route(CPcbNet* net, CGSegment* segment)
-{
-	segment->setWidth(20);
-	segment->setRouted(true);
-	segment->update();
-	pcb()->yield();				/* give up some CPU to the main app */
-	for(int n=0; running() && n < segment->segments(); n++)
-	{
-		CGSegment* child = segment->segment(n);
-		route(net,child);
-	}
-}
-
-/**
   * @brief route the current net.
   */
 void SimpleRouter::route()
@@ -196,7 +181,8 @@ void SimpleRouter::route()
 		for( int n=0; running() && n < wire.segments(); n++)
 		{
 			CGSegment* segment = wire.segment(n);
-			route(net,segment);
+			BoundingBox box(pcb(),net,segment);
+			box.route();
 			emit status(currentStatus());
 		}
 		selectNet(net,false);

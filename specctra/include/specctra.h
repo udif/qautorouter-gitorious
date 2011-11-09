@@ -27,7 +27,7 @@
 #include "cpcbshape.h"
 #include "cpcbstructure.h"
 #include "cpcbvia.h"
-#include "cpcrule.h"
+#include "cpcbrule.h"
 #include "cplugininterface.h"
 #include "cspecctraobject.h"
 #include "cspecctrareader.h"

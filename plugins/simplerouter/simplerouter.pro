@@ -11,9 +11,10 @@ unix {
 	target.path = /opt/qautorouter/plugins
 	INSTALLS += target
 }
-SOURCES += simplerouter.cpp
-HEADERS += simplerouter.h
+SOURCES += simplerouter.cpp \
+    boundingbox.cpp
+HEADERS += simplerouter.h \
+    boundingbox.h
 OTHER_FILES += README.txt
 unix: LIBS += -L../../specctra -lspecctra
 win32: LIBS += -L../../../qautorouter-build-desktop/specctra/release -L../../../qautorouter-build-desktop/specctra/debug -lspecctra
-
