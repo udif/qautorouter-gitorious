@@ -28,6 +28,7 @@
 #define TOPOROUTER_H
 
 #include <assert.h>
+#ifdef GEDA
 #include "data.h"
 #include "macro.h"
 #include "autoroute.h"
@@ -48,6 +49,93 @@
 #include "global.h"
 
 #include "gts.h"
+#else
+#include <math.h>
+#include <float.h>
+#include <string.h>
+#include "gts.h"
+
+#define Message printf
+#define _(x) x
+
+typedef enum
+{
+    SQUAREFLAG,
+    OCTAGONFLAG,
+}ShapeType;
+
+typedef enum
+{
+    GROUP_1,
+    GROUP_2
+} GroupType;
+
+typedef struct
+{
+    int X;
+    int Y;
+} Point;
+
+
+typedef struct
+{
+    char *Name;
+    gdouble Thickness;
+    ShapeType Type;
+} PinType;
+
+typedef struct
+{
+    char *Name;
+    Point Point1;
+    Point Point2;
+    gdouble Thickness;
+    ShapeType Type;
+} PadType;
+
+typedef struct
+{
+    Point Point1;
+    Point Point2;
+    gdouble Thickness;
+} LineType, *LineTypePtr;
+
+typedef struct
+{
+    Point Point1;
+    Point Point2;
+    gdouble Thickness;
+    GroupType group1;
+    GroupType group2;
+} RatType;
+
+typedef struct
+{
+    gdouble Theta;
+} ArcType, *ArcTypePtr;
+
+typedef struct
+{
+    gdouble SomethingHere;
+} LayerType;
+
+typedef struct
+{
+    int MaxWidth;
+    int MaxHeight;
+    int NumLayers;
+    
+} PCBType;
+
+#define TEST_FLAG(x, y) (x == y->Type)
+
+typedef struct
+{
+    gdouble LineThickness;
+    gdouble Keepaway;
+} SettingsType;
+
+#endif
 
 #include <stdlib.h>
 #include <getopt.h>
@@ -482,5 +570,6 @@ typedef struct {
 	toporouter_netlist_t *netlist = *i;
 
 #define FOREACH_END }} while(0)
+
 
 #endif // TOPOROUTER_H

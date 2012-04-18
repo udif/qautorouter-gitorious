@@ -56,6 +56,10 @@
 
 #include "toporouter.h"
 
+PCBType PCBStruct = {0};
+PCBType *PCB = &PCBStruct;
+SettingsType Settings;
+
 static void
 toporouter_edge_init (toporouter_edge_t *edge)
 {
@@ -116,7 +120,7 @@ toporouter_bbox_class(void)
 
 static void
 toporouter_vertex_class_init (toporouter_vertex_class_t *klass)
-{
+{ 
 
 }
 
@@ -281,26 +285,38 @@ gdouble
 lookup_keepaway(char *name)
 {
   if(name)
+      #ifdef GEDA
   STYLE_LOOP(PCB);
   {
 //    if(!strcmp(style->Name, name)) return style->Keepaway + 1.;
 	if(!strcmp(style->Name, name)) return style->Keepaway;
   }
   END_LOOP;
-//  return Settings.Keepaway + 1.;
   return Settings.Keepaway ;
+  #else
+	#warning implement Keepaway
+    return 0;
+  #endif
+  return Settings.Keepaway + 1.;
+  
 }
 
 gdouble
 lookup_thickness(char *name)
 {
   if(name)
+#ifdef GEDA
   STYLE_LOOP(PCB);
   {
 	if(!strcmp(style->Name, name)) return style->Thick;
   }
   END_LOOP;
-  return Settings.LineThickness;
+    return Settings.LineThickness;
+  #else
+	#warning implement line thickness
+	return Settings.LineThickness;
+  #endif
+  
 }
 
 static inline gdouble
@@ -725,7 +741,7 @@ point_from_point_to_point(toporouter_vertex_t *a, toporouter_vertex_t *b, gdoubl
   gdouble theta = atan(fabs(dy/dx));
 
 //#ifdef DEBUG_EXPORT
-  if(!finite(theta)) {
+  if(!isfinite(theta)) {
 //    printf("!finte(theta): a = %f,%f b = %f,%f d = %f\n", vx(a), vy(a), vx(b), vy(b), d);
 //    print_trace();
 	//TODO: this shouldn't happen, fix the hack
@@ -735,7 +751,7 @@ point_from_point_to_point(toporouter_vertex_t *a, toporouter_vertex_t *b, gdoubl
   }
 //#endif
 
-  g_assert(finite(theta));
+  g_assert(isfinite(theta));
 
   *x = vx(a); *y = vy(a);
 
@@ -823,13 +839,13 @@ coord_move_towards_coord_values(gdouble ax, gdouble ay, gdouble px, gdouble py, 
   gdouble theta = atan(fabs(dy/dx));
 
 
-  if(!finite(theta)) {
+  if(!isfinite(theta)) {
 	printf("!finite(theta) a = %f,%f p = %f,%f d = %f\n",
 		ax, ay, px, py, d);
 
   }
 
-  g_assert(finite(theta));
+  g_assert(isfinite(theta));
 
   if( dx >= 0. ) {
 
@@ -863,7 +879,7 @@ vertex_move_towards_point_values(GtsVertex *v, gdouble px, gdouble py, gdouble d
   gdouble dy = py - GTS_POINT(v)->y;
   gdouble theta = atan(fabs(dy/dx));
 
-  g_assert(finite(theta));
+  g_assert(isfinite(theta));
 
   if( dx >= 0. ) {
 
@@ -897,7 +913,7 @@ vertex_move_towards_vertex_values(GtsVertex *v, GtsVertex *p, gdouble d, gdouble
   gdouble dy = GTS_POINT(p)->y - GTS_POINT(v)->y;
   gdouble theta = atan(fabs(dy/dx));
 
-  g_assert(finite(theta));
+  g_assert(isfinite(theta));
 
   if( dx >= 0. ) {
 
@@ -1118,7 +1134,7 @@ toporouter_draw_surface(toporouter_t *r, GtsSurface *s, char *filename, int w, i
 		  nms = min_spacing(tv,nextv);
 		  pms = min_spacing(tv,prevv);
 
-		  g_assert(finite(nms)); g_assert(finite(pms));
+		  g_assert(isfinite(nms)); g_assert(isfinite(pms));
 
 		  point_from_point_to_point(tv, nextv, nms, &tempx, &tempy);
 
@@ -1239,11 +1255,13 @@ groupcount(void)
 {
   int group;
   guint count = 0;
-
+#ifdef GEDA
   for (group = 0; group < max_group; group++) {
 	if(PCB->LayerGroups.Number[group] > 0) count++;
   }
-
+#else
+	count = PCB->NumLayers;
+#endif
   return count;
 }
 
@@ -1894,6 +1912,7 @@ rect_with_attachments(gdouble rad,
 
 #define VERTEX_CENTRE(x) TOPOROUTER_VERTEX( vertex_bbox(x)->point )
 
+#ifdef GEDA
 /*
  * Read pad data from layer into toporouter_layer_t struct
  *
@@ -2210,6 +2229,171 @@ read_lines(toporouter_t *r, toporouter_layer_t *l, LayerType *layer, int ln)
 
   return 0;
 }
+#else
+#warning Implement the read_* functions
+int read_pads(toporouter_t *r, toporouter_layer_t *l, guint layer)
+{
+
+}
+
+void AddPad(gdouble P1X, gdouble P1Y, gdouble P2X, gdouble P2Y, gdouble Thickness, ShapeType Shape)
+{
+#if 0
+    toporouter_spoint_t p[2], rv[5];
+    gdouble x[2], y[2], t, m;
+    GList *objectconstraints;
+
+    GList *vlist = NULL;
+    toporouter_bbox_t *bbox = NULL;
+
+    objectconstraints = NULL;
+
+    t = Thickness / 2.0f;
+    x[0] = P1X;
+    x[1] = P2X;
+    y[0] = P1Y;
+    y[1] = P2Y;
+
+
+    if(SQUAREFLAG == Shape)
+    {
+        /* Square or oblong pad. Four points and four constraint edges are
+        * used */
+        if(x[0] == x[1] && y[0] == y[1])
+        {
+            /* Pad is square */
+            vlist = rect_with_attachments(pad_rad(pad),
+                x[0]-t, y[0]-t,
+                x[0]-t, y[0]+t,
+                x[0]+t, y[0]+t,
+                x[0]+t, y[0]-t,
+                l - r->layers);
+            bbox = toporouter_bbox_create(l - r->layers, vlist, PAD, pad);
+            r->bboxes = g_slist_prepend(r->bboxes, bbox);
+            insert_constraints_from_list(r, l, vlist, bbox);
+            g_list_free(vlist);
+
+            bbox->point = GTS_POINT( insert_vertex(r, l, x[0], y[0], bbox) );
+            g_assert(TOPOROUTER_VERTEX(bbox->point)->bbox == bbox);
+        }
+        else
+        {
+            /* Pad is diagonal oblong or othogonal oblong */
+
+            m = cartesian_gradient(x[0], y[0], x[1], y[1]);
+
+            p[0].x = x[0]; p[0].y = y[0];
+            p[1].x = x[1]; p[1].y = y[1];
+
+            vertex_outside_segment(&p[0], &p[1], t, &rv[0]);
+            vertices_on_line(&rv[0], perpendicular_gradient(m), t, &rv[1], &rv[2]);
+
+            vertex_outside_segment(&p[1], &p[0], t, &rv[0]);
+            vertices_on_line(&rv[0], perpendicular_gradient(m), t, &rv[3], &rv[4]);
+
+            if(wind(&rv[1], &rv[2], &rv[3]) != wind(&rv[2], &rv[3], &rv[4]))
+            {
+                rv[0].x = rv[3].x; rv[0].y = rv[3].y;
+                rv[3].x = rv[4].x; rv[3].y = rv[4].y;
+                rv[4].x = rv[0].x; rv[4].y = rv[0].y;
+            }
+
+            vlist = rect_with_attachments(pad_rad(pad),
+            rv[1].x, rv[1].y,
+            rv[2].x, rv[2].y,
+            rv[3].x, rv[3].y,
+            rv[4].x, rv[4].y,
+            l - r->layers);
+            bbox = toporouter_bbox_create(l - r->layers, vlist, PAD, pad);
+            r->bboxes = g_slist_prepend(r->bboxes, bbox);
+            insert_constraints_from_list(r, l, vlist, bbox);
+            g_list_free(vlist);
+
+            //bbox->point = GTS_POINT( gts_vertex_new(vertex_class, (x[0] + x[1]) / 2., (y[0] + y[1]) / 2., 0.) );
+            bbox->point = GTS_POINT( insert_vertex(r, l, (x[0] + x[1]) / 2., (y[0] + y[1]) / 2., bbox) );
+            g_assert(TOPOROUTER_VERTEX(bbox->point)->bbox == bbox);
+        }
+    }
+    else
+    {
+        /* Either round pad or pad with curved edges */
+
+        if(x[0] == x[1] && y[0] == y[1])
+        {
+            /* One point */
+
+            /* bounding box same as square pad */
+            vlist = rect_with_attachments(pad_rad(pad),
+            x[0]-t, y[0]-t,
+            x[0]-t, y[0]+t,
+            x[0]+t, y[0]+t,
+            x[0]+t, y[0]-t,
+            l - r->layers);
+            bbox = toporouter_bbox_create(l - r->layers, vlist, PAD, pad);
+            r->bboxes = g_slist_prepend(r->bboxes, bbox);
+            g_list_free(vlist);
+
+            //bbox->point = GTS_POINT( insert_vertex(r, l, x[0], y[0], bbox) );
+            bbox->point = GTS_POINT( insert_vertex(r, l, x[0], y[0], bbox) );
+
+        }
+        else
+        {
+            /* Two points and one constraint edge */
+
+            /* the rest is just for bounding box */
+            m = cartesian_gradient(x[0], y[0], x[1], y[1]);
+
+            p[0].x = x[0]; p[0].y = y[0];
+            p[1].x = x[1]; p[1].y = y[1];
+
+            vertex_outside_segment(&p[0], &p[1], t, &rv[0]);
+            vertices_on_line(&rv[0], perpendicular_gradient(m), t, &rv[1], &rv[2]);
+
+            vertex_outside_segment(&p[1], &p[0], t, &rv[0]);
+            vertices_on_line(&rv[0], perpendicular_gradient(m), t, &rv[3], &rv[4]);
+
+            if(wind(&rv[1], &rv[2], &rv[3]) != wind(&rv[2], &rv[3], &rv[4]))
+            {
+                rv[0].x = rv[3].x; rv[0].y = rv[3].y;
+                rv[3].x = rv[4].x; rv[3].y = rv[4].y;
+                rv[4].x = rv[0].x; rv[4].y = rv[0].y;
+            }
+
+            vlist = rect_with_attachments(pad_rad(pad),
+            rv[1].x, rv[1].y,
+            rv[2].x, rv[2].y,
+            rv[3].x, rv[3].y,
+            rv[4].x, rv[4].y,
+            l - r->layers);
+            bbox = toporouter_bbox_create(l - r->layers, vlist, PAD, pad);
+            r->bboxes = g_slist_prepend(r->bboxes, bbox);
+            insert_constraints_from_list(r, l, vlist, bbox);
+            g_list_free(vlist);
+
+            //bbox->point = GTS_POINT( gts_vertex_new(vertex_class, (x[0] + x[1]) / 2., (y[0] + y[1]) / 2., 0.) );
+            bbox->point = GTS_POINT( insert_vertex(r, l, (x[0] + x[1]) / 2., (y[0] + y[1]) / 2., bbox) );
+
+            //bbox->constraints = g_list_concat(bbox->constraints, insert_constraint_edge(r, l, x[0], y[0], x[1], y[1], bbox));
+        }
+    }
+#endif
+}
+
+int
+read_points(toporouter_t *r, toporouter_layer_t *l, int layer)
+{
+}
+int
+read_lines(toporouter_t *r, toporouter_layer_t *l, LayerType *layer, int ln)
+{
+}
+void
+import_clusters(toporouter_t *r)
+{
+}
+
+#endif
 
 void
 create_board_edge(gdouble x0, gdouble y0, gdouble x1, gdouble y1, gdouble max, gint layer, GList **vlist)
@@ -2718,7 +2902,6 @@ cluster_vertices(toporouter_t *r, toporouter_cluster_t *c)
 
   return rval;
 }
-
 void
 print_cluster(toporouter_cluster_t *c)
 {
@@ -2795,6 +2978,7 @@ netlist_create(toporouter_t *r, char *netlist, char *style)
   return nl;
 }
 
+#ifdef GEDA
 void
 import_clusters(toporouter_t *r)
 {
@@ -2877,6 +3061,7 @@ import_clusters(toporouter_t *r)
   END_LOOP;
   FreeNetListListMemory(&nets);
 }
+#endif
 
 void
 import_geometry(toporouter_t *r)
@@ -2896,16 +3081,16 @@ import_geometry(toporouter_t *r)
 #endif
   /* Allocate space for per layer struct */
   cur_layer = r->layers = (toporouter_layer_t *)malloc(groupcount() * sizeof(toporouter_layer_t));
-
+  #ifdef GEDA
   /* Foreach layer, read in pad vertices and constraints, and build CDT */
   for (group = 0; group < max_group; group++) {
 #ifdef DEBUG_IMPORT
 	printf("*** LAYER GROUP %d ***\n", group);
 #endif
+
 	if(PCB->LayerGroups.Number[group] > 0){
 	  cur_layer->vertices    = NULL;
 	  cur_layer->constraints = NULL;
-
 #ifdef DEBUG_IMPORT
 	  printf("reading board constraints from layer %d into group %d\n", PCB->LayerGroups.Entries[group][0], group);
 #endif
@@ -2932,7 +3117,6 @@ import_geometry(toporouter_t *r)
 	  END_LOOP;
 
 
-
 #ifdef DEBUG_IMPORT
 	  printf("building CDT\n");
 #endif
@@ -2951,8 +3135,11 @@ import_geometry(toporouter_t *r)
 #endif
 	  cur_layer++;
 	}
-  }
 
+  }
+#else
+  #warning Actually read the PCB now...
+#endif
   r->bboxtree = gts_bb_tree_new(r->bboxes);
 
   import_clusters(r);
@@ -5205,7 +5392,7 @@ vertex_move_towards_point(GtsVertex *v, gdouble px, gdouble py, gdouble d)
   gdouble dy = py - GTS_POINT(v)->y;
   gdouble theta = atan(fabs(dy/dx));
 
-  g_assert(finite(theta));
+  g_assert(isfinite(theta));
 
   if( dx >= 0. ) {
 
@@ -5239,7 +5426,7 @@ vertex_move_towards_vertex(GtsVertex *v, GtsVertex *p, gdouble d)
   gdouble dy = GTS_POINT(p)->y - GTS_POINT(v)->y;
   gdouble theta = atan(fabs(dy/dx));
 
-  g_assert(finite(theta));
+  g_assert(isfinite(theta));
 
   if( dx >= 0. ) {
 
@@ -5487,11 +5674,13 @@ print_oproute(toporouter_oproute_t *oproute)
   printf("\t"); print_vertex(oproute->term2); printf("\n");
 }
 
+
 gdouble
 export_pcb_drawline(guint layer, guint x0, guint y0, guint x1, guint y1, guint thickness, guint keepaway)
 {
   gdouble d = 0.;
   LineTypePtr line;
+#ifdef GEDA
   line = CreateDrawnLineOnLayer( LAYER_PTR(layer), x0, y0, x1, y1,
 	  thickness, keepaway,
 	  MakeFlags (AUTOFLAG | (TEST_FLAG (CLEARNEWFLAG, PCB) ? CLEARLINEFLAG : 0)));
@@ -5500,6 +5689,9 @@ export_pcb_drawline(guint layer, guint x0, guint y0, guint x1, guint y1, guint t
 	AddObjectToCreateUndoList (LINE_TYPE, LAYER_PTR(layer), line, line);
 	d = coord_distance((double)x0, (double)y0, (double)x1, (double)y1) / 100.;
   }
+#else
+	#warning Create drawline
+#endif
   return d;
 }
 
@@ -5543,7 +5735,7 @@ export_pcb_drawarc(guint layer, toporouter_arc_t *a, guint thickness, guint keep
 
   if(da < 1. && da > -1.) return 0.;
   if(da > 359. || da < -359.) return 0.;
-
+#ifdef GEDA
   arc = CreateNewArcOnLayer(LAYER_PTR(layer), vx(a->centre), vy(a->centre), a->r, a->r,
 	sa, da, thickness, keepaway,
 	MakeFlags( AUTOFLAG | (TEST_FLAG (CLEARNEWFLAG, PCB) ? CLEARLINEFLAG : 0)));
@@ -5552,6 +5744,9 @@ export_pcb_drawarc(guint layer, toporouter_arc_t *a, guint thickness, guint keep
 	AddObjectToCreateUndoList( ARC_TYPE, LAYER_PTR(layer), arc, arc);
 	d = a->r * theta / 100.;
   }
+#else
+	#warning Export DrawArc
+#endif
 
   return d;
 }
@@ -5850,7 +6045,12 @@ calculate_arc_to_arc(toporouter_t *ar, toporouter_arc_t *parc, toporouter_arc_t 
 void
 export_oproutes(toporouter_t *ar, toporouter_oproute_t *oproute)
 {
+#ifdef GEDA
   guint layer = PCB->LayerGroups.Entries[oproute->layergroup][0];
+#else
+	guint layer = 0;
+	#warning get layer
+#endif
   guint thickness = lookup_thickness(oproute->style);
   guint keepaway = lookup_keepaway(oproute->style);
   GList *arcs = oproute->arcs;
@@ -6848,7 +7048,7 @@ routedata_create(void)
   routedata->destvertices = routedata->srcvertices = NULL;
   return routedata;
 }
-/*
+/* 
 void
 print_routedata(toporouter_route_t *routedata)
 {
@@ -7059,7 +7259,7 @@ netscore_create(toporouter_t *r, toporouter_route_t *routedata, guint n, guint i
   netscore->routedata = routedata;
   routedata->detourscore = netscore->score = routedata->score;
 
-  if(!finite(routedata->detourscore)) {
+  if(!isfinite(routedata->detourscore)) {
 	printf("WARNING: !finite(detourscore)\n");
 	print_cluster(routedata->src);
 	print_cluster(routedata->dest);
@@ -7129,7 +7329,7 @@ netscore_pairwise_calculation(toporouter_netscore_t *netscore, GPtrArray *netsco
 		netscore->pairwise_nodetour[i-netscores_base] = 1;
 		(*i)->pairwise_nodetour[netscore->id] = 1;
 	  }else
-	  if(!finite(temproutedata->score)) {
+	  if(!isfinite(temproutedata->score)) {
 		netscore->pairwise_fails += 1;
 	  }else{
 		netscore->pairwise_detour_sum += temproutedata->score - (*i)->score;
@@ -7150,9 +7350,9 @@ gint
 netscore_pairwise_size_compare(toporouter_netscore_t **a, toporouter_netscore_t **b)
 {
   // infinite scores are last
-  if(!finite((*a)->score) && !finite((*b)->score)) return 0;
-  if(finite((*a)->score) && !finite((*b)->score)) return -1;
-  if(finite((*b)->score) && !finite((*a)->score)) return 1;
+  if(!isfinite((*a)->score) && !isfinite((*b)->score)) return 0;
+  if(isfinite((*a)->score) && !isfinite((*b)->score)) return -1;
+  if(isfinite((*b)->score) && !isfinite((*a)->score)) return 1;
 
   // order by pairwise fails
   if((*a)->pairwise_fails < (*b)->pairwise_fails) return -1;
@@ -7173,9 +7373,9 @@ gint
 netscore_pairwise_compare(toporouter_netscore_t **a, toporouter_netscore_t **b)
 {
   // infinite scores are last
-  if(!finite((*a)->score) && !finite((*b)->score)) return 0;
-  if(finite((*a)->score) && !finite((*b)->score)) return -1;
-  if(finite((*b)->score) && !finite((*a)->score)) return 1;
+  if(!isfinite((*a)->score) && !isfinite((*b)->score)) return 0;
+  if(isfinite((*a)->score) && !isfinite((*b)->score)) return -1;
+  if(isfinite((*b)->score) && !isfinite((*a)->score)) return 1;
 
   // order by pairwise fails
   if((*a)->pairwise_fails < (*b)->pairwise_fails) return -1;
@@ -7214,7 +7414,7 @@ order_nets_preroute_greedy(toporouter_t *r, GList *nets, GList **rnets)
   *rnets = NULL;
   FOREACH_NETSCORE(netscores) {
 	*rnets = g_list_prepend(*rnets, netscore->routedata);
-	if(!finite(netscore->score)) failcount++;
+	if(!isfinite(netscore->score)) failcount++;
 	netscore_destroy(netscore);
   } FOREACH_END;
 
@@ -7752,7 +7952,7 @@ detour_router(toporouter_t *r)
   for(toporouter_route_t **i = (toporouter_route_t **) scores->pdata; i < (toporouter_route_t **) scores->pdata + scores->len; i++) {
 	toporouter_route_t *curroute = (*i);
 
-	if(finite(curroute->score) && finite(curroute->detourscore)) {
+	if(isfinite(curroute->score) && isfinite(curroute->detourscore)) {
 //    printf("%15s %15f \t %8f,%8f - %8f,%8f\n", (*i)->src->netlist + 2, (*i)->score - (*i)->detourscore,
 //        vx(curroute->mergebox1->point), vy(curroute->mergebox1->point),
 //        vx(curroute->mergebox2->point), vy(curroute->mergebox2->point));
@@ -7825,7 +8025,7 @@ hybrid_router(toporouter_t *r)
 
   return failcount;
 }
-
+#ifdef GEDA
 void
 parse_arguments(toporouter_t *r, int argc, char **argv)
 {
@@ -7849,7 +8049,7 @@ parse_arguments(toporouter_t *r, int argc, char **argv)
 	  }
 
 }
-
+#endif
 toporouter_t *
 toporouter_new(void)
 {
@@ -7899,6 +8099,7 @@ toporouter_new(void)
 void
 acquire_twonets(toporouter_t *r)
 {
+#ifdef GEDA
   RAT_LOOP(PCB->Data);
 	if( TEST_FLAG(SELECTEDFLAG, line) ) import_route(r, line);
   END_LOOP;
@@ -7909,6 +8110,9 @@ acquire_twonets(toporouter_t *r)
 	END_LOOP;
   }
 //     */
+#else
+	#warning Import routes
+#endif
 
 }
 
@@ -7930,11 +8134,13 @@ toporouter_set_pair(toporouter_t *r, toporouter_netlist_t *n1, toporouter_netlis
   return 1;
 }
 
-static int
-toporouter (int argc, char **argv, int x, int y)
+int
+toporouter(int argc, char **argv, int x, int y)
 {
   toporouter_t *r = toporouter_new();
+#ifdef GEDA
   parse_arguments(r, argc, argv);
+#endif
   import_geometry(r);
   acquire_twonets(r);
 
@@ -7959,6 +8165,7 @@ toporouter (int argc, char **argv, int x, int y)
   toporouter_export(r);
   toporouter_free(r);
 
+#ifdef GEDA
   SaveUndoSerialNumber ();
   DeleteRats (false);
   RestoreUndoSerialNumber ();
@@ -7966,10 +8173,10 @@ toporouter (int argc, char **argv, int x, int y)
   RestoreUndoSerialNumber ();
   IncrementUndoSerialNumber ();
   Redraw ();
-
+#endif
   return 0;
 }
-
+#ifdef GEDA
 static int
 escape (int argc, char **argv, int x, int y)
 {
@@ -8077,3 +8284,4 @@ void hid_toporouter_init()
 {
   register_toporouter_action_list();
 }
+#endif
