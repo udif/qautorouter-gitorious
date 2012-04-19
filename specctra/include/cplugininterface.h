@@ -22,9 +22,10 @@ class CPluginInterface
 
 		virtual QString				title() const = 0;				/* a brief name for the plugin */
 		virtual QString				version() const = 0;			/* return a version number string */
-		virtual QString				author() const = 0;				/* name of author + email */
+		virtual QStringList			credits() const = 0;			/* name of author(s) + email */
 		virtual QString				website() const = 0;			/* the author's website */
 		virtual QString				description() const = 0;		/* a brief description of the plugin */
+		virtual	QStringList			license() const = 0;			/* the text of the plugin license */
 
 		virtual bool				start(CPcb* pcb)=0;				/** initialize, gets' called once prior to exec() being called */
 		virtual void				stop()=0;						/** stop processing */

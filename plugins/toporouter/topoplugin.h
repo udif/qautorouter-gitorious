@@ -27,9 +27,10 @@ class TopoRouter : public QObject, public CPluginInterface
 
 		virtual QString				title() const;					/* a brief name for the plugin */
 		virtual QString				version() const;				/* return a version number string */
-		virtual QString				author() const;					/* name of author + email */
+		virtual QStringList			credits() const;				/* name of authors + email */
 		virtual QString				website() const;				/* the author's website */
 		virtual QString				description() const;			/* a brief description of the plugin */
+		virtual QStringList			license() const;				/* the license text for the plugin */
 
 		virtual bool				start(CPcb* pcb);				/** initialize, gets' called once prior to exec() being called */
 		virtual void				stop();							/** stop processing */

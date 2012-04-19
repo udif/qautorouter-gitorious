@@ -108,17 +108,39 @@ bool QAutoRouter::loadPlugin(QString filename,QString& errorString)
 							preferences->postRouterCombo->addItem(iPlugin->title()+" V"+iPlugin->version(),mPluginLoader.fileName());
 						}
 						title += iPlugin->title();
-						QTreeWidgetItem *pluginItem = new QTreeWidgetItem(preferences->pluginTree);
+						QTreeWidgetItem* pluginItem = new QTreeWidgetItem(preferences->pluginTree);
 						pluginItem->setText(0, title);
 						pluginItem->setData(0,Qt::UserRole,mPluginLoader.fileName());
-						QTreeWidgetItem *pluginVersion = new QTreeWidgetItem(pluginItem);
+						QTreeWidgetItem* pluginVersion = new QTreeWidgetItem(pluginItem);
 						pluginVersion->setText(0, tr("Version: ")+iPlugin->version());
-						QTreeWidgetItem *pluginAuthor = new QTreeWidgetItem(pluginItem);
-						pluginAuthor->setText(0, tr("Author: ")+iPlugin->author());
-						QTreeWidgetItem *pluginWebsite = new QTreeWidgetItem(pluginItem);
+
+						/** creadits */
+						QTreeWidgetItem* pluginCredits = new QTreeWidgetItem(pluginItem);
+						pluginCredits->setText(0, tr( "Credits..." ));
+						for(int n=0; n < iPlugin->credits().count(); n++)
+						{
+							QTreeWidgetItem* credit = new QTreeWidgetItem(pluginCredits);
+							credit->setText(0, iPlugin->credits().at(n));
+						}
+
+						/** website + about */
+						QTreeWidgetItem* pluginWebsite = new QTreeWidgetItem(pluginItem);
 						pluginWebsite->setText(0, tr("Website: ")+iPlugin->website());
 						QTreeWidgetItem *pluginDescription = new QTreeWidgetItem(pluginItem);
 						pluginDescription->setText(0, tr("About: ")+iPlugin->description());
+
+						/** license */
+						if (iPlugin->license().count() > 0 )
+						{
+							QTreeWidgetItem* pluginLicense = new QTreeWidgetItem(pluginItem);
+							pluginLicense->setText(0, tr( "License: " )+iPlugin->license().at(0));
+							for(int n=1; n < iPlugin->license().count(); n++)
+							{
+								QTreeWidgetItem* licenseText = new QTreeWidgetItem(pluginLicense);
+								licenseText->setText(0, iPlugin->license().at(n));
+							}
+						}
+
 						preferences->pluginTree->addTopLevelItem(pluginItem);
 					}
 					rc = true;

@@ -46,9 +46,13 @@ QString TopoRouter::version() const
 /**
   * @return A author for the plugin to display in user interface.
   */
-QString TopoRouter::author() const
+QStringList TopoRouter::credits() const
 {
-	return "Mike Sharkey <mike@pikeaero.com>";
+	QStringList rc;
+	rc << "Anthony Blake <tonyb33@gmail.com>";
+	rc << "Peter Allen <pete@strangepete.co.uk>";
+	rc << "Mike Sharkey <michael_sharkey@firstclass.com>";
+	return rc;
 }
 
 /**
@@ -65,6 +69,31 @@ QString TopoRouter::website() const
 QString TopoRouter::description() const
 {
 	return "Topological Auto Router";
+}
+
+/**
+  * @brief The license text
+  */
+QStringList TopoRouter::license() const
+{
+	QStringList rc;
+	rc << "GPL Version 2.0";
+	rc << "This program is free software; you can redistribute it and/or modify\n"
+			"it under the terms of the GNU General Public License as published\n"
+			"by the Free Software Foundation; either version 2 of the License,\n"
+			"or (at your option) any later version. \n"
+			"\n"
+			"This program is distributed in the hope that it will be useful, \n"
+			"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+			"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the \n"
+			"GNU General Public License for more details. \n"
+			"\n"
+			"You should have received a copy of the GNU General Public License \n"
+			"along with this program; if not, write to the \n"
+			"\n"
+			"Free Software Foundation, Inc.,\n"
+			"59 Temple Place - Suite 330,\nBoston, MA 02111-1307,\nU.S.A.\n";
+	return rc;
 }
 
 /**
