@@ -63,6 +63,7 @@ class CSpecctraObject : public QObject, public QGraphicsItem /* QGraphicsPathIte
 		virtual void					appendProperty(QStringList& property);
 		virtual void					appendChild(CSpecctraObject* child);
 
+		QList<CSpecctraObject*>			collect(QString oc);
 		CSpecctraObject*				parentObject(QString o="");
 		QString&						objectClass();
 		QStringList&					properties();

@@ -184,6 +184,26 @@ QString CSpecctraObject::toText(int lvl)
 }
 
 /**
+  * @return All child objects of objectClass
+  */
+QList<CSpecctraObject*> CSpecctraObject::collect(QString oc)
+{
+	QList<CSpecctraObject*> rc;
+	/* Am I one of them? */
+	if (this->objectClass() == oc)
+	{
+		rc += this;
+	}
+	/* Are any of my descendants one of them? */
+	for(int n=0; n < children().count(); n++)
+	{
+		rc += children().at(n)->collect(oc);
+	}
+	return rc;
+}
+
+
+/**
   * @return the root of the specctra object tree, should normally be a "pcb" object.
   */
 CSpecctraObject* CSpecctraObject::root()
