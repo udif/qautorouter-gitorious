@@ -8,13 +8,18 @@
 #include <cpcb.h>
 #include <cpcbnetwork.h>
 #include <cpcbnet.h>
+#include <cpcbpin.h>
 #include <cpcbstructure.h>
 #include <cpcbboundary.h>
 #include <cgpadstack.h>
 #include <cutil.h>
 #include <cgsegment.h>
 #include <cgwire.h>
-
+#include <cpcbpadstack.h>
+#include <cpcbshape.h>
+#include <cpcbplace.h>
+#include <cpcbplacement.h>
+#include <iostream>
 
 int
 toporouter(int argc, char **argv, int x, int y);
@@ -238,28 +243,63 @@ void TopoRouter::route(CPcbNet* net, CGSegment* segment)
   */
 void TopoRouter::route()
 {
-	while( netStack().count() )
-	{
-                CPcbNet* net = netStack().pop();
-		selectNet(net,true);
-		#warning Parse all pads here
-		#if 0
-                for( int Pads=0; running() && Pads < net->padstacks(); Pads++)
-		{
-                    CGPadstack *PadStack = net->padstack(Pads);
-                    QStringList Layers = PadStack->layers();
-                    for(int LayerNum = 0; LayerNum  < Layers.count(); LayerNum ++)
-                    {
-                        CGPad *Shape = PadStack->layer(Layers.at(LayerNum));
-                        cout <<"Found pad on layer << Layers.at(LayerNum) << endl;
-                    }
-		}
-		selectNet(net,false);
-		#endif
-        }
-	toporouter(0, NULL, 0, 0);
-	setState(Idle);
+    if(pcb())
+    {
+        QList<CSpecctraObject*> Places = pcb()->collect("place");
 
+        for(int PlaceNum=0; PlaceNum < Places.count(); PlaceNum ++)
+        {
+            CPcbPlace* Place = (CPcbPlace*)Places.at(PlaceNum);
+            
+            /* We've got the absolute position of our component */
+            std::cout << "Component: " << Place->pos().x() << " x " << Place->pos().y() << ", rot: " << Place->rotation() << std::endl;
+            
+            QTransform Transform;
+
+            /* Apply the global translation (first so will be applied last) */
+            Transform.translate(Place->pos().x(), -Place->pos().y());
+
+            /* Apply the rotation to be applied first */
+            Transform.rotate(Place->rotation(), Qt::ZAxis);
+
+            for(int PadNum = 0; PadNum < Place->pads(); PadNum ++)
+            {
+                CPcbPin* Pin = Place->pin(Place->pad(PadNum)->pinRef());
+                std::cout << "Pin " << qPrintable(Place->pad(PadNum)->pinRef()) << ": " << Pin->pos().x() << "," << Pin->pos().y() << std::endl;
+
+                for(int ShapeNum = 0; ShapeNum < Pin->padstack()->shapes(); ShapeNum ++)
+                {
+                    CPcbShape* Shape = Pin->padstack()->shape(ShapeNum);
+                    qreal X1,Y1,X2,Y2;
+                    qreal XOut1, YOut1, XOut2, YOut2;
+                    Shape->shape().boundingRect().getCoords(&X1, &Y1, &X2, &Y2);
+                    std::cout << "Shape: " << X1 << "," << Y1 << " x " << X2 << "," << Y2 << std::endl;
+                    
+                    /* For this pad, calculate where it is relative to the component centre */
+                    X1 += Pin->pos().x();
+                    X2 += Pin->pos().x();
+                    Y1 += Pin->pos().y();
+                    Y2 += Pin->pos().y();
+                    std::cout << "ShapeTranslated: " << X1 << "," << Y1 << " x " << X2 << "," << Y2 << std::endl;
+
+                    /* Then transform it by the component position / orientation matrix */
+                    Transform.map(X1, Y1, &XOut1, &YOut1);
+                    Transform.map(X2, Y2, &XOut2, &YOut2);
+
+                    /* And to be like geda we need to be 0.01 mil */
+                    XOut1 *= 100;
+                    YOut1 *= 100;
+                    XOut2 *= 100;
+                    YOut2 *= 100;
+
+                    std::cout << "ShapeTransformed: " << XOut1 << "," << YOut1 << " x " << XOut2 << "," << YOut2 << std::endl;
+                }
+            }
+
+        }
+        toporouter(0, NULL, 0, 0);
+        setState(Idle);
+    }
 }
 
 /**
