@@ -1,0 +1,62 @@
+# EESchema Netlist Version 1.1 created  19/04/2012 12:44:46
+(
+ ( /4F8FF0F4 DIP-6__300 P1 CONN_6
+  ( 1 N-000005 )
+  ( 2 N-000004 )
+  ( 3 N-000003 )
+  ( 4 GND )
+  ( 5 GND )
+  ( 6 GND )
+ )
+ ( /4F8FF8A5 R3 R1 10K
+  ( 1 N-000005 )
+  ( 2 N-000008 )
+ )
+ ( /4F8FF8AD R3 R2 10K
+  ( 1 N-000004 )
+  ( 2 N-000008 )
+ )
+ ( /4F8FF8AF R3 R3 10K
+  ( 1 N-000008 )
+  ( 2 N-000007 )
+ )
+ ( /4F8FF8CA SO8E U1 TL072
+  ( 1 N-000007 )
+  ( 2 N-000008 )
+  ( 3 GND )
+  ( 4 VEE )
+  ( 8 VCC )
+ )
+ ( /4F8FF8D2 SO8E U2 TL072
+  ( 1 N-000003 )
+  ( 2 N-000003 )
+  ( 3 N-000007 )
+  ( 4 VEE )
+  ( 8 VCC )
+ )
+)
+*
+{ Allowed footprints by component:
+$component R1
+ R?
+ SM0603
+ SM0805
+ R?-*
+ SM1206
+$endlist
+$component R2
+ R?
+ SM0603
+ SM0805
+ R?-*
+ SM1206
+$endlist
+$component R3
+ R?
+ SM0603
+ SM0805
+ R?-*
+ SM1206
+$endlist
+$endfootprintlist
+}

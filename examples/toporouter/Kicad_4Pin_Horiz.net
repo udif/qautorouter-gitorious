@@ -1,0 +1,29 @@
+# EESchema Netlist Version 1.1 created  Fri 20 Apr 2012 07:24:08 BST
+(
+ ( /4F9100D8 SM1206 R1 10K
+  ( 1 N-000002 )
+  ( 2 N-000001 )
+ )
+ ( /4F9100DB SM1206 R2 5K
+  ( 1 N-000002 )
+  ( 2 N-000001 )
+ )
+)
+*
+{ Allowed footprints by component:
+$component R1
+ R?
+ SM0603
+ SM0805
+ R?-*
+ SM1206
+$endlist
+$component R2
+ R?
+ SM0603
+ SM0805
+ R?-*
+ SM1206
+$endlist
+$endfootprintlist
+}
