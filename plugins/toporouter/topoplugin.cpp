@@ -21,9 +21,6 @@
 #include <cpcbplacement.h>
 #include <iostream>
 
-int
-toporouter(int argc, char **argv, int x, int y);
-
 /**
   * @return plugin type
   */
@@ -154,12 +151,16 @@ bool TopoRouter::start(CPcb* pcb)
 	mPcb = pcb;
 	setState(Idle);
 	mStartTime = QDateTime::currentDateTime();
-	if ( mPcb != NULL && mPcb->network() != NULL )
+
+        TopoRouterHandle = toporouter_new();
+
+        if ( mPcb != NULL && mPcb->network() != NULL && TopoRouterHandle != NULL)
 	{
-		setState(Selecting);
-		QObject::connect(this,SIGNAL(status(QString)),mPcb,SIGNAL(status(QString)));
-		QObject::connect(this,SIGNAL(clearCache()),mPcb,SLOT(clearCache()));
-		return true;
+            AllocateLayers(TopoRouterHandle, mPcb->structure()->layers());
+            setState(Selecting);
+            QObject::connect(this,SIGNAL(status(QString)),mPcb,SIGNAL(status(QString)));
+            QObject::connect(this,SIGNAL(clearCache()),mPcb,SLOT(clearCache()));
+            return true;
 	}
 	return false;
 }
@@ -270,11 +271,25 @@ void TopoRouter::route()
                 for(int ShapeNum = 0; ShapeNum < Pin->padstack()->shapes(); ShapeNum ++)
                 {
                     CPcbShape* Shape = Pin->padstack()->shape(ShapeNum);
+                    int Layer;
                     qreal X1,Y1,X2,Y2;
                     qreal XOut1, YOut1, XOut2, YOut2;
+
                     Shape->shape().boundingRect().getCoords(&X1, &Y1, &X2, &Y2);
+
                     std::cout << "Shape: " << X1 << "," << Y1 << " x " << X2 << "," << Y2 << std::endl;
-                    
+                    std::cout << "    Layer: " << qPrintable(Shape->layer()) << std::endl;
+
+#warning Add proper layer support
+                    if(Shape->layer().contains("Front"))
+                    {
+                        Layer = 0;
+                    }
+                    else
+                    {
+                        Layer = 1;
+                    }
+
                     /* For this pad, calculate where it is relative to the component centre */
                     X1 += Pin->pos().x();
                     X2 += Pin->pos().x();
@@ -293,11 +308,14 @@ void TopoRouter::route()
                     YOut2 *= 100;
 
                     std::cout << "ShapeTransformed: " << XOut1 << "," << YOut1 << " x " << XOut2 << "," << YOut2 << std::endl;
+
+                    AddPad(TopoRouterHandle, (char *)qPrintable(Place->pad(PadNum)->pinRef()),
+                            XOut1, YOut1, XOut2, YOut2, XOut2-XOut1, 1500, SQUAREFLAG, Layer);
                 }
             }
 
         }
-        toporouter(0, NULL, 0, 0);
+        toporoute(TopoRouterHandle);
         setState(Idle);
     }
 }

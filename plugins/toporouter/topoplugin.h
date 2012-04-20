@@ -2,8 +2,8 @@
 * Copyright (C) Pike Aerospace Research Corporation                            *
 * Author: Mike Sharkey <mike@pikeaero.com>                                     *
 *******************************************************************************/
-#ifndef TOPOROUTER_H
-#define TOPOROUTER_H
+#ifndef TOPOPLUGIN_H
+#define TOPOPLUGIN_H
 
 #include <QObject>
 #include <QString>
@@ -12,6 +12,8 @@
 #include <QRectF>
 #include <QStack>
 #include <cplugininterface.h>
+
+#include "toporouter.h"
 
 class CPcb;
 class CPcbNet;
@@ -27,11 +29,11 @@ class TopoRouter : public QObject, public CPluginInterface
 
 		virtual QString				title() const;					/* a brief name for the plugin */
 		virtual QString				version() const;				/* return a version number string */
-		virtual QStringList			credits() const;				/* name of authors + email */
+		virtual QStringList			credits() const;	
 		virtual QString				website() const;				/* the author's website */
 		virtual QString				description() const;			/* a brief description of the plugin */
-		virtual QStringList			license() const;				/* the license text for the plugin */
-
+		virtual QStringList			license() const;	
+    
 		virtual bool				start(CPcb* pcb);				/** initialize, gets' called once prior to exec() being called */
 		virtual void				stop();							/** stop processing */
 		virtual bool				exec();							/** get's called repeatedly while exec() returns true, return false to stop */
@@ -56,7 +58,7 @@ class TopoRouter : public QObject, public CPluginInterface
                 void						route(CPcbNet* net,CGSegment*);
 
 		void						initializeBox();				/** initialize the expanding box */
-		void						expandBox();					/** expand the bounding box */
+                void						expandBox();					/** expand the bounding box */
 
 		QStack<CPcbNet*>&			netStack()	{return mNetStack;}
 
@@ -65,7 +67,8 @@ class TopoRouter : public QObject, public CPluginInterface
 		QDateTime					mStartTime;
 		tRunState					mState;
 		QStack<CPcbNet*>			mNetStack;						/** the current work stack */
-		QRectF						mBoundingBox;					/** the expanding bounding box */
+                QRectF						mBoundingBox;					/** the expanding bounding box */
+                toporouter_t*                            TopoRouterHandle;
 };
 
 #endif // TOPOROUTER_H

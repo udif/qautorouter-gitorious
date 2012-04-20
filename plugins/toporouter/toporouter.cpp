@@ -2236,18 +2236,25 @@ int read_pads(toporouter_t *r, toporouter_layer_t *l, guint layer)
 
 }
 
-void AddPad(gdouble P1X, gdouble P1Y, gdouble P2X, gdouble P2Y, gdouble Thickness, ShapeType Shape)
+void AddPad(toporouter_t *r, char *Name,
+            gdouble P1X, gdouble P1Y, gdouble P2X, gdouble P2Y,gdouble Thickness,
+            gdouble Radius, ShapeType Shape, unsigned int Layer)
 {
-#if 0
     toporouter_spoint_t p[2], rv[5];
     gdouble x[2], y[2], t, m;
     GList *objectconstraints;
-
+    toporouter_layer_t *l = &(r->layers[Layer]);
     GList *vlist = NULL;
     toporouter_bbox_t *bbox = NULL;
-
+    PadType *NewPad = (PadType *)g_malloc(sizeof(PadType));
+#warning Memory leak: This is never freed!
     objectconstraints = NULL;
 
+    if(!NewPad)
+    {
+        printf("Could not allocate memory for pad\n");
+        exit(1);
+    }
     t = Thickness / 2.0f;
     x[0] = P1X;
     x[1] = P2X;
@@ -2262,15 +2269,20 @@ void AddPad(gdouble P1X, gdouble P1Y, gdouble P2X, gdouble P2Y, gdouble Thicknes
         if(x[0] == x[1] && y[0] == y[1])
         {
             /* Pad is square */
-            vlist = rect_with_attachments(pad_rad(pad),
+            vlist = rect_with_attachments(Radius,
                 x[0]-t, y[0]-t,
                 x[0]-t, y[0]+t,
                 x[0]+t, y[0]+t,
                 x[0]+t, y[0]-t,
-                l - r->layers);
-            bbox = toporouter_bbox_create(l - r->layers, vlist, PAD, pad);
+                Layer);
+            NewPad->Name = Name;
+            NewPad->Thickness = Thickness;
+            NewPad->Type = Shape;
+
+            bbox = toporouter_bbox_create(Layer, vlist, PAD, NewPad);
             r->bboxes = g_slist_prepend(r->bboxes, bbox);
             insert_constraints_from_list(r, l, vlist, bbox);
+
             g_list_free(vlist);
 
             bbox->point = GTS_POINT( insert_vertex(r, l, x[0], y[0], bbox) );
@@ -2298,16 +2310,29 @@ void AddPad(gdouble P1X, gdouble P1Y, gdouble P2X, gdouble P2Y, gdouble Thicknes
                 rv[4].x = rv[0].x; rv[4].y = rv[0].y;
             }
 
-            vlist = rect_with_attachments(pad_rad(pad),
-            rv[1].x, rv[1].y,
-            rv[2].x, rv[2].y,
-            rv[3].x, rv[3].y,
-            rv[4].x, rv[4].y,
-            l - r->layers);
-            bbox = toporouter_bbox_create(l - r->layers, vlist, PAD, pad);
+            vlist = rect_with_attachments(Radius,
+                rv[1].x, rv[1].y,
+                rv[2].x, rv[2].y,
+                rv[3].x, rv[3].y,
+                rv[4].x, rv[4].y,
+                Layer);
+
+            NewPad->Name = Name;
+            NewPad->Thickness = Thickness;
+            NewPad->Type = Shape;
+
+            bbox = toporouter_bbox_create(Layer, vlist, PAD, NewPad);
             r->bboxes = g_slist_prepend(r->bboxes, bbox);
             insert_constraints_from_list(r, l, vlist, bbox);
             g_list_free(vlist);
+
+            printf("Pad: OBLONG : rect_with_attachments(%2.2f, %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f)\n",
+                            (double)Radius,
+                            (double)rv[1].x, (double)rv[1].y,
+                            (double)rv[2].x, (double)rv[2].y,
+                            (double)rv[3].x, (double)rv[3].y,
+                            (double)rv[4].x, (double)rv[4].y,
+                            (double)(Layer));
 
             //bbox->point = GTS_POINT( gts_vertex_new(vertex_class, (x[0] + x[1]) / 2., (y[0] + y[1]) / 2., 0.) );
             bbox->point = GTS_POINT( insert_vertex(r, l, (x[0] + x[1]) / 2., (y[0] + y[1]) / 2., bbox) );
@@ -2323,13 +2348,13 @@ void AddPad(gdouble P1X, gdouble P1Y, gdouble P2X, gdouble P2Y, gdouble Thicknes
             /* One point */
 
             /* bounding box same as square pad */
-            vlist = rect_with_attachments(pad_rad(pad),
+            vlist = rect_with_attachments(Radius,
             x[0]-t, y[0]-t,
             x[0]-t, y[0]+t,
             x[0]+t, y[0]+t,
             x[0]+t, y[0]-t,
             l - r->layers);
-            bbox = toporouter_bbox_create(l - r->layers, vlist, PAD, pad);
+            bbox = toporouter_bbox_create(l - r->layers, vlist, PAD, NewPad);
             r->bboxes = g_slist_prepend(r->bboxes, bbox);
             g_list_free(vlist);
 
@@ -2360,13 +2385,13 @@ void AddPad(gdouble P1X, gdouble P1Y, gdouble P2X, gdouble P2Y, gdouble Thicknes
                 rv[4].x = rv[0].x; rv[4].y = rv[0].y;
             }
 
-            vlist = rect_with_attachments(pad_rad(pad),
+            vlist = rect_with_attachments(Radius,
             rv[1].x, rv[1].y,
             rv[2].x, rv[2].y,
             rv[3].x, rv[3].y,
             rv[4].x, rv[4].y,
             l - r->layers);
-            bbox = toporouter_bbox_create(l - r->layers, vlist, PAD, pad);
+            bbox = toporouter_bbox_create(l - r->layers, vlist, PAD, NewPad);
             r->bboxes = g_slist_prepend(r->bboxes, bbox);
             insert_constraints_from_list(r, l, vlist, bbox);
             g_list_free(vlist);
@@ -2377,7 +2402,6 @@ void AddPad(gdouble P1X, gdouble P1Y, gdouble P2X, gdouble P2Y, gdouble Thicknes
             //bbox->constraints = g_list_concat(bbox->constraints, insert_constraint_edge(r, l, x[0], y[0], x[1], y[1], bbox));
         }
     }
-#endif
 }
 
 int
@@ -3062,6 +3086,26 @@ import_clusters(toporouter_t *r)
   FreeNetListListMemory(&nets);
 }
 #endif
+
+void AllocateLayers(toporouter_t *r, int NumLayers)
+{
+    unsigned int i;
+    r->layers = (toporouter_layer_t *)g_malloc(NumLayers * sizeof(toporouter_layer_t));
+#warning Memory never freed
+    if(!r->layers)
+    {
+        printf("Cannot allocate space for layers, exiting..\n");
+        exit(1);
+    }
+    else
+    {
+        for(i = 0; i < NumLayers; i ++)
+        {
+            r->layers[i].vertices = NULL;
+            r->layers[i].constraints = NULL;
+        }
+    }
+}
 
 void
 import_geometry(toporouter_t *r)
@@ -8132,6 +8176,30 @@ toporouter_set_pair(toporouter_t *r, toporouter_netlist_t *n1, toporouter_netlis
   n1->pair = n2;
   n2->pair = n1;
   return 1;
+}
+
+int toporoute(toporouter_t *r)
+{
+  import_geometry(r);
+  acquire_twonets(r);
+
+  hybrid_router(r);
+/*
+  for(gint i=0;i<groupcount();i++) {
+   gts_surface_foreach_edge(r->layers[i].surface, space_edge, NULL);
+  }
+  {
+        int i;
+        for(i=0;i<groupcount();i++) {
+          char buffer[256];
+          sprintf(buffer, "route%d.png", i);
+          toporouter_draw_surface(r, r->layers[i].surface, buffer, 1024, 1024, 2, NULL, i, NULL);
+        }
+  }
+*/
+  toporouter_export(r);
+
+  return 0;
 }
 
 int

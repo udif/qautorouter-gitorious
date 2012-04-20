@@ -134,7 +134,6 @@ typedef struct
     gdouble LineThickness;
     gdouble Keepaway;
 } SettingsType;
-
 #endif
 
 #include <stdlib.h>
@@ -571,5 +570,12 @@ typedef struct {
 
 #define FOREACH_END }} while(0)
 
+
+int toporoute(toporouter_t *r);
+toporouter_t *toporouter_new(void);
+void AddPad(toporouter_t *r, char *Name,
+            gdouble P1X, gdouble P1Y, gdouble P2X, gdouble P2Y,gdouble Thickness,
+            gdouble Radius, ShapeType Shape, unsigned int Layer);
+void AllocateLayers(toporouter_t *r, int NumLayers);
 
 #endif // TOPOROUTER_H
