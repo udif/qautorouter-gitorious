@@ -59,7 +59,8 @@ class TopoRouter : public QObject, public CPluginInterface
 
 		void						initializeBox();				/** initialize the expanding box */
                 void						expandBox();					/** expand the bounding box */
-
+                void                                            getPads();                                      /** Assemble PCB's pads */
+                void                                            getNets();                                      /** Assemble PCB's nets */
 		QStack<CPcbNet*>&			netStack()	{return mNetStack;}
 
 	private:

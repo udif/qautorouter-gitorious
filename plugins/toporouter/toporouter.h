@@ -573,9 +573,12 @@ typedef struct {
 
 int toporoute(toporouter_t *r);
 toporouter_t *toporouter_new(void);
-void AddPad(toporouter_t *r, char *Name,
+PadType *AddPad(toporouter_t *r, char *Name,
             gdouble P1X, gdouble P1Y, gdouble P2X, gdouble P2Y,gdouble Thickness,
             gdouble Radius, ShapeType Shape, unsigned int Layer);
 void AllocateLayers(toporouter_t *r, int NumLayers);
-
+toporouter_bbox_t *toporouter_bbox_locate(toporouter_t *r, toporouter_term_t type, void *data, gdouble x, gdouble y, guint layergroup);
+toporouter_netlist_t *netlist_create(toporouter_t *r, char *netlist, char *style);
+toporouter_cluster_t *cluster_create(toporouter_t *r, toporouter_netlist_t *netlist);
+void cluster_join_bbox(toporouter_cluster_t *cluster, toporouter_bbox_t *box);
 #endif // TOPOROUTER_H

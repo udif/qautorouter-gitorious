@@ -21,6 +21,8 @@
 #include <cpcbplacement.h>
 #include <iostream>
 
+#define GEDA_SCALE 100
+
 /**
   * @return plugin type
   */
@@ -240,9 +242,9 @@ void TopoRouter::route(CPcbNet* net, CGSegment* segment)
 }
 
 /**
-  * @brief route the current net.
+  * @brief Assemble the PCB's pads into toporouter structures
   */
-void TopoRouter::route()
+void TopoRouter::getPads()
 {
     if(pcb())
     {
@@ -251,14 +253,14 @@ void TopoRouter::route()
         for(int PlaceNum=0; PlaceNum < Places.count(); PlaceNum ++)
         {
             CPcbPlace* Place = (CPcbPlace*)Places.at(PlaceNum);
-            
+
             /* We've got the absolute position of our component */
             std::cout << "Component: " << Place->pos().x() << " x " << Place->pos().y() << ", rot: " << Place->rotation() << std::endl;
-            
+
             QTransform Transform;
 
             /* Apply the global translation (first so will be applied last) */
-            Transform.translate(Place->pos().x(), -Place->pos().y());
+            Transform.translate(Place->pos().x(), Place->pos().y());
 
             /* Apply the rotation to be applied first */
             Transform.rotate(Place->rotation(), Qt::ZAxis);
@@ -302,10 +304,10 @@ void TopoRouter::route()
                     Transform.map(X2, Y2, &XOut2, &YOut2);
 
                     /* And to be like geda we need to be 0.01 mil */
-                    XOut1 *= 100;
-                    YOut1 *= 100;
-                    XOut2 *= 100;
-                    YOut2 *= 100;
+                    XOut1 *= GEDA_SCALE;
+                    YOut1 *= GEDA_SCALE;
+                    XOut2 *= GEDA_SCALE;
+                    YOut2 *= GEDA_SCALE;
 
                     std::cout << "ShapeTransformed: " << XOut1 << "," << YOut1 << " x " << XOut2 << "," << YOut2 << std::endl;
 
@@ -315,6 +317,65 @@ void TopoRouter::route()
             }
 
         }
+    }
+}
+
+/**
+  * @brief Assemble the PCB's nets into toporouter structures
+  */
+void TopoRouter::getNets()
+{
+    if(pcb())
+    {
+        QList<CSpecctraObject*> Nets = pcb()->collect("net");
+
+        for(int NetNum=0; NetNum < Nets.count(); NetNum ++)
+        {
+            CPcbNet* Net = (CPcbNet*)Nets.at(NetNum);
+            std::cout << "New net " << qPrintable(Net->name()) << std::endl;
+
+            // No idea what the last argument (char *Style) is and why we need it.. NULL in examples I've looked at so far
+            toporouter_netlist_t *TopoNetList = netlist_create(TopoRouterHandle, (char *)qPrintable(Net->name()), NULL);
+
+            for(int PadStackNum = 0; PadStackNum < Net->padstacks(); PadStackNum ++)
+            {
+                CGPadstack *PadStack = Net->padstack(PadStackNum);
+
+                if(PadStack->segments() >= 1)
+                {
+                    // Presuming we only have one segment.. Can we have more??
+                    std::cout << "Pos: " << PadStack->segment(0)->origin().x() << "," << PadStack->segment(0)->origin().y() << std::endl;
+                    toporouter_cluster_t *TopoCluster = cluster_create(TopoRouterHandle, TopoNetList);
+
+    #warning Nets should be supporting more than pads
+    #warning Last arg (0) is layer.. We should support other layers
+#warning Third arg is the pointer to the data type. This is how the relevant TopoBox is actually found. It cant be null
+                    toporouter_bbox_t *TopoBox = toporouter_bbox_locate(TopoRouterHandle, PAD, NULL,
+                            PadStack->segment(0)->origin().x() * GEDA_SCALE, PadStack->segment(0)->origin().y() * GEDA_SCALE, 0);
+                    if(TopoBox)
+                    {
+                        cluster_join_bbox(TopoCluster, TopoBox);
+                    }
+                    else
+                    {
+                        std::cout << "Could not locate pad" << std::endl;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+  * @brief route the current net.
+  */
+void TopoRouter::route()
+{
+
+    if(pcb())
+    {
+        getPads();
+        getNets();
         toporoute(TopoRouterHandle);
         setState(Idle);
     }

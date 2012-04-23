@@ -2236,7 +2236,7 @@ int read_pads(toporouter_t *r, toporouter_layer_t *l, guint layer)
 
 }
 
-void AddPad(toporouter_t *r, char *Name,
+PadType *AddPad(toporouter_t *r, char *Name,
             gdouble P1X, gdouble P1Y, gdouble P2X, gdouble P2Y,gdouble Thickness,
             gdouble Radius, ShapeType Shape, unsigned int Layer)
 {
@@ -2402,6 +2402,7 @@ void AddPad(toporouter_t *r, char *Name,
             //bbox->constraints = g_list_concat(bbox->constraints, insert_constraint_edge(r, l, x[0], y[0], x[1], y[1], bbox));
         }
     }
+    return NewPad;
 }
 
 int
