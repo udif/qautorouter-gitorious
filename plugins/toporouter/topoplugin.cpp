@@ -158,7 +158,17 @@ bool TopoRouter::start(CPcb* pcb)
 
         if ( mPcb != NULL && mPcb->network() != NULL && TopoRouterHandle != NULL)
 	{
+            CPcbStructure *S = mPcb->structure();
+            CPcbBoundary *B = S->boundary();
+
+            TopoSetSettings(1, 800);
+            //std::cout << "PCB Size : " << mPcb->structure()->boundary()->boundingRect().x() << std::endl;
+
+            //TopoSetPCBSettings(mPcb->structure()->boundary()->boundingRect().x() * GEDA_SCALE, mPcb->structure()->boundingRect().y() * GEDA_SCALE, mPcb->structure()->layers());
+            TopoSetPCBSettings(10000 * GEDA_SCALE, -10000 * GEDA_SCALE, mPcb->structure()->layers());
+
             AllocateLayers(TopoRouterHandle, mPcb->structure()->layers());
+
             setState(Selecting);
             QObject::connect(this,SIGNAL(status(QString)),mPcb,SIGNAL(status(QString)));
             QObject::connect(this,SIGNAL(clearCache()),mPcb,SLOT(clearCache()));
@@ -255,7 +265,7 @@ void TopoRouter::getPads()
             CPcbPlace* Place = (CPcbPlace*)Places.at(PlaceNum);
 
             /* We've got the absolute position of our component */
-            std::cout << "Component: " << Place->pos().x() << " x " << Place->pos().y() << ", rot: " << Place->rotation() << std::endl;
+            std::cout << "Component: " << qPrintable(Place->unit()) << ", " << Place->pos().x() << " x " << Place->pos().y() << ", rot: " << Place->rotation() << std::endl;
 
             QTransform Transform;
 
@@ -267,8 +277,13 @@ void TopoRouter::getPads()
 
             for(int PadNum = 0; PadNum < Place->pads(); PadNum ++)
             {
+                QString PinName = Place->unit();
+                qreal OriginX, OriginY;
                 CPcbPin* Pin = Place->pin(Place->pad(PadNum)->pinRef());
+
                 std::cout << "Pin " << qPrintable(Place->pad(PadNum)->pinRef()) << ": " << Pin->pos().x() << "," << Pin->pos().y() << std::endl;
+                PinName.append("-");
+                PinName.append(Place->pad(PadNum)->pinRef());
 
                 for(int ShapeNum = 0; ShapeNum < Pin->padstack()->shapes(); ShapeNum ++)
                 {
@@ -277,7 +292,12 @@ void TopoRouter::getPads()
                     qreal X1,Y1,X2,Y2;
                     qreal XOut1, YOut1, XOut2, YOut2;
 
+
                     Shape->shape().boundingRect().getCoords(&X1, &Y1, &X2, &Y2);
+
+
+                    OriginX = Pin->pos().x();
+                    OriginY = Pin->pos().y();
 
                     std::cout << "Shape: " << X1 << "," << Y1 << " x " << X2 << "," << Y2 << std::endl;
                     std::cout << "    Layer: " << qPrintable(Shape->layer()) << std::endl;
@@ -302,22 +322,55 @@ void TopoRouter::getPads()
                     /* Then transform it by the component position / orientation matrix */
                     Transform.map(X1, Y1, &XOut1, &YOut1);
                     Transform.map(X2, Y2, &XOut2, &YOut2);
+                    Transform.map(OriginX, OriginY, &OriginX, &OriginY);
 
                     /* And to be like geda we need to be 0.01 mil */
                     XOut1 *= GEDA_SCALE;
                     YOut1 *= GEDA_SCALE;
                     XOut2 *= GEDA_SCALE;
                     YOut2 *= GEDA_SCALE;
+                    OriginX *= GEDA_SCALE;
+                    OriginY *= GEDA_SCALE;
 
-                    std::cout << "ShapeTransformed: " << XOut1 << "," << YOut1 << " x " << XOut2 << "," << YOut2 << std::endl;
+                    std::cout << "Shape " << qPrintable(PinName) << " Transformed: " << XOut1 << "," << YOut1 << " x " << XOut2 << "," << YOut2 << std::endl;
 
-                    AddPad(TopoRouterHandle, (char *)qPrintable(Place->pad(PadNum)->pinRef()),
-                            XOut1, YOut1, XOut2, YOut2, XOut2-XOut1, 1500, SQUAREFLAG, Layer);
+                    UsedPadList.append(AddPad(TopoRouterHandle, (char *)qPrintable(PinName),
+                            XOut1, YOut1, XOut2, YOut2, XOut2-XOut1, 1500, SQUAREFLAG, Layer,
+                            OriginX, OriginY));
                 }
             }
 
         }
+        for(int i = 0; i < mPcb->structure()->layers(); i++)
+        {
+            build_cdt(TopoRouterHandle, &(TopoRouterHandle->layers[i]));
+        }
     }
+}
+
+/**
+  * @brief Find a pad from PadName like "R2-2" on layer Layer.. Found in QList UsedPads
+  */
+PadType *TopoRouter::FindPad(QString PadName, int Layer)
+{
+    int i = 0;
+    PadType *Ret = NULL;
+
+    while((i < UsedPadList.count()) && (!Ret))
+    {
+        PadType *Pad = (PadType *)UsedPadList.at(i);
+        if(0 == PadName.compare(Pad->Name))
+        {
+            //std::cout << "Pad compare found: [" << Pad->Name << "][" << qPrintable(PadName) << "]" << std::endl;
+            Ret = Pad;
+        }
+        i ++;
+    }
+    if(NULL == Ret)
+    {
+        std::cout << "Couldn't find pad " << qPrintable(PadName) << std::endl;
+    }
+    return Ret;
 }
 
 /**
@@ -327,6 +380,8 @@ void TopoRouter::getNets()
 {
     if(pcb())
     {
+        TopoRouterHandle->bboxtree = gts_bb_tree_new(TopoRouterHandle->bboxes);
+
         QList<CSpecctraObject*> Nets = pcb()->collect("net");
 
         for(int NetNum=0; NetNum < Nets.count(); NetNum ++)
@@ -341,25 +396,25 @@ void TopoRouter::getNets()
             {
                 CGPadstack *PadStack = Net->padstack(PadStackNum);
 
-                if(PadStack->segments() >= 1)
-                {
-                    // Presuming we only have one segment.. Can we have more??
-                    std::cout << "Pos: " << PadStack->segment(0)->origin().x() << "," << PadStack->segment(0)->origin().y() << std::endl;
-                    toporouter_cluster_t *TopoCluster = cluster_create(TopoRouterHandle, TopoNetList);
+                PadType *Pad = FindPad(PadStack->unitRef(), 0);
 
-    #warning Nets should be supporting more than pads
-    #warning Last arg (0) is layer.. We should support other layers
-#warning Third arg is the pointer to the data type. This is how the relevant TopoBox is actually found. It cant be null
-                    toporouter_bbox_t *TopoBox = toporouter_bbox_locate(TopoRouterHandle, PAD, NULL,
-                            PadStack->segment(0)->origin().x() * GEDA_SCALE, PadStack->segment(0)->origin().y() * GEDA_SCALE, 0);
-                    if(TopoBox)
-                    {
-                        cluster_join_bbox(TopoCluster, TopoBox);
-                    }
-                    else
-                    {
-                        std::cout << "Could not locate pad" << std::endl;
-                    }
+                // Presuming we only have one segment.. Can we have more??
+                std::cout << "Pin: " << qPrintable(PadStack->unitRef()) << ", Pos: " << Pad->Origin.X << "," << Pad->Origin.Y << std::endl;
+
+                toporouter_cluster_t *TopoCluster = cluster_create(TopoRouterHandle, TopoNetList);
+
+#warning Nets should be supporting more than pads
+#warning Last arg (0) is layer.. We should support other layers
+                toporouter_bbox_t *TopoBox = toporouter_bbox_locate(TopoRouterHandle, PAD, Pad,
+                    Pad->Origin.X, Pad->Origin.Y, 0);
+
+                if(TopoBox)
+                {
+                    cluster_join_bbox(TopoCluster, TopoBox);
+                }
+                else
+                {
+                    std::cout << "Could not locate pad" << std::endl;
                 }
             }
         }

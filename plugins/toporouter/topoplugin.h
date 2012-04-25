@@ -61,15 +61,17 @@ class TopoRouter : public QObject, public CPluginInterface
                 void						expandBox();					/** expand the bounding box */
                 void                                            getPads();                                      /** Assemble PCB's pads */
                 void                                            getNets();                                      /** Assemble PCB's nets */
-		QStack<CPcbNet*>&			netStack()	{return mNetStack;}
+                QStack<CPcbNet*>&                               netStack()	{return mNetStack;}
+                PadType*                                        FindPad(QString PadName, int Layer);
 
 	private:
 		CPcb*						mPcb;
 		QDateTime					mStartTime;
 		tRunState					mState;
-		QStack<CPcbNet*>			mNetStack;						/** the current work stack */
+                QStack<CPcbNet*>                                mNetStack;						/** the current work stack */
                 QRectF						mBoundingBox;					/** the expanding bounding box */
-                toporouter_t*                            TopoRouterHandle;
+                toporouter_t*                                   TopoRouterHandle;
+                QList<PadType *>                                UsedPadList;
 };
 
 #endif // TOPOROUTER_H

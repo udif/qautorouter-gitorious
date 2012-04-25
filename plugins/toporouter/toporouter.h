@@ -91,6 +91,7 @@ typedef struct
     Point Point2;
     gdouble Thickness;
     ShapeType Type;
+    Point Origin;
 } PadType;
 
 typedef struct
@@ -575,10 +576,14 @@ int toporoute(toporouter_t *r);
 toporouter_t *toporouter_new(void);
 PadType *AddPad(toporouter_t *r, char *Name,
             gdouble P1X, gdouble P1Y, gdouble P2X, gdouble P2Y,gdouble Thickness,
-            gdouble Radius, ShapeType Shape, unsigned int Layer);
+            gdouble Radius, ShapeType Shape, unsigned int Layer, gdouble OriginX, gdouble OriginY);
 void AllocateLayers(toporouter_t *r, int NumLayers);
 toporouter_bbox_t *toporouter_bbox_locate(toporouter_t *r, toporouter_term_t type, void *data, gdouble x, gdouble y, guint layergroup);
 toporouter_netlist_t *netlist_create(toporouter_t *r, char *netlist, char *style);
 toporouter_cluster_t *cluster_create(toporouter_t *r, toporouter_netlist_t *netlist);
 void cluster_join_bbox(toporouter_cluster_t *cluster, toporouter_bbox_t *box);
+void build_cdt(toporouter_t *r, toporouter_layer_t *l);
+int read_board_constraints(toporouter_t *r, toporouter_layer_t *l, int layer);
+void TopoSetSettings(gdouble Keepaway, gdouble LineThickness);
+void TopoSetPCBSettings(int MaxWidth, int MaxHeight, int NumLayers);
 #endif // TOPOROUTER_H

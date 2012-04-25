@@ -60,6 +60,19 @@ PCBType PCBStruct = {0};
 PCBType *PCB = &PCBStruct;
 SettingsType Settings;
 
+void TopoSetSettings(gdouble Keepaway, gdouble LineThickness)
+{
+    Settings.Keepaway = Keepaway;
+    Settings.LineThickness = LineThickness;
+}
+
+void TopoSetPCBSettings(int MaxWidth, int MaxHeight, int NumLayers)
+{
+    PCBStruct.MaxHeight = MaxHeight;
+    PCBStruct.MaxWidth = MaxWidth;
+    PCBStruct.NumLayers = NumLayers;
+}
+
 static void
 toporouter_edge_init (toporouter_edge_t *edge)
 {
@@ -2238,7 +2251,7 @@ int read_pads(toporouter_t *r, toporouter_layer_t *l, guint layer)
 
 PadType *AddPad(toporouter_t *r, char *Name,
             gdouble P1X, gdouble P1Y, gdouble P2X, gdouble P2Y,gdouble Thickness,
-            gdouble Radius, ShapeType Shape, unsigned int Layer)
+            gdouble Radius, ShapeType Shape, unsigned int Layer, gdouble OriginX, gdouble OriginY)
 {
     toporouter_spoint_t p[2], rv[5];
     gdouble x[2], y[2], t, m;
@@ -2261,6 +2274,21 @@ PadType *AddPad(toporouter_t *r, char *Name,
     y[0] = P1Y;
     y[1] = P2Y;
 
+#warning Memory leak: String needs to be freed
+    NewPad->Name = strdup(Name);
+    if(!NewPad->Name)
+    {
+        printf("Could not allocate memory for string\n");
+        exit(1);
+    }
+    NewPad->Thickness = Thickness;
+    NewPad->Type = Shape;
+    NewPad->Point1.X = P1X;
+    NewPad->Point1.Y = P1Y;
+    NewPad->Point2.X = P2X;
+    NewPad->Point2.Y = P2X;
+    NewPad->Origin.X = OriginX;
+    NewPad->Origin.Y = OriginY;
 
     if(SQUAREFLAG == Shape)
     {
@@ -2275,9 +2303,6 @@ PadType *AddPad(toporouter_t *r, char *Name,
                 x[0]+t, y[0]+t,
                 x[0]+t, y[0]-t,
                 Layer);
-            NewPad->Name = Name;
-            NewPad->Thickness = Thickness;
-            NewPad->Type = Shape;
 
             bbox = toporouter_bbox_create(Layer, vlist, PAD, NewPad);
             r->bboxes = g_slist_prepend(r->bboxes, bbox);
@@ -2317,17 +2342,14 @@ PadType *AddPad(toporouter_t *r, char *Name,
                 rv[4].x, rv[4].y,
                 Layer);
 
-            NewPad->Name = Name;
-            NewPad->Thickness = Thickness;
-            NewPad->Type = Shape;
 
             bbox = toporouter_bbox_create(Layer, vlist, PAD, NewPad);
             r->bboxes = g_slist_prepend(r->bboxes, bbox);
             insert_constraints_from_list(r, l, vlist, bbox);
             g_list_free(vlist);
 
-            printf("Pad: OBLONG : rect_with_attachments(%2.2f, %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f)\n",
-                            (double)Radius,
+            printf("Pad %s: OBLONG : rect_with_attachments(%2.2f, %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f)\n",
+                            NewPad->Name, (double)Radius,
                             (double)rv[1].x, (double)rv[1].y,
                             (double)rv[2].x, (double)rv[2].y,
                             (double)rv[3].x, (double)rv[3].y,
@@ -3104,6 +3126,12 @@ void AllocateLayers(toporouter_t *r, int NumLayers)
         {
             r->layers[i].vertices = NULL;
             r->layers[i].constraints = NULL;
+            r->layers[i].surface = NULL;
+            gdouble *layer = (gdouble *)malloc(sizeof(gdouble));
+            *layer = (double)i;
+            r->keepoutlayers = g_list_prepend(r->keepoutlayers, layer);
+
+            read_board_constraints(r, &(r->layers[i]), i);
         }
     }
 }
@@ -3182,8 +3210,6 @@ import_geometry(toporouter_t *r)
 	}
 
   }
-#else
-  #warning Actually read the PCB now...
 #endif
   r->bboxtree = gts_bb_tree_new(r->bboxes);
 
