@@ -2224,6 +2224,7 @@ read_lines(toporouter_t *r, toporouter_layer_t *l, LayerType *layer, int ln)
 	xs[1] = line->Point2.X;
 	ys[0] = line->Point1.Y;
 	ys[1] = line->Point2.Y;
+        printf("Line: %2.2f,%2.2fx%2.2f,%2.2f\n", line->Point1.X, line->Point1.Y, line->Point2.X, line->Point2.Y);
 	if(!(xs[0] == xs[1] && ys[0] == ys[1])) {
 	  vlist = g_list_prepend(NULL, gts_vertex_new (vertex_class, xs[0], ys[0], l - r->layers));
 	  vlist = g_list_prepend(vlist, gts_vertex_new (vertex_class, xs[1], ys[1], l - r->layers));
@@ -2620,11 +2621,13 @@ build_cdt(toporouter_t *r, toporouter_layer_t *l)
 check_cons_continuation:
   i = l->constraints;
   while (i) {
+      //printf("CDT:constraints i\n");
 	toporouter_constraint_t *c1 = TOPOROUTER_CONSTRAINT(i->data);
 	GList *j = i->next;
    // printf("adding cons: "); print_constraint(c1);
 
 	while(j) {
+          //  printf("CDT:constraints j\n");
 	  toporouter_constraint_t *c2 = TOPOROUTER_CONSTRAINT(j->data);
 	  guint rem = 0;
 	  GList *temp;
@@ -2796,6 +2799,7 @@ check_cons_continuation:
 
   i = l->vertices;
   while (i) {
+      //printf("CDT:vertex i\n");
 	//v = i->data;
 	//if(r->flags & TOPOROUTER_FLAG_DEBUG_CDTS)
   //  fprintf(stderr, "\tadding vertex %f,%f\n", v->p.x, v->p.y);
@@ -2808,13 +2812,14 @@ check_cons_continuation:
   }
   i = l->constraints;
   while (i) {
-
+        //printf("CDT:constraintsb  i\n");
 	// toporouter_constraint_t *c1 = TOPOROUTER_CONSTRAINT(i->data);
 	// printf("adding cons: "); print_constraint(c1);
 
 	GSList *conflicts = gts_delaunay_add_constraint (l->surface, (GtsConstraint *)i->data);
 	GSList *j = conflicts;
 	while(j) {
+            //printf("CDT:constraintsb j\n");
 	  if(TOPOROUTER_IS_CONSTRAINT(j->data)) {
 		toporouter_constraint_t *c2 = TOPOROUTER_CONSTRAINT(j->data);
 
@@ -2975,6 +2980,7 @@ cluster_create(toporouter_t *r, toporouter_netlist_t *netlist)
   g_ptr_array_add(netlist->clusters, c);
   c->netlist = netlist;
   c->boxes = g_ptr_array_new();
+  print_cluster(c);
 
   return c;
 }
@@ -3015,7 +3021,8 @@ toporouter_netlist_t *
 netlist_create(toporouter_t *r, char *netlist, char *style)
 {
   toporouter_netlist_t *nl = (toporouter_netlist_t *)malloc(sizeof(toporouter_netlist_t));
-  nl->netlist = netlist;
+#warning String memory not free'd'
+  nl->netlist = g_strdup(netlist);
   nl->style = style;
   nl->clusters = g_ptr_array_new();
   nl->routes = g_ptr_array_new();
@@ -8207,8 +8214,9 @@ toporouter_set_pair(toporouter_t *r, toporouter_netlist_t *n1, toporouter_netlis
 
 int toporoute(toporouter_t *r)
 {
-  import_geometry(r);
-  acquire_twonets(r);
+  //import_geometry(r);
+  //acquire_twonets(r);
+  r->bboxtree = gts_bb_tree_new(r->bboxes);
 
   hybrid_router(r);
 /*

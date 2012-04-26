@@ -387,10 +387,12 @@ void TopoRouter::getNets()
         for(int NetNum=0; NetNum < Nets.count(); NetNum ++)
         {
             CPcbNet* Net = (CPcbNet*)Nets.at(NetNum);
-            std::cout << "New net " << qPrintable(Net->name()) << std::endl;
+            QString NetName = Net->name();
+            NetName.replace("\"", "");
+            std::cout << "New net " << qPrintable(NetName) << std::endl;
 
             // No idea what the last argument (char *Style) is and why we need it.. NULL in examples I've looked at so far
-            toporouter_netlist_t *TopoNetList = netlist_create(TopoRouterHandle, (char *)qPrintable(Net->name()), NULL);
+            toporouter_netlist_t *TopoNetList = netlist_create(TopoRouterHandle, (char *)qPrintable(NetName), NULL);
 
             for(int PadStackNum = 0; PadStackNum < Net->padstacks(); PadStackNum ++)
             {
