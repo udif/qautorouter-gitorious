@@ -92,6 +92,7 @@ typedef struct
     gdouble Thickness;
     ShapeType Type;
     Point Origin;
+    unsigned int Group;
 } PadType;
 
 typedef struct
@@ -135,6 +136,14 @@ typedef struct
     gdouble LineThickness;
     gdouble Keepaway;
 } SettingsType;
+
+
+typedef struct
+{
+    PadType *Pad1;
+    PadType *Pad2;
+} RatLineType;
+
 #endif
 
 #include <stdlib.h>
@@ -586,4 +595,6 @@ void build_cdt(toporouter_t *r, toporouter_layer_t *l);
 int read_board_constraints(toporouter_t *r, toporouter_layer_t *l, int layer);
 void TopoSetSettings(gdouble Keepaway, gdouble LineThickness);
 void TopoSetPCBSettings(int MaxWidth, int MaxHeight, int NumLayers);
+void AddRat(toporouter_t *r, double P1X, double P1Y, double P2X, double P2Y, int Group1, int Group2);
+
 #endif // TOPOROUTER_H

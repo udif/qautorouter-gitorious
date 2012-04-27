@@ -19,6 +19,7 @@
 #include <cpcbshape.h>
 #include <cpcbplace.h>
 #include <cpcbplacement.h>
+#include <cpcbpath.h>
 #include <iostream>
 
 #define GEDA_SCALE 100
@@ -162,8 +163,7 @@ bool TopoRouter::start(CPcb* pcb)
             CPcbBoundary *B = S->boundary();
 
             TopoSetSettings(1, 800);
-            //std::cout << "PCB Size : " << mPcb->structure()->boundary()->boundingRect().x() << std::endl;
-
+            //std::cout << "PCB Size : " << mPcb->structure()->boundary()->path()->x() << std::endl;
             //TopoSetPCBSettings(mPcb->structure()->boundary()->boundingRect().x() * GEDA_SCALE, mPcb->structure()->boundingRect().y() * GEDA_SCALE, mPcb->structure()->layers());
             TopoSetPCBSettings(10000 * GEDA_SCALE, -10000 * GEDA_SCALE, mPcb->structure()->layers());
 
@@ -378,6 +378,8 @@ PadType *TopoRouter::FindPad(QString PadName, int Layer)
   */
 void TopoRouter::getNets()
 {
+    QList<RatLineType *> Rats;
+
     if(pcb())
     {
         TopoRouterHandle->bboxtree = gts_bb_tree_new(TopoRouterHandle->bboxes);
@@ -394,31 +396,65 @@ void TopoRouter::getNets()
             // No idea what the last argument (char *Style) is and why we need it.. NULL in examples I've looked at so far
             toporouter_netlist_t *TopoNetList = netlist_create(TopoRouterHandle, (char *)qPrintable(NetName), NULL);
 
-            for(int PadStackNum = 0; PadStackNum < Net->padstacks(); PadStackNum ++)
+            if(Net->padstacks() > 0)
             {
-                CGPadstack *PadStack = Net->padstack(PadStackNum);
+                PadType *Pad1;
 
-                PadType *Pad = FindPad(PadStack->unitRef(), 0);
-
-                // Presuming we only have one segment.. Can we have more??
-                std::cout << "Pin: " << qPrintable(PadStack->unitRef()) << ", Pos: " << Pad->Origin.X << "," << Pad->Origin.Y << std::endl;
-
-                toporouter_cluster_t *TopoCluster = cluster_create(TopoRouterHandle, TopoNetList);
-
-#warning Nets should be supporting more than pads
-#warning Last arg (0) is layer.. We should support other layers
-                toporouter_bbox_t *TopoBox = toporouter_bbox_locate(TopoRouterHandle, PAD, Pad,
-                    Pad->Origin.X, Pad->Origin.Y, 0);
-
-                if(TopoBox)
+                for(int PadStackNum = 0; PadStackNum < Net->padstacks(); PadStackNum ++)
                 {
-                    cluster_join_bbox(TopoCluster, TopoBox);
-                }
-                else
-                {
-                    std::cout << "Could not locate pad" << std::endl;
+                    CGPadstack *PadStack = Net->padstack(PadStackNum);
+
+                    PadType *Pad = FindPad(PadStack->unitRef(), 0);
+
+                    // Presuming we only have one segment.. Can we have more??
+                    std::cout << "Pin: " << qPrintable(PadStack->unitRef()) << ", Pos: " << Pad->Origin.X << "," << Pad->Origin.Y << std::endl;
+
+                    toporouter_cluster_t *TopoCluster = cluster_create(TopoRouterHandle, TopoNetList);
+
+    #warning Nets should be supporting more than pads
+    #warning Last arg (0) is layer.. We should support other layers
+                    toporouter_bbox_t *TopoBox = toporouter_bbox_locate(TopoRouterHandle, PAD, Pad,
+                        Pad->Origin.X, Pad->Origin.Y, 0);
+
+                    if(TopoBox)
+                    {
+                        cluster_join_bbox(TopoCluster, TopoBox);
+                    }
+                    else
+                    {
+                        std::cout << "Could not locate pad" << std::endl;
+                    }
+
+                    /* Create data for our ratsnest */
+                    /* Each from line is padstack 0 */
+                    if(0 == PadStackNum)
+                    {
+                        Pad1 = Pad;
+                    }
+                    else
+                    {
+                        RatLineType *Rat = (RatLineType *)malloc(sizeof(RatLineType));
+                        if(!Rat)
+                        {
+                            printf("Could not allocate memory for rat\n");
+                            exit(1);
+                        }
+                        Rat->Pad1 = Pad1;
+                        Rat->Pad2 = Pad;
+                        Rats.append(Rat);
+                    }
                 }
             }
+        }
+
+        /* Now add all our rats */
+        RatLineType *Rat;
+        while(Rats.count())
+        {
+            Rat = Rats.takeFirst();
+
+            AddRat(TopoRouterHandle, Rat->Pad1->Origin.X, Rat->Pad1->Origin.Y, Rat->Pad2->Origin.X, Rat->Pad2->Origin.Y, Rat->Pad1->Group, Rat->Pad2->Group);
+            free(Rat);
         }
     }
 }

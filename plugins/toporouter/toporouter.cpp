@@ -2290,6 +2290,7 @@ PadType *AddPad(toporouter_t *r, char *Name,
     NewPad->Point2.Y = P2X;
     NewPad->Origin.X = OriginX;
     NewPad->Origin.Y = OriginY;
+    NewPad->Group = Layer;
 
     if(SQUAREFLAG == Shape)
     {
@@ -2640,6 +2641,7 @@ check_cons_continuation:
 	  toporouter_vertex_t *c2v2 = tedge_v2(c2);
 
 	  if(gts_segments_are_intersecting(GTS_SEGMENT(c1), GTS_SEGMENT(c2)) == GTS_IN) {
+              printf("Interesection\n");
 		toporouter_vertex_t *v;
 		unconstrain(l, c1); unconstrain(l, c2);
 		rem = 1;
@@ -2676,6 +2678,7 @@ check_cons_continuation:
 		  gts_segments_are_intersecting(GTS_SEGMENT(c2), GTS_SEGMENT(c1)) == GTS_ON) {
 
 		if(vertex_between(edge_v1(c2), edge_v2(c2), edge_v1(c1)) && vertex_between(edge_v1(c2), edge_v2(c2), edge_v2(c1))) {
+                    printf("Interesection 2a\n");
 		  unconstrain(l, c1); unconstrain(l, c2);
 		  rem = 1;
 		  // remove c1
@@ -2683,6 +2686,7 @@ check_cons_continuation:
 		  c2box->constraints = g_list_concat(c2box->constraints, temp);
 
 		}else if(vertex_between(edge_v1(c1), edge_v2(c1), edge_v1(c2)) && vertex_between(edge_v1(c1), edge_v2(c1), edge_v2(c2))) {
+                    printf("Interesection2b\n");
 		  unconstrain(l, c1); unconstrain(l, c2);
 		  rem = 1;
 		  // remove c2
@@ -2821,6 +2825,7 @@ check_cons_continuation:
 	while(j) {
             //printf("CDT:constraintsb j\n");
 	  if(TOPOROUTER_IS_CONSTRAINT(j->data)) {
+              printf("Interesection3\n");
 		toporouter_constraint_t *c2 = TOPOROUTER_CONSTRAINT(j->data);
 
 		printf("\tconflict: "); print_constraint(c2);
@@ -7171,6 +7176,38 @@ import_route(toporouter_t *r, RatType *line)
   r->failednets = g_list_prepend(r->failednets, routedata);
 
   return routedata;
+}
+
+void AddRat(toporouter_t *r, double P1X, double P1Y, double P2X, double P2Y, int Group1, int Group2)
+{
+  toporouter_route_t *routedata = routedata_create();
+
+
+  printf("Rat: %2.2f,%2.2f %d => %2.2f,%2.2f %d\n", P1X, P1Y, Group1, P2X, P2Y, Group2);
+
+  routedata->src = cluster_find(r, (int)P1X, (int)P1Y, Group1);
+  routedata->dest = cluster_find(r, (int)P2X, (int)P2Y, Group2);
+
+  if(!routedata->src) printf("couldn't locate src\n");
+  if(!routedata->dest) printf("couldn't locate dest\n");
+
+  if(!routedata->src || !routedata->dest) {
+        printf("PROBLEM: couldn't locate rat src or dest for rat %2.2f,%2.2f,%d -> %2.2f,%2.2f,%d\n",
+                P1X, P1Y, Group1, P2X, P2Y, Group2);
+        free(routedata);
+        return;
+  }
+
+  routedata->netlist = routedata->src->netlist;
+
+  g_assert(routedata->src->netlist == routedata->dest->netlist);
+
+  g_ptr_array_add(r->routes, routedata);
+  g_ptr_array_add(routedata->netlist->routes, routedata);
+
+  r->failednets = g_list_prepend(r->failednets, routedata);
+
+  return;
 }
 
 void
