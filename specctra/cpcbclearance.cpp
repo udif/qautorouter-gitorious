@@ -36,3 +36,16 @@ double CPcbClearance::data()
 		w = properties()[0].toDouble();
 	return w;
 }
+
+/**
+  * @return the type if there is one
+  */
+QString CPcbClearance::type()
+{
+    QString rc;
+    if ( child("type") != NULL && child("type")->properties().count() )
+    {
+        rc = child("type")->properties().at(0);
+    }
+    return rc;
+}

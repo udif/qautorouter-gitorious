@@ -6,6 +6,10 @@
 #include "cpcbpadstack.h"
 #include "cpcb.h"
 #include "cpcblibrary.h"
+#include "cpcbshape.h"
+#include "cpcbboundary.h"
+#include "cpcbrule.h"
+#include "cpcbstructure.h"
 
 #include <QList>
 
@@ -69,5 +73,46 @@ CPcbPadstack* CPcbPin::padstack()
 CPcbClearanceClass* CPcbPin::clearanceClass()
 {
 	return (CPcbClearanceClass*)child("clearance_clsss");
+}
+
+/**
+  * @brief gEDA export method.
+  * @return Translated gEDA object class name.
+  */
+QString CPcbPin::gedaObjectClass()
+{
+    return "Pad";
+}
+
+/**
+  * @brief gEDA export method.
+  * @return Translated gEDA object properties.
+  */
+QStringList CPcbPin::gedaProperties()
+{
+    QStringList rc;
+    if ( properties().count() >= 4 && padstack() != NULL )
+    {
+        rc << properties().at(2);                                           /* rX1 */
+        rc << properties().at(3);                                           /* rX2 */
+        rc << QString::number(padstack()->boundingRect().bottomRight().x());                 /* rX2 */
+        rc << QString::number(padstack()->boundingRect().bottomRight().y());                 /* rY2 */
+        rc << QString::number(padstack()->boundingRect().width());                           /* Thickmness */
+        rc << QString::number(pcb()->structure()->rule()->clearanceOf(properties().at(0)));  /* Clearance */
+        rc << /* Mask */
+        rc << properties().at(0);                                           /* Name */
+
+    }
+    return rc;
+}
+
+/**
+  * @brief gEDA export method.
+  * @return Translated gEDA child object list.
+  */
+QList<CSpecctraObject*>	CPcbPin::gedaChildren()
+{
+    QList<CSpecctraObject*> rc;
+    return rc;
 }
 

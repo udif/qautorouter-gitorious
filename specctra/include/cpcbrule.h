@@ -13,6 +13,7 @@
 #include "cspecctraobject.h"
 
 class CPcbWidth;
+class CPcbClearance;
 class CPcbRule : public CSpecctraObject
 {
 	Q_OBJECT
@@ -22,6 +23,9 @@ class CPcbRule : public CSpecctraObject
 
 		CPcbWidth*					width();
 
+        int                         clearances();
+        CPcbClearance*              clearance(int idx=0);
+        double                      clearanceOf(QString type);
 };
 
 #endif // CPCBRULE_H

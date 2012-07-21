@@ -25,6 +25,11 @@ class CPcbPin : public CSpecctraObject
 		QString					padstackName();
 		CPcbPadstack*			padstack();
 		CPcbClearanceClass*		clearanceClass();
+
+        /* gEDA export methods */
+        virtual QString					gedaObjectClass();
+        virtual QStringList				gedaProperties();
+        virtual QList<CSpecctraObject*>	gedaChildren();
 };
 
 #endif // CPCBPIN_H

@@ -21,6 +21,8 @@ class CPcbClearance : public CSpecctraObject
 
 		void					setData(double w);
 		double					data();
+
+        QString                 type();
 };
 
 #endif // CPCBCLEARANCE_H
