@@ -64,6 +64,13 @@ bool QAutoRouter::saveAs()
         if ( dialog.exec() && dialog.selectedFiles().count())
         {
             QFile file(dialog.selectedFiles().at(0));
+            if ( file.exists() )
+            {
+                if ( QMessageBox::warning ( NULL, filename+tr(" exists."), filename+tr(" exists. Overwrite it?"), QMessageBox::Ok, QMessageBox::Cancel ) != QMessageBox::Ok )
+                {
+                    return false;
+                }
+            }
             if ( file.open(QIODevice::ReadWrite|QIODevice::Truncate))
             {
                 file.write(pcb()->toText(0).toAscii());
@@ -91,6 +98,13 @@ bool QAutoRouter::exportAs()
         if ( dialog.exec() && dialog.selectedFiles().count())
         {
             QFile file(dialog.selectedFiles().at(0));
+            if ( file.exists() )
+            {
+                if ( QMessageBox::warning ( NULL, filename+tr(" exists."), filename+tr(" exists. Overwrite it?"), QMessageBox::Ok, QMessageBox::Cancel ) != QMessageBox::Ok )
+                {
+                    return false;
+                }
+            }
             if ( file.open(QIODevice::ReadWrite|QIODevice::Truncate))
             {
                 file.write(pcb()->toGeda(0).toAscii());
