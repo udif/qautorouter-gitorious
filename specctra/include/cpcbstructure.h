@@ -25,6 +25,9 @@ class CPcbStructure : public CSpecctraObject
 		int								indexOf(CPcbLayer* layer);
 
 		CPcbBoundary*					boundary();
+
+        virtual QList<CSpecctraObject*>	gedaChildren();
+
 };
 
 #endif // CPCSTRUCTUREB_H

@@ -111,3 +111,13 @@ CPcbPin* CPcbImage::pin(QString ref)
 	}
 	return NULL;
 }
+
+/**
+  @brief Hide the gEDA children of the image object
+  */
+QList<CSpecctraObject*>	CPcbImage::gedaChildren()
+{
+    QList<CSpecctraObject*> rc;
+    return rc;
+}
+

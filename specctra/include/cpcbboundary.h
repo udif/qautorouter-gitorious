@@ -25,6 +25,7 @@ class CPcbBoundary : public CSpecctraObject
 		virtual QRectF				boundingRect() const;
 		virtual QPainterPath		shape() const;
 		virtual void				paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget);
+
 };
 
 #endif // CPCBLAY_H

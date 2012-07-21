@@ -75,6 +75,37 @@ QStringList CPcbPlace::gedaProperties()
 QList<CSpecctraObject*>	CPcbPlace::gedaChildren()
 {
     QList<CSpecctraObject*> rc;
+    CPcbLibrary* library = (CPcbLibrary*)pcb()->library();
+    CPcbComponent* component = (CPcbComponent*)parentObject("component");
+    if ( library != NULL && component != NULL )
+    {
+        QString imageName = component->properties().at(0); /* Desc */
+        CPcbImage* image = library->image(imageName);
+        if ( image != NULL )
+        {
+            /* FIXME Since gEDA instatiates an instance of image for each placement, we have to do the
+              coordinate translation somewhere here
+            */
+            QList<CSpecctraObject*>& imageChildren = image->children();
+            for(int n=0; n < imageChildren.count(); n++)
+            {
+                CSpecctraObject* child = imageChildren.at(n);
+                /* extract the paths from the outlines.. */
+                if ( child->objectClass() == "outline" )
+                {
+                    CPcbPath* path = (CPcbPath*)child->child("path");
+                    if ( path != NULL )
+                    {
+                        rc.append( path );
+                    }
+                }
+                else
+                {
+                    rc.append( child );
+                }
+            }
+        }
+    }
     return rc;
 }
 

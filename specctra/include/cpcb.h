@@ -25,6 +25,7 @@ class CPcb : public CSpecctraObject
         CPcbNetwork*                    network();
 
         /* gEDA export methods */
+        virtual QString					toGeda(int lvl=0);
         virtual QString					gedaObjectClass();
         virtual QStringList				gedaProperties();
         virtual QList<CSpecctraObject*>	gedaChildren();

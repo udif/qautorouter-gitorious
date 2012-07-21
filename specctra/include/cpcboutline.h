@@ -18,9 +18,10 @@ class CPcbOutline : public CSpecctraObject
 		CPcbOutline(QGraphicsItem *parent = 0);
 		virtual ~CPcbOutline();
 
-		int							paths();
-		CPcbPath*					path(int idx);
-		CPcbPath*					path();
+        int                             paths();
+        CPcbPath*                       path(int idx);
+        CPcbPath*                       path();
+
 };
 
 #endif // CPCBOUTLINE_H

@@ -37,6 +37,28 @@ void CPcb::yield()
 }
 
 /**
+  * @brief span the object tree and extract each object's gEDA translation.
+  */
+QString CPcb::toGeda(int lvl)
+{
+    QString fill;
+    QString text;
+    fill.fill(' ',lvl*2);
+    if ( gedaObjectClass().length() )
+    {
+        text += fill;
+        text += "["+gedaObjectClass()+" "+gedaProperties().join(" ")+"]\n";
+    }
+    for(int n=0;n<children().count();n++)
+    {
+        CSpecctraObject* child = children().at(n);
+        text += child->toGeda(lvl);
+    }
+    return text;
+
+}
+
+/**
   * @brief gEDA export method.
   * @return Translated gEDA object class name.
   */

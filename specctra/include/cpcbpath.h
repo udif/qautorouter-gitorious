@@ -18,10 +18,16 @@ class CPcbPath : public CSpecctraObject
 		CPcbPath(QGraphicsItem *parent = 0);
 		virtual ~CPcbPath();
 
-		QString					layer();
-		double					width();
-		QPainterPath			shape();
-		QPainterPath			oval();
+        QString                         layer();
+        double                          width();
+        QPainterPath                    shape();
+        QPainterPath                    oval();
+
+        /* gEDA export methods */
+        virtual QString					gedaObjectClass();
+        virtual QStringList				gedaProperties();
+        virtual QList<CSpecctraObject*>	gedaChildren();
+
 private:
 		QPainterPath			circle(QPointF center,double radius);
 		QPainterPath			mOval;

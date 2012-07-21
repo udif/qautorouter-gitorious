@@ -90,6 +90,8 @@ QPainterPath CPcbPath::oval()
 	return mOval;
 }
 
+
+
 /**
   * @brief draw a circle as part of oval pad drawing.
   */
@@ -100,4 +102,41 @@ QPainterPath CPcbPath::circle(QPointF center,double radius)
 	QPointF bottomRight(center.x()+radius,center.y()+radius);
 	ppath.addEllipse(QRectF(topLeft,bottomRight));
 	return ppath;
+}
+
+/**
+  * @brief gEDA export method.
+  * @return Translated gEDA object class name.
+  */
+QString CPcbPath::gedaObjectClass()
+{
+    return "ElementLine";
+}
+
+/**
+  * @brief gEDA export method.
+  * @return Translated gEDA object properties.
+  */
+QStringList CPcbPath::gedaProperties()
+{
+    QStringList rc;
+    if ( properties().count() >= 6 )
+    {
+        rc << properties().at(2);   /* X1 */
+        rc << properties().at(3);   /* X2 */
+        rc << properties().at(4);   /* X3 */
+        rc << properties().at(5);   /* X4 */
+        rc << properties().at(1);   /* Thickness */
+    }
+    return rc;
+}
+
+/**
+  * @brief gEDA export method.
+  * @return Translated gEDA child object list.
+  */
+QList<CSpecctraObject*>	CPcbPath::gedaChildren()
+{
+    QList<CSpecctraObject*> rc;
+    return rc;
 }

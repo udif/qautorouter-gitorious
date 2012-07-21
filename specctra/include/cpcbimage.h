@@ -26,7 +26,11 @@ class CPcbImage : public CSpecctraObject
 		int								pins();
 		CPcbPin*						pin(int idx);
 		CPcbPin*						pin(QString ref);
-	private:
+
+        /* gEDA export methods */
+        virtual QList<CSpecctraObject*>	gedaChildren();
+
+private:
 		QList<CPcbOutline*>				mOutlines;
 		QList<CPcbPin*>					mPins;
 

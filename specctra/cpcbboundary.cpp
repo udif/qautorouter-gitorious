@@ -58,3 +58,4 @@ void CPcbBoundary::paint(QPainter *painter, const QStyleOptionGraphicsItem* /* o
 	painter->setPen(QPen(QColor(255, 255, 0), 10, Qt::SolidLine,Qt::FlatCap,Qt::MiterJoin));
 	painter->drawPath(shape());
 }
+

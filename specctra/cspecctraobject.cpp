@@ -183,42 +183,46 @@ QString CSpecctraObject::toText(int lvl)
 	return text;
 }
 
+/**
+  * @brief span the object tree and extract each object's gEDA translation.
+  */
 QString CSpecctraObject::toGeda(int lvl)
 {
     QString fill;
     QString text;
+    QList<CSpecctraObject*> gedaChildList = gedaChildren();
     fill.fill(' ',lvl*2);
     if ( gedaObjectClass().length() )
     {
         text += fill;
         text += "["+gedaObjectClass()+" "+gedaProperties().join(" ")+"]\n";
-        if ( gedaChildren().count() )
+        if ( gedaChildList.count() )
         {
             text += fill;
             text += "(\n";
-            for(int n=0;n<gedaChildren().count();n++)
+            for(int n=0;n<gedaChildList.count();n++)
             {
-                CSpecctraObject* child = children().at(n);
-                text += child->toText(lvl+1);
+                CSpecctraObject* child = gedaChildList.at(n);
+                text += child->toGeda(lvl+1);
             }
             text += fill;
             text += ")\n";
         }
         else
-        if ( children().count() )
+        if ( gedaChildList.count() )
         {
-            for(int n=0;n<children().count();n++)
+            for(int n=0;n<gedaChildList.count();n++)
             {
-                CSpecctraObject* child = children().at(n);
+                CSpecctraObject* child = gedaChildList.at(n);
                 text += child->toGeda(lvl);
             }
         }
     }
     else
     {
-        for(int n=0;n<children().count();n++)
+        for(int n=0;n<gedaChildList.count();n++)
         {
-            CSpecctraObject* child = children().at(n);
+            CSpecctraObject* child = gedaChildList.at(n);
             text += child->toGeda(lvl);
         }
     }
@@ -226,17 +230,27 @@ QString CSpecctraObject::toGeda(int lvl)
 
 }
 
+/**
+  * @brief The default gEDA object class is empty indicating no translation.
+  *        However if there is no translation, the object's children are queried for gEDA translations.
+  */
 QString CSpecctraObject::gedaObjectClass()
 {
     return "";
 }
 
+/**
+  * @brief The default is an empty list of properties.
+  */
 QStringList CSpecctraObject::gedaProperties()
 {
     QStringList rc;
     return rc;
 }
 
+/**
+  * @brief The default is to return the object's children
+  */
 QList<CSpecctraObject*>	CSpecctraObject::gedaChildren()
 {
     return children();

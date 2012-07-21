@@ -75,3 +75,12 @@ CPcbBoundary* CPcbStructure::boundary()
 	return (CPcbBoundary*)child("boundary");
 }
 
+/**
+  * @brief Hide the structure children from top lvel gEDE output
+  */
+QList<CSpecctraObject*>	CPcbStructure::gedaChildren()
+{
+    QList<CSpecctraObject*> rc;
+    return rc;
+}
+

@@ -40,4 +40,3 @@ CPcbPath* CPcbOutline::path()
 	return path(0);
 }
 
-
