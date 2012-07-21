@@ -83,17 +83,17 @@ QString gedaFooter()
         SymbolLine[1500 1500 1500 2000 800] \n\
         SymbolLine[0 3500 0 4500 800] \n\
     ) \n\
-    Symbol[''' 1200] \n\
+    Symbol['\'' 1200] \n\
     ( \n\
         SymbolLine[0 2000 1000 1000 800] \n\
     ) \n\
-    Symbol['( \n\' 1200] \n\
+    Symbol['(' 1200] \n\
     ( \n\
         SymbolLine[0 4500 500 5000 800] \n\
         SymbolLine[0 1500 500 1000 800] \n\
         SymbolLine[0 1500 0 4500 800] \n\
     ) \n\
-    Symbol[') \n\' 1200] \n\
+    Symbol[')' 1200] \n\
     ( \n\
         SymbolLine[0 1000 500 1500 800] \n\
         SymbolLine[500 1500 500 4500 800] \n\
