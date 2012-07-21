@@ -35,6 +35,13 @@ class CPcbPlace : public CSpecctraObject
 		virtual QRectF					boundingRect() const;
 		virtual QPainterPath			shape() const;
 		virtual void					paint(QPainter *painter, const QStyleOptionGraphicsItem *option,QWidget *widget);
+
+
+        /* gEDA export methods */
+        virtual QString					gedaObjectClass();
+        virtual QStringList				gedaProperties();
+        virtual QList<CSpecctraObject*>	gedaChildren();
+
 	protected:
 		void							createPadstacks();
 	private:

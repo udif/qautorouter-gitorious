@@ -4,7 +4,7 @@
 QT += gui
 win32: CONFIG += qt plugin
 unix: CONFIG += dll plugin debug -std=c99
-INCLUDEPATH += ../../include ../../graphics/include ../../specctra/include gts /usr/include/glib-2.0 -/usr/lib/i386-linux-gnu/glib-2.0/include /usr/lib/i386-linux-gnu/glib-2.0/include/
+INCLUDEPATH += ../../include ../../graphics/include ../../specctra/include gts /usr/include/glib-2.0 /usr/lib/x86_64-linux-gnu/glib-2.0/include
 TARGET = toporouter
 TEMPLATE = lib
 unix {

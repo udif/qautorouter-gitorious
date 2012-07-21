@@ -55,29 +55,56 @@ bool QAutoRouter::save()
 
 bool QAutoRouter::saveAs()
 {
-	QString filename = mFileName;
-	filename.replace(".dsn",".ses");
-	if (pcb()!=NULL)
-	{
-		QFileDialog dialog(this,tr("Save"),QDir::currentPath(),tr("Specctra Session (*.ses)"));
-		dialog.selectFile(filename);
-		if ( dialog.exec() && dialog.selectedFiles().count())
-		{
-			QFile file(dialog.selectedFiles().at(0));
-			if ( file.open(QIODevice::ReadWrite))
-			{
-				file.write(pcb()->toText(0).toAscii());
-				file.close();
-				return true;
-			}
-			else
-			{
-				emit fault(tr("error saving '")+mFileName+"'");
-				return false;
-			}
-		}
-	}
-	return true;
+    QString filename = mFileName;
+    filename.replace(".dsn",".ses");
+    if (pcb()!=NULL)
+    {
+        QFileDialog dialog(this,tr("Save As"),QDir::currentPath(),tr("Specctra Session (*.ses)"));
+        dialog.selectFile(filename);
+        if ( dialog.exec() && dialog.selectedFiles().count())
+        {
+            QFile file(dialog.selectedFiles().at(0));
+            if ( file.open(QIODevice::ReadWrite|QIODevice::Truncate))
+            {
+                file.write(pcb()->toText(0).toAscii());
+                file.close();
+                return true;
+            }
+            else
+            {
+                emit fault(tr("error saving '")+mFileName+"'");
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool QAutoRouter::exportAs()
+{
+    QString filename = mFileName;
+    filename.replace(".dsn",".pcb");
+    if (pcb()!=NULL)
+    {
+        QFileDialog dialog(this,tr("Export"),QDir::currentPath(),tr("gEDA (*.pcb)"));
+        dialog.selectFile(filename);
+        if ( dialog.exec() && dialog.selectedFiles().count())
+        {
+            QFile file(dialog.selectedFiles().at(0));
+            if ( file.open(QIODevice::ReadWrite|QIODevice::Truncate))
+            {
+                file.write(pcb()->toGeda(0).toAscii());
+                file.close();
+                return true;
+            }
+            else
+            {
+                emit fault(tr("error exporting '")+mFileName+"'");
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 /**

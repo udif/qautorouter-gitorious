@@ -31,6 +31,54 @@ CPcbPlace::~CPcbPlace()
 }
 
 /**
+  * @brief gEDA export method.
+  * @return Translated gEDA object class name.
+  */
+QString CPcbPlace::gedaObjectClass()
+{
+    return "Element";
+}
+
+/**
+  * @brief gEDA export method.
+  * @return Translated gEDA object properties.
+  */
+QStringList CPcbPlace::gedaProperties()
+{
+    QStringList rc;
+    if ( properties().count() >= 5 )
+    {
+        CPcbComponent* component = (CPcbComponent*)parentObject("component");
+        CSpecctraObject* pn = child("pn");
+        if ( component != NULL && pn != NULL )
+        {
+            rc << "0";                                          /* SFlag */
+            rc << "\""+component->properties().at(0)+"\"";      /* Desc */
+            rc << "\""+properties().at(0)+"\"";                 /* Name */
+            rc << "\""+pn->properties().at(0)+"\"";             /* Value */
+            rc << properties().at(1);                           /* MX */
+            rc << properties().at(2);                           /* MY */
+            rc << properties().at(1);                           /* TX */
+            rc << properties().at(2);                           /* TY */
+            rc << properties().at(4);                           /* TDir */
+            rc << "100";                                        /* TScale */
+            rc << "0";                                          /* TSFlags */
+        }
+    }
+    return rc;
+}
+
+/**
+  * @brief gEDA export method.
+  * @return Translated gEDA child object list.
+  */
+QList<CSpecctraObject*>	CPcbPlace::gedaChildren()
+{
+    QList<CSpecctraObject*> rc;
+    return rc;
+}
+
+/**
   * @return the class of drawable object which this is.
   */
 CSpecctraObject::tDrawableClass CPcbPlace::drawableClass()

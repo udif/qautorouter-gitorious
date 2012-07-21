@@ -2,7 +2,7 @@
 # Project created by QtCreator 2011-06-16T09:55:28
 # -------------------------------------------------
 QT += gui
-
+CONFIG += debug
 # QMAKE_LFLAGS += -rdynamic
 unix { 
     QMAKE_LFLAGS += -rdynamic \

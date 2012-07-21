@@ -11,8 +11,9 @@ void QAutoRouter::setupActions()
 {
 	ui->actionOpen->setIcon(QIcon(":/icons/fileopen.png"));
 	ui->actionSave->setIcon(QIcon(":/icons/filesave.png"));
-	ui->actionSave_As->setIcon(QIcon(":/icons/filesaveas.png"));
-	ui->actionQuit->setIcon(QIcon(":/icons/exit.png"));
+    ui->actionSave_As->setIcon(QIcon(":/icons/filesaveas.png"));
+    ui->actionExport->setIcon(QIcon(":/icons/document-export.png"));
+    ui->actionQuit->setIcon(QIcon(":/icons/exit.png"));
 	ui->actionZoom_Fit->setIcon(QIcon(":/icons/viewmagfit.png"));
 	ui->actionZoom_In->setIcon(QIcon(":/icons/viewmag+.png"));
 	ui->actionZoom_Out->setIcon(QIcon(":/icons/viewmag-.png"));
@@ -32,8 +33,9 @@ void QAutoRouter::setupActions()
 
 	QObject::connect(ui->actionOpen,SIGNAL(triggered()),this,SLOT(open()));
 	QObject::connect(ui->actionSave,SIGNAL(triggered()),this,SLOT(save()));
-	QObject::connect(ui->actionSave_As,SIGNAL(triggered()),this,SLOT(saveAs()));
-	QObject::connect(ui->actionQuit,SIGNAL(triggered()),this,SLOT(close()));
+    QObject::connect(ui->actionSave_As,SIGNAL(triggered()),this,SLOT(saveAs()));
+    QObject::connect(ui->actionExport,SIGNAL(triggered()),this,SLOT(exportAs()));
+    QObject::connect(ui->actionQuit,SIGNAL(triggered()),this,SLOT(close()));
 	QObject::connect(ui->actionZoom_In,SIGNAL(triggered()),this,SLOT(zoomIn()));
 	QObject::connect(ui->actionZoom_Out,SIGNAL(triggered()),this,SLOT(zoomOut()));
 	QObject::connect(ui->actionZoom_Fit,SIGNAL(triggered()),this,SLOT(zoomFit()));
@@ -45,8 +47,9 @@ void QAutoRouter::setupActions()
 	QToolBar* file = addToolBar(tr("File"));
 	file->addAction(ui->actionOpen);
 	file->addAction(ui->actionSave);
-	file->addAction(ui->actionSave_As);
-	file->addAction(ui->actionQuit);
+    file->addAction(ui->actionSave_As);
+    file->addAction(ui->actionExport);
+    file->addAction(ui->actionQuit);
 
 	QToolBar* view = addToolBar(tr("View"));
 	view->addAction(ui->actionZoom_In);

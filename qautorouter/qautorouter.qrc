@@ -17,5 +17,7 @@
         <file>icons/viewmag1.png</file>
         <file>icons/viewmag+.png</file>
         <file>icons/viewmagfit.png</file>
+        <file>icons/document-export.png</file>
+        <file>icons/document-import.png</file>
     </qresource>
 </RCC>

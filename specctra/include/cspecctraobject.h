@@ -51,8 +51,8 @@ class CSpecctraObject : public QObject, public QGraphicsItem /* QGraphicsPathIte
 
 		virtual QString					name();
 		virtual QString					description();
-		virtual QString					toText(int lvl=0);
-		virtual tDrawableClass			drawableClass();
+        virtual QString					toText(int lvl=0);
+        virtual tDrawableClass			drawableClass();
 
 		CSpecctraObject&				copy( const CSpecctraObject& other );
 		CSpecctraObject&				operator=( const CSpecctraObject & other )		{return copy( other ); }
@@ -73,7 +73,13 @@ class CSpecctraObject : public QObject, public QGraphicsItem /* QGraphicsPathIte
 		CSpecctraObject*				root();
 		CPcb*							pcb();
 
-		virtual QRectF					boundingRect() const;
+        virtual QString					toGeda(int lvl=0);
+        virtual QString					gedaObjectClass();
+        virtual QStringList				gedaProperties();
+        virtual QList<CSpecctraObject*>	gedaChildren();
+
+
+        virtual QRectF					boundingRect() const;
 		virtual void					paint(QPainter*,const QStyleOptionGraphicsItem*, QWidget*);
 		virtual void					dump(int lvl=0);
 

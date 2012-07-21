@@ -19,19 +19,25 @@ class CPcb : public CSpecctraObject
 		CPcb(QGraphicsItem *parent = 0);
 		virtual ~CPcb();
 
-		CPcbStructure*				structure();
-		CPcbPlacement*				placement();
-		CPcbLibrary*				library();
-		CPcbNetwork*				network();
-	public slots:
-		void						yield();
+        CPcbStructure*                  structure();
+        CPcbPlacement*                  placement();
+        CPcbLibrary*                    library();
+        CPcbNetwork*                    network();
+
+        /* gEDA export methods */
+        virtual QString					gedaObjectClass();
+        virtual QStringList				gedaProperties();
+        virtual QList<CSpecctraObject*>	gedaChildren();
+
+public slots:
+        void                            yield();
 	signals:
-		void						status(QString txt);
+        void                            status(QString txt);
 	private:
-		CPcbStructure*				mStructure;
-		CPcbPlacement*				mPlacement;
-		CPcbLibrary*				mLibrary;
-		CPcbNetwork*				mNetwork;
+        CPcbStructure*                  mStructure;
+        CPcbPlacement*                  mPlacement;
+        CPcbLibrary*                    mLibrary;
+        CPcbNetwork*                    mNetwork;
 };
 
 #endif // CPCB_H

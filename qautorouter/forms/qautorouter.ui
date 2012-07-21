@@ -56,6 +56,7 @@
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
+    <addaction name="actionExport"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -137,6 +138,11 @@
   <action name="actionStop">
    <property name="text">
     <string>Stop</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export...</string>
    </property>
   </action>
  </widget>

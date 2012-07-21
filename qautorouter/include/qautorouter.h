@@ -61,8 +61,9 @@ class QAutoRouter : public QMainWindow
 		void					stop();
 		void					open();
 		bool					save();
-		bool					saveAs();
-		void					zoomIn();
+        bool					saveAs();
+        bool					exportAs();
+        void					zoomIn();
 		void					zoomOut();
 		void					zoomFit();
 		void					about();

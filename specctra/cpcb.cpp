@@ -7,6 +7,7 @@
 #include "cpcbplacement.h"
 #include "cpcblibrary.h"
 #include "cpcbnetwork.h"
+#include "cpcbboundary.h"
 
 #include <QEventLoop>
 
@@ -33,6 +34,49 @@ void CPcb::yield()
 {
 	QEventLoop loop;
 	loop.processEvents();
+}
+
+/**
+  * @brief gEDA export method.
+  * @return Translated gEDA object class name.
+  */
+QString CPcb::gedaObjectClass()
+{
+    return "PCB";
+}
+
+/**
+  * @brief gEDA export method.
+  * @return Translated gEDA object properties.
+  */
+QStringList CPcb::gedaProperties()
+{
+    QStringList rc;
+    if ( properties().count() )
+    {
+        CPcbStructure* structure = (CPcbStructure*)child("structure");
+        if ( structure != NULL )
+        {
+            CPcbBoundary* boundary = structure->boundary();
+            if ( boundary != NULL )
+            {
+                rc << "\"" + properties().at(0) + "\"";                     /* Name */
+                rc << QString::number(boundary->boundingRect().width());    /* Width */
+                rc << QString::number(boundary->boundingRect().height());   /* Height */
+            }
+        }
+    }
+    return rc;
+}
+
+/**
+  * @brief gEDA export method.
+  * @return Translated gEDA child object list.
+  */
+QList<CSpecctraObject*>	CPcb::gedaChildren()
+{
+    QList<CSpecctraObject*> rc;
+    return rc;
 }
 
 /**

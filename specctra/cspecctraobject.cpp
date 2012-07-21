@@ -183,6 +183,66 @@ QString CSpecctraObject::toText(int lvl)
 	return text;
 }
 
+QString CSpecctraObject::toGeda(int lvl)
+{
+    QString fill;
+    QString text;
+    fill.fill(' ',lvl*2);
+    if ( gedaObjectClass().length() )
+    {
+        text += fill;
+        text += "["+gedaObjectClass()+" "+gedaProperties().join(" ")+"]\n";
+        if ( gedaChildren().count() )
+        {
+            text += fill;
+            text += "(\n";
+            for(int n=0;n<gedaChildren().count();n++)
+            {
+                CSpecctraObject* child = children().at(n);
+                text += child->toText(lvl+1);
+            }
+            text += fill;
+            text += ")\n";
+        }
+        else
+        if ( children().count() )
+        {
+            for(int n=0;n<children().count();n++)
+            {
+                CSpecctraObject* child = children().at(n);
+                text += child->toGeda(lvl);
+            }
+        }
+    }
+    else
+    {
+        for(int n=0;n<children().count();n++)
+        {
+            CSpecctraObject* child = children().at(n);
+            text += child->toGeda(lvl);
+        }
+    }
+    return text;
+
+}
+
+QString CSpecctraObject::gedaObjectClass()
+{
+    return "";
+}
+
+QStringList CSpecctraObject::gedaProperties()
+{
+    QStringList rc;
+    return rc;
+}
+
+QList<CSpecctraObject*>	CSpecctraObject::gedaChildren()
+{
+    return children();
+}
+
+
 /**
   * @return All child objects of objectClass
   */
@@ -279,7 +339,7 @@ CSpecctraObject* CSpecctraObject::child(QString o,int idx)
 {
 	for(int n=0; n < children().count(); n++)
 	{
-		if ( children().at(n)->objectClass()==o)
+        if ( children().at(n)->objectClass()==o)
 		{
 			if ( idx == 0 )
 				return children().at(n);
