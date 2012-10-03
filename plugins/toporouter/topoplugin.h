@@ -11,9 +11,12 @@
 #include <QList>
 #include <QRectF>
 #include <QStack>
+#include <QVector>
 #include <cplugininterface.h>
 
+extern "C" {
 #include "toporouter.h"
+}
 
 class CPcb;
 class CPcbNet;
@@ -34,7 +37,7 @@ class TopoRouter : public QObject, public CPluginInterface
 		virtual QString				description() const;			/* a brief description of the plugin */
 		virtual QStringList			license() const;	
     
-		virtual bool				start(CPcb* pcb);				/** initialize, gets' called once prior to exec() being called */
+        virtual bool				start(CPcb* pcb, QSettings *settings);				/** initialize, gets' called once prior to exec() being called */
 		virtual void				stop();							/** stop processing */
 		virtual bool				exec();							/** get's called repeatedly while exec() returns true, return false to stop */
 		virtual QString				elapsed();						/** elapsed time of the run in hh:mm:ss format */
@@ -66,12 +69,16 @@ class TopoRouter : public QObject, public CPluginInterface
 
 	private:
 		CPcb*						mPcb;
+        QSettings*                  mAutoRouterSettings;
 		QDateTime					mStartTime;
 		tRunState					mState;
-                QStack<CPcbNet*>                                mNetStack;						/** the current work stack */
-                QRectF						mBoundingBox;					/** the expanding bounding box */
-                toporouter_t*                                   TopoRouterHandle;
-                QList<PadType *>                                UsedPadList;
+        QStack<CPcbNet*>                                mNetStack;						/** the current work stack */
+        QRectF						mBoundingBox;					/** the expanding bounding box */
+        toporouter_t*                                   TopoRouterHandle;
+        QList<PadType *>                                UsedPadList;
+        PadType *addPad(toporouter_t *r, char *Name,
+                              qreal &P1X, qreal &P1Y, qreal &P2X, qreal &P2Y, qreal& Thickness,
+                              qreal& Radius, int Shape, unsigned int& Layer);
 };
 
 #endif // TOPOROUTER_H

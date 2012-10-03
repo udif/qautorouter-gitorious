@@ -4,7 +4,7 @@
 #QT += gui
 win32: CONFIG += staticlib
 unix: CONFIG += staticlib
-INCLUDEPATH += /usr/include/glib-2.0 -/usr/lib/i386-linux-gnu/glib-2.0/include /usr/lib/i386-linux-gnu/glib-2.0/include/
+INCLUDEPATH += /usr/include/glib-2.0 -/usr/lib/i386-linux-gnu/glib-2.0/include /usr/lib/i386-linux-gnu/glib-2.0/include/ /usr/lib/glib-2.0/include/
 TARGET = gts
 TEMPLATE = lib
 unix {

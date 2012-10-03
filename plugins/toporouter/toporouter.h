@@ -4,6 +4,7 @@
  *  Topological Autorouter for
  *  PCB, interactive printed circuit board design
  *  Copyright (C) 2009 Anthony Blake
+ *  Copyright (C) 2009-2011 PCB Contributors (see ChangeLog for details)
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,18 +25,17 @@
  *
  */
 
-#ifndef TOPOROUTER_H
-#define TOPOROUTER_H
+#ifndef PCB_TOPOROUTER_H
+#define PCH_TOPOROUTER_H
 
 #include <assert.h>
-#ifdef GEDA
 #include "data.h"
 #include "macro.h"
 #include "autoroute.h"
 #include "box.h"
 #include "create.h"
 #include "draw.h"
-#include "error.h"
+// #include "error.h"
 #include "find.h"
 #include "heap.h"
 #include "rtree.h"
@@ -49,102 +49,6 @@
 #include "global.h"
 
 #include "gts.h"
-#else
-#include <math.h>
-#include <float.h>
-#include <string.h>
-#include "gts.h"
-
-#define Message printf
-#define _(x) x
-
-typedef enum
-{
-    SQUAREFLAG,
-    OCTAGONFLAG,
-}ShapeType;
-
-typedef enum
-{
-    GROUP_1,
-    GROUP_2
-} GroupType;
-
-typedef struct
-{
-    int X;
-    int Y;
-} Point;
-
-
-typedef struct
-{
-    char *Name;
-    gdouble Thickness;
-    ShapeType Type;
-} PinType;
-
-typedef struct
-{
-    char *Name;
-    Point Point1;
-    Point Point2;
-    gdouble Thickness;
-    ShapeType Type;
-    Point Origin;
-    unsigned int Group;
-} PadType;
-
-typedef struct
-{
-    Point Point1;
-    Point Point2;
-    gdouble Thickness;
-} LineType, *LineTypePtr;
-
-typedef struct
-{
-    Point Point1;
-    Point Point2;
-    gdouble Thickness;
-    GroupType group1;
-    GroupType group2;
-} RatType;
-
-typedef struct
-{
-    gdouble Theta;
-} ArcType, *ArcTypePtr;
-
-typedef struct
-{
-    gdouble SomethingHere;
-} LayerType;
-
-typedef struct
-{
-    int MaxWidth;
-    int MaxHeight;
-    int NumLayers;
-    
-} PCBType;
-
-#define TEST_FLAG(x, y) (x == y->Type)
-
-typedef struct
-{
-    gdouble LineThickness;
-    gdouble Keepaway;
-} SettingsType;
-
-
-typedef struct
-{
-    PadType *Pad1;
-    PadType *Pad2;
-} RatLineType;
-
-#endif
 
 #include <stdlib.h>
 #include <getopt.h>
@@ -209,16 +113,16 @@ typedef struct
 #define TOPOROUTER_BBOX_CLASS(klass)  GTS_OBJECT_CLASS_CAST (klass, toporouter_bbox_class_t, toporouter_bbox_class ())
 
 typedef enum {
-  PAD,
-  PIN,
-  VIA,
-  ARC,
-  VIA_SHADOW,
-  LINE,
-  OTHER,
-  BOARD,
-  EXPANSION_AREA,
-  POLYGON,
+  PAD, 
+  PIN, 
+  VIA, 
+  ARC, 
+  VIA_SHADOW, 
+  LINE, 
+  OTHER, 
+  BOARD, 
+  EXPANSION_AREA, 
+  POLYGON, 
   TEMP
 } toporouter_term_t;
 
@@ -234,7 +138,7 @@ struct _toporouter_bbox_t {
 
   GList *constraints;
   GtsPoint *point,
-		   *realpoint;
+           *realpoint;
 
 //  char *netlist, *style;
 
@@ -342,9 +246,9 @@ typedef struct {
   GtsSurface *surface;
 //  GtsTriangle *t;
 //  GtsVertex *v1, *v2, *v3;
-
+  
   GList *vertices;
-  GList *constraints;
+  GList *constraints; 
   GList *edges;
 
 } toporouter_layer_t;
@@ -378,10 +282,10 @@ struct _toporouter_route_t {
   gdouble score, detourscore;
 
   toporouter_vertex_t *curpoint;
-  GHashTable *alltemppoints;
-
+  GHashTable *alltemppoints; 
+  
   GList *path;
-
+  
   guint flags;
 
   GList *destvertices, *srcvertices;
@@ -446,7 +350,7 @@ struct _toporouter_oproute_t {
   guint layergroup;
   gdouble tof;
   GList *path;
-
+  
   toporouter_serpintine_t *serp;
 };
 
@@ -459,7 +363,7 @@ typedef struct _toporouter_oproute_t toporouter_oproute_t;
 
 struct _toporouter_arc_t {
   GtsObject object;
-
+  
   gdouble x0, y0, x1, y1;
   toporouter_vertex_t *centre, *v;
   gdouble r;
@@ -505,7 +409,7 @@ struct _toporouter_t {
   GNode *bboxtree;
 
   toporouter_layer_t *layers;
-
+  
   GList *paths;
 
   GList *keepoutlayers;
@@ -515,10 +419,7 @@ struct _toporouter_t {
   GList *destboxes, *consumeddestboxes;
 
   /* settings: */
-  guint viamax;
   gdouble viacost;
-  gdouble stublength;
-  gdouble serpintine_half_amplitude;
 
   gdouble wiring_score;
 
@@ -529,7 +430,7 @@ struct _toporouter_t {
 
   gint (*netsort)(toporouter_netscore_t **, toporouter_netscore_t **);
 
-  struct timeval starttime;
+  struct timeval starttime;  
 
   FILE *debug;
 };
@@ -547,8 +448,8 @@ typedef struct {
 #ifdef CAIRO_H
   cairo_t *cr;
   cairo_surface_t *surface;
-#endif
-
+#endif  
+  
   double s; /* scale factor */
 
   int mode;
@@ -560,41 +461,58 @@ typedef struct {
 
 #define FOREACH_CLUSTER(clusters) do { \
   for(toporouter_cluster_t **i = ((toporouter_cluster_t **)clusters->pdata) + clusters->len - 1; i >= (toporouter_cluster_t **)clusters->pdata && clusters->len > 0; --i) { \
-	toporouter_cluster_t *cluster = *i;
+    toporouter_cluster_t *cluster = *i; 
 
 #define FOREACH_BBOX(boxes) do { \
   for(toporouter_bbox_t **i = ((toporouter_bbox_t **)boxes->pdata) + boxes->len - 1; i >= (toporouter_bbox_t **)boxes->pdata && boxes->len > 0; --i) { \
-	toporouter_bbox_t *box = *i;
+    toporouter_bbox_t *box = *i;
 
 #define FOREACH_ROUTE(routes) do { \
   for(toporouter_route_t **i = ((toporouter_route_t **)routes->pdata) + routes->len - 1; i >= (toporouter_route_t **)routes->pdata && routes->len > 0; --i) { \
-	toporouter_route_t *routedata = *i;
+    toporouter_route_t *routedata = *i;
 
 #define FOREACH_NETSCORE(netscores) do { \
   for(toporouter_netscore_t **i = ((toporouter_netscore_t **)netscores->pdata) + netscores->len - 1; i >= (toporouter_netscore_t **)netscores->pdata && netscores->len > 0; --i) { \
-	toporouter_netscore_t *netscore = *i;
+    toporouter_netscore_t *netscore = *i;
 
 #define FOREACH_NETLIST(netlists) do { \
   for(toporouter_netlist_t **i = ((toporouter_netlist_t **)netlists->pdata) + netlists->len - 1; i >= (toporouter_netlist_t **)netlists->pdata && netlists->len > 0; --i) { \
-	toporouter_netlist_t *netlist = *i;
+    toporouter_netlist_t *netlist = *i;
 
 #define FOREACH_END }} while(0)
 
-
-int toporoute(toporouter_t *r);
-toporouter_t *toporouter_new(void);
-PadType *AddPad(toporouter_t *r, char *Name,
-            gdouble P1X, gdouble P1Y, gdouble P2X, gdouble P2Y,gdouble Thickness,
-            gdouble Radius, ShapeType Shape, unsigned int Layer, gdouble OriginX, gdouble OriginY);
-void AllocateLayers(toporouter_t *r, int NumLayers);
-toporouter_bbox_t *toporouter_bbox_locate(toporouter_t *r, toporouter_term_t type, void *data, gdouble x, gdouble y, guint layergroup);
-toporouter_netlist_t *netlist_create(toporouter_t *r, char *netlist, char *style);
-toporouter_cluster_t *cluster_create(toporouter_t *r, toporouter_netlist_t *netlist);
-void cluster_join_bbox(toporouter_cluster_t *cluster, toporouter_bbox_t *box);
-void build_cdt(toporouter_t *r, toporouter_layer_t *l);
-int read_board_constraints(toporouter_t *r, toporouter_layer_t *l, int layer);
-void TopoSetSettings(gdouble Keepaway, gdouble LineThickness);
-void TopoSetPCBSettings(int MaxWidth, int MaxHeight, int NumLayers);
-void AddRat(toporouter_t *r, double P1X, double P1Y, double P2X, double P2Y, int Group1, int Group2);
-
-#endif // TOPOROUTER_H
+// Exported functions to be linked into the C++-Qt4 frontend
+extern toporouter_t *toporouter_new(void);
+extern guint hybrid_router(toporouter_t *r);
+extern void build_cdt(toporouter_t *r, toporouter_layer_t *l) ;
+extern toporouter_netlist_t *netlist_create(toporouter_t *r, char *netlist, char *style);
+extern toporouter_cluster_t *cluster_create(toporouter_t *r, toporouter_netlist_t *netlist);
+extern toporouter_bbox_t *toporouter_bbox_locate(toporouter_t *r, toporouter_term_t type, void *data, gdouble x, gdouble y, guint layergroup);
+extern GList *rect_with_attachments(gdouble rad,
+    gdouble x0, gdouble y0,
+    gdouble x1, gdouble y1,
+    gdouble x2, gdouble y2,
+    gdouble x3, gdouble y3,
+    gdouble z);
+extern toporouter_bbox_t *
+toporouter_bbox_create(int layer, GList *vertices, toporouter_term_t type, gpointer data);
+extern void
+insert_constraints_from_list(toporouter_t *r, toporouter_layer_t *l, GList *vlist, toporouter_bbox_t *box);
+extern gdouble cartesian_gradient(gdouble x0, gdouble y0, gdouble x1, gdouble y1);
+extern GtsVertex *
+insert_vertex(toporouter_t *r, toporouter_layer_t *l, gdouble x, gdouble y, toporouter_bbox_t *box);
+extern void
+vertex_outside_segment(toporouter_spoint_t *a, toporouter_spoint_t *b, gdouble r, toporouter_spoint_t *p);
+extern void
+vertices_on_line (toporouter_spoint_t *a,
+                  double m,
+                  double r,
+                  toporouter_spoint_t *b0,
+                  toporouter_spoint_t *b1);
+extern gdouble
+perpendicular_gradient(gdouble m);
+extern int
+wind(toporouter_spoint_t *p1, toporouter_spoint_t *p2, toporouter_spoint_t *p3);
+extern void
+cluster_join_bbox(toporouter_cluster_t *cluster, toporouter_bbox_t *box);
+#endif /* PCB_TOPOROUTER_H */

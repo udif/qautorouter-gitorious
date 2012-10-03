@@ -20,7 +20,9 @@
 #include <cpcbplace.h>
 #include <cpcbplacement.h>
 #include <cpcbpath.h>
+
 #include <iostream>
+#include <QDebug>
 
 #define GEDA_SCALE 100
 
@@ -148,33 +150,36 @@ QString TopoRouter::currentStatus()
 /**
   * @brief perform initialization
   */
-bool TopoRouter::start(CPcb* pcb)
+bool TopoRouter::start(CPcb* pcb, QSettings* settings )
 {
 	netStack().clear();
 	mPcb = pcb;
 	setState(Idle);
 	mStartTime = QDateTime::currentDateTime();
+    mAutoRouterSettings=settings;
 
         TopoRouterHandle = toporouter_new();
+        TopoRouterHandle->viacost=mAutoRouterSettings->value("ViaCosts").toDouble();
 
         if ( mPcb != NULL && mPcb->network() != NULL && TopoRouterHandle != NULL)
-	{
+        {
             CPcbStructure *S = mPcb->structure();
             CPcbBoundary *B = S->boundary();
 
-            TopoSetSettings(1, 800);
+//             TopoSetSettings(settings->value("KeepAway").toDouble(), settings->value("LineThickness").toDouble());
             //std::cout << "PCB Size : " << mPcb->structure()->boundary()->path()->x() << std::endl;
             //TopoSetPCBSettings(mPcb->structure()->boundary()->boundingRect().x() * GEDA_SCALE, mPcb->structure()->boundingRect().y() * GEDA_SCALE, mPcb->structure()->layers());
-            TopoSetPCBSettings(10000 * GEDA_SCALE, -10000 * GEDA_SCALE, mPcb->structure()->layers());
+//             TopoSetPCBSettings(10000 * GEDA_SCALE, -10000 * GEDA_SCALE, mPcb->structure()->layers());
 
-            AllocateLayers(TopoRouterHandle, mPcb->structure()->layers());
+//             AllocateLayers(TopoRouterHandle, mPcb->structure()->layers());
+            hybrid_router(TopoRouterHandle);
 
             setState(Selecting);
             QObject::connect(this,SIGNAL(status(QString)),mPcb,SIGNAL(status(QString)));
             QObject::connect(this,SIGNAL(clearCache()),mPcb,SLOT(clearCache()));
             return true;
-	}
-	return false;
+        }
+        return false;
 }
 
 /**
@@ -225,30 +230,6 @@ void TopoRouter::select()
 
 void TopoRouter::route(CPcbNet* net, CGSegment* segment)
 {
-  #if 0
-    {
-            CPcbNet* net = netStack().pop();
-            CGWire& wire = net->wire();
-            selectNet(net,true);
-
-            for( int n=0; running() && n < wire.segments(); n++)
-            {
-                    CGSegment* segment = wire.segment(n);
-                    route(net,segment);
-                    emit status(currentStatus());
-            }
-            selectNet(net,false);
-    }
-    segment->setWidth(20);
-        segment->setRouted(true);
-        segment->update();
-	pcb()->yield();				/* give up some CPU to the main app */
-        for(int n=0; running() && n < segment->segments(); n++)
-        {
-                CGSegment* child = segment->segment(n);
-                route(net,child);
-        }
-#endif
 }
 
 /**
@@ -277,6 +258,8 @@ void TopoRouter::getPads()
 
             for(int PadNum = 0; PadNum < Place->pads(); PadNum ++)
             {
+                qDebug() << "------------------" << __FUNCTION__ << ": ------------------";
+                
                 QString PinName = Place->unit();
                 qreal OriginX, OriginY;
                 CPcbPin* Pin = Place->pin(Place->pad(PadNum)->pinRef());
@@ -288,36 +271,30 @@ void TopoRouter::getPads()
                 for(int ShapeNum = 0; ShapeNum < Pin->padstack()->shapes(); ShapeNum ++)
                 {
                     CPcbShape* Shape = Pin->padstack()->shape(ShapeNum);
-                    int Layer;
+                    unsigned int Layer;
                     qreal X1,Y1,X2,Y2;
-                    qreal XOut1, YOut1, XOut2, YOut2;
-
+                    qreal XOut1, YOut1, XOut2, YOut2, Thickness, Radius;
+                    Thickness=mAutoRouterSettings->value("Thickness",1500).toDouble();;
+                    Radius=mAutoRouterSettings->value("Radius",100).toDouble();;
 
                     Shape->shape().boundingRect().getCoords(&X1, &Y1, &X2, &Y2);
 
 
                     OriginX = Pin->pos().x();
                     OriginY = Pin->pos().y();
-
-                    std::cout << "Shape: " << X1 << "," << Y1 << " x " << X2 << "," << Y2 << std::endl;
-                    std::cout << "    Layer: " << qPrintable(Shape->layer()) << std::endl;
+                    qDebug() << "\tShape: " << X1 << "," << Y1 << " x " << X2 << "," << Y2;
+                    qDebug() << "\tLayer: " << qPrintable(Shape->layer());
 
 #warning Add proper layer support
-                    if(Shape->layer().contains("Front"))
-                    {
-                        Layer = 0;
-                    }
-                    else
-                    {
-                        Layer = 1;
-                    }
 
+                    Layer=(Shape->layer().contains("Front"))?0:(mPcb->structure()->layers()-1);
+                    
                     /* For this pad, calculate where it is relative to the component centre */
                     X1 += Pin->pos().x();
                     X2 += Pin->pos().x();
                     Y1 += Pin->pos().y();
                     Y2 += Pin->pos().y();
-                    std::cout << "ShapeTranslated: " << X1 << "," << Y1 << " x " << X2 << "," << Y2 << std::endl;
+                    qDebug() << "\t\tShapeTranslated: " << X1 << "," << Y1 << " x " << X2 << "," << Y2;
 
                     /* Then transform it by the component position / orientation matrix */
                     Transform.map(X1, Y1, &XOut1, &YOut1);
@@ -332,20 +309,204 @@ void TopoRouter::getPads()
                     OriginX *= GEDA_SCALE;
                     OriginY *= GEDA_SCALE;
 
-                    std::cout << "Shape " << qPrintable(PinName) << " Transformed: " << XOut1 << "," << YOut1 << " x " << XOut2 << "," << YOut2 << std::endl;
+                    qDebug() << "\t\tShape " << qPrintable(PinName) << " Transformed: " << XOut1 << "," << YOut1 << " x " << XOut2 << "," << YOut2;
 
-                    UsedPadList.append(AddPad(TopoRouterHandle, (char *)qPrintable(PinName),
-                            XOut1, YOut1, XOut2, YOut2, XOut2-XOut1, 1500, SQUAREFLAG, Layer,
-                            OriginX, OriginY));
+                    PadType* tmpPad = addPad(TopoRouterHandle, (char *)qPrintable(PinName),
+                             XOut1, YOut1, XOut2, YOut2, Radius, Thickness, SQUAREFLAG, Layer );
+                    
+//                     if(tmpPad!=NULL) UsedPadList.append(tmpPad);
                 }
+                
+                qDebug() << "----------------------------------------------";
             }
 
         }
         for(int i = 0; i < mPcb->structure()->layers(); i++)
         {
+            qDebug() << "build_cdt, run " << i;
             build_cdt(TopoRouterHandle, &(TopoRouterHandle->layers[i]));
         }
     }
+}
+
+PadType *TopoRouter::addPad(toporouter_t *r, char *Name,
+                              qreal &P1X, qreal &P1Y, qreal &P2X, qreal &P2Y, qreal& Thickness,
+                              qreal& Radius, int Shape, unsigned int& Layer)
+{
+    toporouter_spoint_t p[2], rv[5];
+    gdouble x[2], y[2], t, m;
+    GList *objectconstraints;
+    toporouter_layer_t *l = &(r->layers[Layer]);
+    GList *vlist = NULL;
+    toporouter_bbox_t *bbox = NULL;
+    PadType *NewPad = (PadType *)g_malloc(sizeof(PadType));
+#warning Memory leak: This is never freed!
+    objectconstraints = NULL;
+
+    if(!NewPad)
+    {
+        printf("Could not allocate memory for pad\n");
+        exit(1);
+    }
+    t = Thickness / 2.0f;
+    x[0] = P1X;
+    x[1] = P2X;
+    y[0] = P1Y;
+    y[1] = P2Y;
+
+#warning Memory leak: String needs to be freed
+    NewPad->Name = strdup(Name);
+    if(!NewPad->Name)
+    {
+        printf("Could not allocate memory for string\n");
+        exit(1);
+    }
+    NewPad->Thickness = Thickness;
+    NewPad->Point1.X = P1X;
+    NewPad->Point1.Y = P1Y;
+    NewPad->Point2.X = P2X;
+    NewPad->Point2.Y = P2X;
+
+    if(SQUAREFLAG == Shape)
+    {
+        qDebug() << __FUNCTION__ << " Square or oblong pad. Four points and four constraint edges are used";
+        /* Square or oblong pad. Four points and four constraint edges are
+        * used */
+        if(x[0] == x[1] && y[0] == y[1])
+        {
+            qDebug() << __FUNCTION__ << " Pad is square";
+            /* Pad is square */
+            vlist = rect_with_attachments(Radius,
+                x[0]-t, y[0]-t,
+                x[0]-t, y[0]+t,
+                x[0]+t, y[0]+t,
+                x[0]+t, y[0]-t,
+                Layer);
+
+            bbox = toporouter_bbox_create(Layer, vlist, PAD, NewPad);
+            r->bboxes = g_slist_prepend(r->bboxes, bbox);
+            insert_constraints_from_list(r, l, vlist, bbox);
+
+            g_list_free(vlist);
+
+            bbox->point = GTS_POINT( insert_vertex(r, l, x[0], y[0], bbox) );
+            g_assert(TOPOROUTER_VERTEX(bbox->point)->bbox == bbox);
+        }
+        else
+        {
+            qDebug() << __FUNCTION__ << "  Pad is diagonal oblong or othogonal oblong";
+            /* Pad is diagonal oblong or othogonal oblong */
+
+            m = cartesian_gradient(x[0], y[0], x[1], y[1]);
+
+            p[0].x = x[0]; p[0].y = y[0];
+            p[1].x = x[1]; p[1].y = y[1];
+
+            vertex_outside_segment(&p[0], &p[1], t, &rv[0]);
+            vertices_on_line(&rv[0], perpendicular_gradient(m), t, &rv[1], &rv[2]);
+
+            vertex_outside_segment(&p[1], &p[0], t, &rv[0]);
+            vertices_on_line(&rv[0], perpendicular_gradient(m), t, &rv[3], &rv[4]);
+
+            if(wind(&rv[1], &rv[2], &rv[3]) != wind(&rv[2], &rv[3], &rv[4]))
+            {
+                rv[0].x = rv[3].x; rv[0].y = rv[3].y;
+                rv[3].x = rv[4].x; rv[3].y = rv[4].y;
+                rv[4].x = rv[0].x; rv[4].y = rv[0].y;
+            }
+
+            vlist = rect_with_attachments(Radius,
+                rv[1].x, rv[1].y,
+                rv[2].x, rv[2].y,
+                rv[3].x, rv[3].y,
+                rv[4].x, rv[4].y,
+                Layer);
+
+            qDebug() << __FUNCTION__ << "toporouter_bbox_create(Layer, vlist, PAD, NewPad)";
+            bbox = toporouter_bbox_create(Layer, vlist, PAD, NewPad);
+            r->bboxes = g_slist_prepend(r->bboxes, bbox);
+            insert_constraints_from_list(r, l, vlist, bbox);
+            /*
+            g_list_free(vlist);
+
+            printf("Pad %s: OBLONG : rect_with_attachments(%2.2f, %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f,  %2.2f)\n",
+                            NewPad->Name, (double)Radius,
+                            (double)rv[1].x, (double)rv[1].y,
+                            (double)rv[2].x, (double)rv[2].y,
+                            (double)rv[3].x, (double)rv[3].y,
+                            (double)rv[4].x, (double)rv[4].y,
+                            (double)(Layer));
+
+            //bbox->point = GTS_POINT( gts_vertex_new(vertex_class, (x[0] + x[1]) / 2., (y[0] + y[1]) / 2., 0.) );
+            bbox->point = GTS_POINT( insert_vertex(r, l, (x[0] + x[1]) / 2., (y[0] + y[1]) / 2., bbox) );
+            g_assert(TOPOROUTER_VERTEX(bbox->point)->bbox == bbox);
+            */
+        }
+    }
+    else
+    {
+        /* Either round pad or pad with curved edges */
+
+        if(x[0] == x[1] && y[0] == y[1])
+        {
+            /* One point */
+
+            /* bounding box same as square pad */
+            vlist = rect_with_attachments(Radius,
+            x[0]-t, y[0]-t,
+            x[0]-t, y[0]+t,
+            x[0]+t, y[0]+t,
+            x[0]+t, y[0]-t,
+            l - r->layers);
+            bbox = toporouter_bbox_create(l - r->layers, vlist, PAD, NewPad);
+            r->bboxes = g_slist_prepend(r->bboxes, bbox);
+            g_list_free(vlist);
+
+            //bbox->point = GTS_POINT( insert_vertex(r, l, x[0], y[0], bbox) );
+            bbox->point = GTS_POINT( insert_vertex(r, l, x[0], y[0], bbox) );
+
+        }
+        else
+        {
+            /* Two points and one constraint edge */
+
+            /* the rest is just for bounding box */
+            m = cartesian_gradient(x[0], y[0], x[1], y[1]);
+
+            p[0].x = x[0]; p[0].y = y[0];
+            p[1].x = x[1]; p[1].y = y[1];
+
+            vertex_outside_segment(&p[0], &p[1], t, &rv[0]);
+            vertices_on_line(&rv[0], perpendicular_gradient(m), t, &rv[1], &rv[2]);
+
+            vertex_outside_segment(&p[1], &p[0], t, &rv[0]);
+            vertices_on_line(&rv[0], perpendicular_gradient(m), t, &rv[3], &rv[4]);
+
+            if(wind(&rv[1], &rv[2], &rv[3]) != wind(&rv[2], &rv[3], &rv[4]))
+            {
+                rv[0].x = rv[3].x; rv[0].y = rv[3].y;
+                rv[3].x = rv[4].x; rv[3].y = rv[4].y;
+                rv[4].x = rv[0].x; rv[4].y = rv[0].y;
+            }
+
+            vlist = rect_with_attachments(Radius,
+            rv[1].x, rv[1].y,
+            rv[2].x, rv[2].y,
+            rv[3].x, rv[3].y,
+            rv[4].x, rv[4].y,
+            l - r->layers);
+            bbox = toporouter_bbox_create(l - r->layers, vlist, PAD, NewPad);
+            r->bboxes = g_slist_prepend(r->bboxes, bbox);
+            insert_constraints_from_list(r, l, vlist, bbox);
+            g_list_free(vlist);
+
+            //bbox->point = GTS_POINT( gts_vertex_new(vertex_class, (x[0] + x[1]) / 2., (y[0] + y[1]) / 2., 0.) );
+            bbox->point = GTS_POINT( insert_vertex(r, l, (x[0] + x[1]) / 2., (y[0] + y[1]) / 2., bbox) );
+
+            //bbox->constraints = g_list_concat(bbox->constraints, insert_constraint_edge(r, l, x[0], y[0], x[1], y[1], bbox));
+        }
+    }
+    return NewPad;
 }
 
 /**
@@ -378,12 +539,11 @@ PadType *TopoRouter::FindPad(QString PadName, int Layer)
   */
 void TopoRouter::getNets()
 {
-    QList<RatLineType *> Rats;
+    QList<RatType *> Rats;
 
     if(pcb())
     {
         TopoRouterHandle->bboxtree = gts_bb_tree_new(TopoRouterHandle->bboxes);
-
         QList<CSpecctraObject*> Nets = pcb()->collect("net");
 
         for(int NetNum=0; NetNum < Nets.count(); NetNum ++)
@@ -396,6 +556,7 @@ void TopoRouter::getNets()
             // No idea what the last argument (char *Style) is and why we need it.. NULL in examples I've looked at so far
             toporouter_netlist_t *TopoNetList = netlist_create(TopoRouterHandle, (char *)qPrintable(NetName), NULL);
 
+#if 0
             if(Net->padstacks() > 0)
             {
                 PadType *Pad1;
@@ -407,14 +568,12 @@ void TopoRouter::getNets()
                     PadType *Pad = FindPad(PadStack->unitRef(), 0);
 
                     // Presuming we only have one segment.. Can we have more??
-                    std::cout << "Pin: " << qPrintable(PadStack->unitRef()) << ", Pos: " << Pad->Origin.X << "," << Pad->Origin.Y << std::endl;
 
                     toporouter_cluster_t *TopoCluster = cluster_create(TopoRouterHandle, TopoNetList);
 
     #warning Nets should be supporting more than pads
     #warning Last arg (0) is layer.. We should support other layers
-                    toporouter_bbox_t *TopoBox = toporouter_bbox_locate(TopoRouterHandle, PAD, Pad,
-                        Pad->Origin.X, Pad->Origin.Y, 0);
+                    toporouter_bbox_t *TopoBox = toporouter_bbox_locate(TopoRouterHandle, PAD, Pad, Pad->Point1.X, Pad->Point1.Y, 0);
 
                     if(TopoBox)
                     {
@@ -433,43 +592,48 @@ void TopoRouter::getNets()
                     }
                     else
                     {
-                        RatLineType *Rat = (RatLineType *)malloc(sizeof(RatLineType));
+                        RatType *Rat = (RatType *)malloc(sizeof(RatType));
                         if(!Rat)
                         {
                             printf("Could not allocate memory for rat\n");
                             exit(1);
                         }
-                        Rat->Pad1 = Pad1;
-                        Rat->Pad2 = Pad;
+                        Rat->Point1 = Pad1->Point1;
+                        Rat->Point2 = Pad->Point1;
                         Rats.append(Rat);
                     }
                 }
             }
         }
+#endif
 
         /* Now add all our rats */
-        RatLineType *Rat;
+#if 0
+        RatType *Rat;
         while(Rats.count())
         {
             Rat = Rats.takeFirst();
 
-            AddRat(TopoRouterHandle, Rat->Pad1->Origin.X, Rat->Pad1->Origin.Y, Rat->Pad2->Origin.X, Rat->Pad2->Origin.Y, Rat->Pad1->Group, Rat->Pad2->Group);
+            AddRat(TopoRouterHandle, Rat->Point1.X, Rat->Point2.Y, Rat->Point2.X, Rat->Point2.Y, Rat->group1, Rat->group1);
             free(Rat);
         }
-    }
-}
+#endif
+        }
+}}
 
 /**
   * @brief route the current net.
   */
 void TopoRouter::route()
 {
-
     if(pcb())
     {
+        qDebug() << "Starging routing the net";
         getPads();
         getNets();
-        toporoute(TopoRouterHandle);
+        qDebug() << "\tNumber of nets: " << TopoRouterHandle->netlists->len;
+//         toporoute(TopoRouterHandle);
+        hybrid_router(TopoRouterHandle);
         setState(Idle);
     }
 }
