@@ -9,6 +9,7 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include <QFile>
+#include <QSettings>
 #include <QCloseEvent>
 #include <QDialog>
 #include <QWheelEvent>
@@ -107,6 +108,7 @@ class QAutoRouter : public QMainWindow
 		QString					mFileName;
 		QPluginLoader			mPluginLoader;
 		CPluginInterface*		mAutoRouter;
+		QSettings*			mAutoRouterRules;
 };
 
 #endif // QAUTOROUTER_H

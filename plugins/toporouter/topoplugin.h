@@ -5,6 +5,8 @@
 #ifndef TOPOPLUGIN_H
 #define TOPOPLUGIN_H
 
+#include <stdlib.h>
+#include <QContiguousCacheData>
 #include <QObject>
 #include <QString>
 #include <QDateTime>
@@ -69,16 +71,13 @@ class TopoRouter : public QObject, public CPluginInterface
 
 	private:
 		CPcb*						mPcb;
-        QSettings*                  mAutoRouterSettings;
+		QSettings*					mAutoRouterSettings;
 		QDateTime					mStartTime;
 		tRunState					mState;
-        QStack<CPcbNet*>                                mNetStack;						/** the current work stack */
-        QRectF						mBoundingBox;					/** the expanding bounding box */
-        toporouter_t*                                   TopoRouterHandle;
-        QList<PadType *>                                UsedPadList;
-        PadType *addPad(toporouter_t *r, char *Name,
-                              qreal &P1X, qreal &P1Y, qreal &P2X, qreal &P2Y, qreal& Thickness,
-                              qreal& Radius, int Shape, unsigned int& Layer);
+		QStack<CPcbNet*>				mNetStack;						/** the current work stack */
+		QRectF						mBoundingBox;					/** the expanding bounding box */
+		toporouter_t*					TopoRouterHandle;
+		QList<PadType*>					UsedPadList;
 };
 
 #endif // TOPOROUTER_H

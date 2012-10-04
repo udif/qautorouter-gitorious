@@ -137,7 +137,7 @@ QString SimpleRouter::currentStatus()
 /**
   * @brief perform initialization
   */
-bool SimpleRouter::start(CPcb* pcb)
+bool SimpleRouter::start(CPcb* pcb, QSettings *s)
 {
 	netStack().clear();
 	mPcb = pcb;

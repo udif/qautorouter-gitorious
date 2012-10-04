@@ -67,7 +67,6 @@ void QAutoRouter::writeSettings()
 	settings.setValue("visibilityPlanes",	preferences->visibilityPlanes->isChecked());
 	settings.setValue("visibilityOutlines",	preferences->visibilityOutlines->isChecked());
 	settings.setValue("visibilityBorders",	preferences->visibilityBorders->isChecked());
-
 }
 
 /**
@@ -146,6 +145,8 @@ void QAutoRouter::readSettings()
 	CSpecctraObject::globalVisibility()[CSpecctraObject::Plane]		=	preferences->visibilityPlanes->isChecked();
 	CSpecctraObject::globalVisibility()[CSpecctraObject::Outline]	=	preferences->visibilityOutlines->isChecked();
 	CSpecctraObject::globalVisibility()[CSpecctraObject::Border]	=	preferences->visibilityBorders->isChecked();
+
+	mAutoRouterRules=new QSettings("8bit.zapto.org", "QAutoRouterRules");
 }
 
 /**

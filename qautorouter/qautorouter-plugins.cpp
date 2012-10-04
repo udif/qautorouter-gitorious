@@ -36,7 +36,7 @@ void QAutoRouter::start()
 					{
 						QEventLoop loop;
 						ui->actionStart->setEnabled(false);
-						autorouter()->start(pcb());
+						autorouter()->start(pcb(),mAutoRouterRules);
 						while ( autorouter() != NULL && autorouter()->exec() )
 						{
 							loop.processEvents();

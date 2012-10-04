@@ -90,7 +90,7 @@ void ChangeArcAngles (LayerType *, ArcType *, Angle, Angle);
 char *UniqueElementName (DataType *, char *);
 void AttachForCopy (Coord, Coord);
 double GetValue (const char *, const char *, bool *);
-static double GetValueEx (const char *, const char *, bool *, UnitList, const char *);
+double GetValueEx (const char *, const char *, bool *, UnitList, const char *);
 int FileExists (const char *);
 char *Concat (const char *, ...);	/* end with NULL */
 

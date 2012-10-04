@@ -32,7 +32,7 @@ class SimpleRouter : public QObject, public CPluginInterface
 		virtual QString				description() const;			/* a brief description of the plugin */
 		virtual QStringList			license() const;				/* the license text for the plugin */
 
-		virtual bool				start(CPcb* pcb);				/** initialize, gets' called once prior to exec() being called */
+		virtual bool				start(CPcb*, QSettings*);				/** initialize, gets' called once prior to exec() being called */
 		virtual void				stop();							/** stop processing */
 		virtual bool				exec();							/** get's called repeatedly while exec() returns true, return false to stop */
 		virtual QString				elapsed();						/** elapsed time of the run in hh:mm:ss format */
