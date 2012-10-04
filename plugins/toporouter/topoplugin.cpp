@@ -236,6 +236,23 @@ void TopoRouter::route(CPcbNet* net, CGSegment* segment)
   */
 void TopoRouter::getPads()
 {
+	 if(pcb()) {
+	 	qDebug() << "Feeding our SPECTRA objects to the gEDA-format PCB";
+
+		QList<CSpecctraObject*> Places = pcb()->collect("place");
+		for(int PlaceNum=0; PlaceNum < Places.count(); PlaceNum ++) {
+			CPcbPlace* Place = (CPcbPlace*)Places.at(PlaceNum);
+			for(int PadNum = 0; PadNum < Place->pads(); PadNum ++) {
+				CPcbPin* Pin = Place->pin(Place->pad(PadNum)->pinRef());
+				for(int ShapeNum = 0; ShapeNum < Pin->padstack()->shapes(); ShapeNum ++) {
+
+					//g_list_append(PCB->Data->Element,pad);
+					qDebug() << "Pad stack loop";
+				}
+			}
+		}
+		import_geometry(TopoRouterHandle);
+	}
 }
 
 /**

@@ -515,4 +515,7 @@ extern int
 wind(toporouter_spoint_t *p1, toporouter_spoint_t *p2, toporouter_spoint_t *p3);
 extern void
 cluster_join_bbox(toporouter_cluster_t *cluster, toporouter_bbox_t *box);
+extern void
+import_geometry(toporouter_t *r);
+
 #endif /* PCB_TOPOROUTER_H */
