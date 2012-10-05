@@ -18,6 +18,7 @@ unix {
 SOURCES += topoplugin.cpp
 SOURCES += toporouter.c
 SOURCES += data.c
+SOURCES += find.c
 
 HEADERS += toporouter.h
 HEADERS += topoplugin.h

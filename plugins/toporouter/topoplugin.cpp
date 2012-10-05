@@ -3,6 +3,7 @@
 * Author: Mike Sharkey <mike@pikeaero.com>                                     *
 *******************************************************************************/
 #include "topoplugin.h"
+#include "../../../qautorouter/specctra/include/cpcbpin.h"
 
 #include <cspecctraobject.h>
 #include <cpcb.h>
@@ -238,18 +239,30 @@ void TopoRouter::getPads()
 {
 	 if(pcb()) {
 	 	qDebug() << "Feeding our SPECTRA objects to the gEDA-format PCB";
+		if(PCB==NULL)
+			PCB=new PCBType();
+
+		if(PCB->Data==NULL)
+			PCB->Data=new DataType();
 
 		QList<CSpecctraObject*> Places = pcb()->collect("place");
 		for(int PlaceNum=0; PlaceNum < Places.count(); PlaceNum ++) {
+			//Iterates over the different part case type groups (SOIC,DIP,etc.)
+			ElementType* element = new ElementType();
 			CPcbPlace* Place = (CPcbPlace*)Places.at(PlaceNum);
 			for(int PadNum = 0; PadNum < Place->pads(); PadNum ++) {
 				CPcbPin* Pin = Place->pin(Place->pad(PadNum)->pinRef());
+				PadType* pad = new PadType();
+				pad->Point1.X=Pin->x();
+				pad->Point2.X=Pin->x();
+				pad->Point1.Y=Pin->y();
+				pad->Point2.Y=Pin->y();
+				g_list_append(element->Pad,pad);
 				for(int ShapeNum = 0; ShapeNum < Pin->padstack()->shapes(); ShapeNum ++) {
-
-					//g_list_append(PCB->Data->Element,pad);
 					qDebug() << "Pad stack loop";
 				}
 			}
+			g_list_append(PCB->Data->Element,element);
 		}
 		import_geometry(TopoRouterHandle);
 	}
