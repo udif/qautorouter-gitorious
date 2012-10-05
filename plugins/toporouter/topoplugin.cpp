@@ -306,6 +306,13 @@ void TopoRouter::getNets()
 		for(int NetNum=0; NetNum < Nets.count(); NetNum ++)
 		{
 			qDebug() << "Here the ratnets should be shuffled into the PCB->Data->Rat list";
+			CPcbNet* Net = (CPcbNet*)Nets.at(NetNum);
+			RatType *line = new RatType();
+			line->Point1.X=Net->x();
+			line->Point2.X=Net->x();
+			line->Point1.Y=Net->y();
+			line->Point2.Y=Net->y();
+			g_list_append(PCB->Data->Rat,line);
 		}
 	}
 }
