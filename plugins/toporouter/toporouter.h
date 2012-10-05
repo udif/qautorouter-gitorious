@@ -518,4 +518,6 @@ cluster_join_bbox(toporouter_cluster_t *cluster, toporouter_bbox_t *box);
 extern void
 import_geometry(toporouter_t *r);
 
+void Message(char *c,...);
+
 #endif /* PCB_TOPOROUTER_H */

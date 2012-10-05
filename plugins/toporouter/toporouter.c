@@ -1118,7 +1118,7 @@ toporouter_free(toporouter_t *r)
   time_delta = endtime.tv_sec - r->starttime.tv_sec +
                (endtime.tv_usec - r->starttime.tv_usec) / 1000000.;
 
-//   Message(_("Elapsed time: %.2f seconds\n"), time_delta);
+  Message(_("Elapsed time: %.2f seconds\n"), time_delta);
   free(r->layers);  
   free(r);
 
@@ -6500,12 +6500,12 @@ toporouter_export(toporouter_t *r)
     i = i->next;
   }
 
-//   Message (_("Reticulating splines... successful\n\n"));
+   Message (_("Reticulating splines... successful\n\n"));
   /* NB: We could use the %$mS specifier to print these distances, but we would
    *     have to cast to Coord, which might overflow for complex routing when
    *     PCB is built with Coord as a 32-bit integer.
    */
-//   Message (_("Wiring cost: %f inches\n"), COORD_TO_INCH (r->wiring_score));
+   Message (_("Wiring cost: %f inches\n"), COORD_TO_INCH (r->wiring_score));
   printf ("Wiring cost: %f inches\n", COORD_TO_INCH (r->wiring_score));
 
   g_list_free(oproutes);
@@ -7293,7 +7293,7 @@ roar_router(toporouter_t *r, gint failcount, gint threshold)
 {
   gint pfailcount = failcount +1;
 
-//   Message(_("ROAR router: "));
+  Message(_("ROAR router: "));
   for(guint j=0;j<6;j++) {
     GList *failed = g_list_copy(r->failednets), *k = failed;
 
@@ -7307,10 +7307,10 @@ roar_router(toporouter_t *r, gint failcount, gint threshold)
     printf("\tROAR pass %d - %d routed -  %d failed\n", j, g_list_length(r->routednets), g_list_length(r->failednets));
 
     if(!failcount || failcount >= pfailcount) {
-//       Message(_("%d nets remaining\n"), failcount);
+       Message(_("%d nets remaining\n"), failcount);
       break;
     }
-//     Message(_("%d -> "), failcount);
+     Message(_("%d -> "), failcount);
     pfailcount = failcount;
   }
 
@@ -7486,7 +7486,7 @@ hybrid_router(toporouter_t *r)
   r->flags |= TOPOROUTER_FLAG_AFTERRUBIX;
   failcount = rubix_router(r, failcount);
 
-//   Message(_("RUBIX router: %d nets remaining\n"), failcount);
+  Message(_("RUBIX router: %d nets remaining\n"), failcount);
   printf("RUBIX router: %d nets remaining\n", failcount);
 
   r->flags |= TOPOROUTER_FLAG_GOFAR;
@@ -7570,9 +7570,9 @@ toporouter_new(void)
 
   gts_predicates_init();
 
-//   Message(_("Topological Autorouter\n"));
-//   Message(_("Started %s"),asctime(localtime(&ltime)));  
-//   Message(_("-------------------------------------\n"));
+  Message(_("Topological Autorouter\n"));
+  Message(_("Started %s"),asctime(localtime(&ltime)));  
+  Message(_("-------------------------------------\n"));
   return r;
 }
 

@@ -15,10 +15,15 @@ unix {
 	target.path = /opt/qautorouter/plugins
 	INSTALLS += target
 }
+
 SOURCES += topoplugin.cpp
 SOURCES += toporouter.c
+
+SOURCES += compatibility_wrapper.c
 SOURCES += data.c
 SOURCES += find.c
+SOURCES += mymem.c
+SOURCES += rats.c
 
 HEADERS += toporouter.h
 HEADERS += topoplugin.h
