@@ -159,6 +159,11 @@ bool TopoRouter::start(CPcb* pcb, QSettings* settings )
 	mStartTime = QDateTime::currentDateTime();
         mAutoRouterSettings=settings;
 
+	if(PCB==NULL) {
+		PCB=new PCBType();
+		PCB->Data=new DataType();
+	}
+
         TopoRouterHandle = toporouter_new();
         TopoRouterHandle->viacost=mAutoRouterSettings->value("ViaCosts").toDouble();
 
@@ -239,11 +244,7 @@ void TopoRouter::getPads()
 {
 	 if(pcb()) {
 	 	qDebug() << "Feeding our SPECTRA objects to the gEDA-format PCB";
-		if(PCB==NULL)
-			PCB=new PCBType();
 
-		if(PCB->Data==NULL)
-			PCB->Data=new DataType();
 
 		QList<CSpecctraObject*> Places = pcb()->collect("place");
 		for(int PlaceNum=0; PlaceNum < Places.count(); PlaceNum ++) {
@@ -298,6 +299,15 @@ PadType *TopoRouter::FindPad(QString PadName, int Layer)
   */
 void TopoRouter::getNets()
 {
+	if(pcb()) {
+	 	qDebug() << "Feeding our SPECTRA nets to the gEDA-format PCB";
+		TopoRouterHandle->bboxtree = gts_bb_tree_new(TopoRouterHandle->bboxes);
+		QList<CSpecctraObject*> Nets = pcb()->collect("net");
+		for(int NetNum=0; NetNum < Nets.count(); NetNum ++)
+		{
+			qDebug() << "Here the ratnets should be shuffled into the PCB->Data->Rat list";
+		}
+	}
 }
 
 /**
