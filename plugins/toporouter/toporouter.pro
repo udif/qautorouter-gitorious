@@ -4,6 +4,7 @@
 QT += gui core
 DEFINES+='COORD_TYPE="long long"'
 DEFINES+='COORD_MAX="LLONG_MAX"'
+DEFINES+='DEBUG_IMPORT'
 win32: CONFIG += qt plugin
 unix: CONFIG += dll plugin debug -std=c99
 QMAKE_CFLAGS += -std=c99 -Wl,--no-undefined
@@ -17,6 +18,7 @@ unix {
 }
 
 SOURCES += topoplugin.cpp
+SOURCES += topoplugin-intrinsics.cpp
 SOURCES += toporouter.c
 
 SOURCES += compatibility_wrapper.c
@@ -24,6 +26,7 @@ SOURCES += data.c
 SOURCES += find.c
 SOURCES += mymem.c
 SOURCES += rats.c
+SOURCES += set.c
 
 HEADERS += toporouter.h
 HEADERS += topoplugin.h

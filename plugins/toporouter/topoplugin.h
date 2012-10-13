@@ -67,7 +67,7 @@ class TopoRouter : public QObject, public CPluginInterface
                 void                                            getPads();                                      /** Assemble PCB's pads */
                 void                                            getNets();                                      /** Assemble PCB's nets */
                 QStack<CPcbNet*>&                               netStack()	{return mNetStack;}
-                PadType*                                        FindPad(QString PadName, int Layer);
+
 
 	private:
 		CPcb*						mPcb;
@@ -77,7 +77,20 @@ class TopoRouter : public QObject, public CPluginInterface
 		QStack<CPcbNet*>				mNetStack;						/** the current work stack */
 		QRectF						mBoundingBox;					/** the expanding bounding box */
 		toporouter_t*					TopoRouterHandle;
-		QList<PadType*>					UsedPadList;
+		QList<PadType*>					*UsedPadList;
+		
+	//Conversion functions
+		void ConvertGeometry();
+		void ConvertRats();
+		PadType* AddPad(toporouter_t* TopoRouterHandle, char* PadNameChar, qreal x1, qreal y1, qreal x2, qreal y2, double arg7, double arg8, unsigned long arg9, int arg10);
+	
+	//Creating objects for the PCB-tree
+		PadType* CreatePad(QString,qreal,qreal,qreal,qreal);
+		PinType* CreatePin(QString,QString,qreal,qreal,unsigned long);
+		
+	//Search functions
+		int FindLayer(QString layer);
+		PadType* FindPad(QString PadName, int Layer);
 };
 
 #endif // TOPOROUTER_H

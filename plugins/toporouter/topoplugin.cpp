@@ -157,34 +157,34 @@ bool TopoRouter::start(CPcb* pcb, QSettings* settings )
 	mPcb = pcb;
 	setState(Idle);
 	mStartTime = QDateTime::currentDateTime();
-        mAutoRouterSettings=settings;
+	mAutoRouterSettings=settings;
 
-	if(PCB==NULL) {
-		PCB=new PCBType();
-		PCB->Data=new DataType();
-	}
+	PCB=(PCBType*)g_malloc(sizeof(PCBType));
+	PCB->Data=(DataType*)g_malloc(sizeof(DataType));
+	PCB->Data->LayerN=mPcb->structure()->layers();
+// 	PCB->Data->Element=(GList*)g_malloc(sizeof(GList));
 
-        TopoRouterHandle = toporouter_new();
-        TopoRouterHandle->viacost=mAutoRouterSettings->value("ViaCosts").toDouble();
+	TopoRouterHandle = toporouter_new();
+	TopoRouterHandle->viacost=mAutoRouterSettings->value("ViaCosts").toDouble();
 
-        if ( mPcb != NULL && mPcb->network() != NULL && TopoRouterHandle != NULL)
-        {
-            CPcbStructure *S = mPcb->structure();
-            CPcbBoundary *B = S->boundary();
+	if ( mPcb != NULL && mPcb->network() != NULL && TopoRouterHandle != NULL)
+	{
+		CPcbStructure *S = mPcb->structure();
+		CPcbBoundary *B = S->boundary();
 
 //             TopoSetSettings(settings->value("KeepAway").toDouble(), settings->value("LineThickness").toDouble());
             //std::cout << "PCB Size : " << mPcb->structure()->boundary()->path()->x() << std::endl;
             //TopoSetPCBSettings(mPcb->structure()->boundary()->boundingRect().x() * GEDA_SCALE, mPcb->structure()->boundingRect().y() * GEDA_SCALE, mPcb->structure()->layers());
 //             TopoSetPCBSettings(10000 * GEDA_SCALE, -10000 * GEDA_SCALE, mPcb->structure()->layers());
 //             AllocateLayers(TopoRouterHandle, mPcb->structure()->layers());
-            hybrid_router(TopoRouterHandle);
+		hybrid_router(TopoRouterHandle);
 
-            setState(Selecting);
-            QObject::connect(this,SIGNAL(status(QString)),mPcb,SIGNAL(status(QString)));
-            QObject::connect(this,SIGNAL(clearCache()),mPcb,SLOT(clearCache()));
-            return true;
-        }
-        return false;
+		setState(Selecting);
+		QObject::connect(this,SIGNAL(status(QString)),mPcb,SIGNAL(status(QString)));
+		QObject::connect(this,SIGNAL(clearCache()),mPcb,SLOT(clearCache()));
+		return true;
+	}
+	return false;
 }
 
 /**
@@ -242,31 +242,7 @@ void TopoRouter::route(CPcbNet* net, CGSegment* segment)
   */
 void TopoRouter::getPads()
 {
-	 if(pcb()) {
-	 	qDebug() << "Feeding our SPECTRA objects to the gEDA-format PCB";
 
-
-		QList<CSpecctraObject*> Places = pcb()->collect("place");
-		for(int PlaceNum=0; PlaceNum < Places.count(); PlaceNum ++) {
-			//Iterates over the different part case type groups (SOIC,DIP,etc.)
-			ElementType* element = new ElementType();
-			CPcbPlace* Place = (CPcbPlace*)Places.at(PlaceNum);
-			for(int PadNum = 0; PadNum < Place->pads(); PadNum ++) {
-				CPcbPin* Pin = Place->pin(Place->pad(PadNum)->pinRef());
-				PadType* pad = new PadType();
-				pad->Point1.X=Pin->x();
-				pad->Point2.X=Pin->x();
-				pad->Point1.Y=Pin->y();
-				pad->Point2.Y=Pin->y();
-				g_list_append(element->Pad,pad);
-				for(int ShapeNum = 0; ShapeNum < Pin->padstack()->shapes(); ShapeNum ++) {
-					qDebug() << "Pad stack loop";
-				}
-			}
-			g_list_append(PCB->Data->Element,element);
-		}
-		import_geometry(TopoRouterHandle);
-	}
 }
 
 /**
@@ -274,24 +250,26 @@ void TopoRouter::getPads()
   */
 PadType *TopoRouter::FindPad(QString PadName, int Layer)
 {
-    int i = 0;
-    PadType *Ret = NULL;
+	PadName=PadName.trimmed();
+	int i = 0;
+	PadType *Ret = NULL;
 
-    while((i < UsedPadList.count()) && (!Ret))
-    {
-        PadType *Pad = (PadType *)UsedPadList.at(i);
-        if(0 == PadName.compare(Pad->Name))
-        {
-            //std::cout << "Pad compare found: [" << Pad->Name << "][" << qPrintable(PadName) << "]" << std::endl;
-            Ret = Pad;
-        }
-        i ++;
-    }
-    if(NULL == Ret)
-    {
-        std::cout << "Couldn't find pad " << qPrintable(PadName) << std::endl;
-    }
-    return Ret;
+	ALLPAD_LOOP(PCB->Data);
+	{
+		if(PadName.toLocal8Bit().data()==pad->Name)
+			Ret=pad;
+	}
+	END_LOOP;
+	END_LOOP;
+
+	if(NULL == Ret)
+		qDebug() << "Couldn't find pad " << qPrintable(PadName);
+
+	return Ret;
+}
+
+int TopoRouter::FindLayer(QString layer) {
+	
 }
 
 /**
@@ -317,6 +295,148 @@ void TopoRouter::getNets()
 	}
 }
 
+void TopoRouter::ConvertRats()
+{
+}
+
+PadType* TopoRouter::CreatePad(QString PadName,qreal x1, qreal y1, qreal x2, qreal y2)
+{
+	PadType* newPad = NULL;
+	newPad = (PadType*)g_malloc(sizeof(PadType));
+	if(newPad==NULL) {
+		qDebug() << "Couldn't create pad";
+		return NULL;
+	}
+
+	newPad->Name=PadName.toLocal8Bit().data();
+	newPad->Point1.X=x1;
+	newPad->Point2.X=x2;
+	newPad->Point1.Y=y1;
+	newPad->Point2.Y=y2;
+
+	return newPad;
+}
+
+PinType* TopoRouter::CreatePin(QString PinName,QString PinNumber, qreal x, qreal y, unsigned long flag) {
+	PinType *newPin = NULL;
+	newPin = (PinType*)g_malloc(sizeof(PinType));
+	if(newPin==NULL) {
+		qDebug() << "Couldn't create pin";
+		return NULL;
+	}
+	newPin->Name=PinName.toLocal8Bit().data();
+	newPin->Number=PinNumber.toLocal8Bit().data();
+	newPin->X=x;
+	newPin->Y=y;
+	newPin->Flags.f=flag;
+
+	return newPin;
+}
+
+void TopoRouter::ConvertGeometry()
+{
+	 if(pcb()) {
+		qDebug() << "Clearing the list of used pads";
+		UsedPadList = new QList<PadType*>;
+		PCB->Data->Element=NULL;
+// 		PCB->MaxWidth=pcb()->structure().collect();
+
+		qDebug() << "Feeding our SPECTRA geometry to the gEDA-format PCB";
+
+		QList<CSpecctraObject*> Places = pcb()->collect("place");
+		QList<CSpecctraObject*> Nets = pcb()->collect("net");
+		
+		ElementType* newElement;
+		RatType *newRat;
+		PadType* newPad;
+
+		CPcbPlace* Place;
+		CPcbShape* Shape;
+		CPcbPin* Pin;
+		CPcbNet* Rat;
+
+		int layer;
+		qreal x1,x2,y1,y2;
+		
+		PCB->Data->Rat=NULL;
+		for(int NetNum=0; NetNum < Nets.count(); NetNum ++) {
+			newRat = new RatType();
+			Rat = (CPcbNet*)Nets.at(NetNum);
+			QString NetName = Rat->name();
+			NetName.replace('"',"");
+			qDebug() << __FUNCTION__ << " Rat name: " << NetName;
+			Rat->shape().boundingRect().getCoords(&x1,&y1,&x2,&y2);
+			newRat->Point1.X=x1;
+			newRat->Point1.Y=y1;
+			newRat->Point2.X=x2;
+			newRat->Point2.Y=y2;
+			PCB->Data->Rat=g_list_append(PCB->Data->Rat,newRat);
+		}
+
+		for(int PlaceNum=0; PlaceNum < Places.count(); PlaceNum ++) {
+			newElement = (ElementType*)g_malloc(sizeof(ElementType));
+			Place = (CPcbPlace*)Places.at(PlaceNum);
+
+			qDebug() << __FUNCTION__ << " Unit name: " << Place->unit();
+
+			newElement->Pin=NULL; // First entry of Pin-List NULL, now we fill it.
+			for(int PadNum = 0; PadNum < Place->pads(); PadNum ++) {
+				Pin = Place->pin(Place->pad(PadNum)->pinRef());
+
+				QString PadName = "";
+				PadName+=Place->unit();
+				PadName+="-";
+				PadName+=Place->pad(PadNum)->pinRef();
+
+				qDebug() << " Pin number: " << Place->pad(PadNum)->pinRef();
+				if(Place->pad(PadNum)->net())
+					qDebug() << " Pin net: " << Place->pad(PadNum)->net()->name();
+				else
+					qDebug() << " Pin not in a net ";
+	
+				newElement->Pad=NULL;
+				for(int ShapeNum = 0; ShapeNum < Pin->padstack()->shapes(); ShapeNum ++) {
+					qDebug() << " Pad Name: " << qPrintable(PadName);
+					Shape = Pin->padstack()->shape(ShapeNum);
+					qDebug() << " on layer: " << Shape->layer();
+					layer=FindLayer(Shape->layer());
+					Shape->shape().boundingRect().getCoords(&x1, &y1, &x2, &y2);
+					newPad = CreatePad(PadName, x1, y1, x2, y2);
+					newElement->Pad=g_list_append(newElement->Pad,newPad);
+				}
+				newElement->Pin=g_list_append(newElement->Pin,
+					CreatePin(
+						(Place->pad(PadNum)->net())?(Place->pad(PadNum)->net()->name()):"none",
+						Place->pad(PadNum)->pinRef(),
+						Pin->x(),
+						Pin->y(),
+						SQUAREFLAG
+					)
+				);
+			}
+			PCB->Data->Element=g_list_append(PCB->Data->Element,newElement);
+		}
+		
+		/**
+		*	We are recently not importing ANY groups
+		*	If you're pissed by this fact. Sacrifice some marks yourself and implement
+		*	it instead doing homeworks for lecture like me right now... >.<
+		*/
+		for(int group=0;group<max_group;group++) {
+			PCB->LayerGroups.Number[group]=1;
+			PCB->LayerGroups.Entries[group][0]=group;
+// 			PCB->Data->Layer[group]=(LayerType*)g_malloc(sizeof(LayerType));
+			PCB->Data->Layer[group].Line=NULL;
+		}
+		
+		// We don't have vias yet...
+		PCB->Data->Via=NULL;
+
+		// Import geometry
+		import_geometry(TopoRouterHandle);
+	}
+}
+
 /**
   * @brief route the current net.
   */
@@ -325,12 +445,13 @@ void TopoRouter::route()
     if(pcb())
     {
         qDebug() << "Starging routing the net";
-        getPads();
-        getNets();
+		ConvertGeometry();
+//         getPads();
+//         getNets();
         qDebug() << "\tNumber of nets: " << TopoRouterHandle->netlists->len;
 //         toporoute(TopoRouterHandle);
-        hybrid_router(TopoRouterHandle);
-        setState(Idle);
+//         hybrid_router(TopoRouterHandle);
+//         setState(Idle);
     }
 }
 

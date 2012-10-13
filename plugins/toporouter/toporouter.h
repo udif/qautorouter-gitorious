@@ -517,6 +517,8 @@ extern void
 cluster_join_bbox(toporouter_cluster_t *cluster, toporouter_bbox_t *box);
 extern void
 import_geometry(toporouter_t *r);
+extern void
+acquire_twonets(toporouter_t *r);
 
 void Message(char *c,...);
 

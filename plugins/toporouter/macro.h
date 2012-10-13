@@ -217,7 +217,7 @@ extern int mem_any_set (unsigned char *, int);
   for (__iter = (top)->Element, __next = g_list_next (__iter);      \
        __iter != NULL;                                              \
        __iter = __next, __next = g_list_next (__iter), n++) {       \
-    ElementType *element = __iter->data;
+    ElementType *element = (ElementType*)__iter->data;
 
 #define RAT_LOOP(top) do {                                          \
   GList *__iter, *__next;                                           \
@@ -256,7 +256,7 @@ extern int mem_any_set (unsigned char *, int);
   for (__iter = (element)->Pad, __next = g_list_next (__iter);      \
        __iter != NULL;                                              \
        __iter = __next, __next = g_list_next (__iter), n++) {       \
-    PadType *pad = __iter->data;
+    PadType *pad = (PadType*)__iter->data;
 
 #define ARC_LOOP(element) do {                                      \
   GList *__iter, *__next;                                           \
